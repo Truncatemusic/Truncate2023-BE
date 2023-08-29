@@ -1,0 +1,6 @@
+POST http://{{host}}:{{port}}/auth/logout
+Content-Type: application/json
+
+{
+    "session": "{{session}}"
+}

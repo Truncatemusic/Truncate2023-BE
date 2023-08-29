@@ -72,6 +72,23 @@ export class AuthController {
         return { success: true, session };
     }
 
+    @Post('logout')
+    async logout(@Body() body: { session: string }) {
+        try {
+            const session = await this.prisma.tsession.delete({
+                where: { session: body.session },
+                select: { session: true }
+            });
+
+            return session?.session
+                ? { success: true }
+                : { success: false, reason: "UNKNOWN" }
+        }
+        catch (_) {
+            return { success: false, reason: "INVALID_SESSION" }
+        }
+    }
+
     @Patch('updateSession')
     async updateSession(@Body() body: { session: string }) {
         try {
