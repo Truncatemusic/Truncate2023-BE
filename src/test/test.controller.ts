@@ -1,3 +1,4 @@
+/*
 import { Controller, Get, Param } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
@@ -27,3 +28,4 @@ export class TestController {
     };
   }
 }
+*/
