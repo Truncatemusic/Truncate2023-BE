@@ -5,6 +5,24 @@ import {PrismaClient} from "@prisma/client";
 export class ProjectService {
     constructor(private readonly prisma: PrismaClient) {}
 
+    async getInfo(@Param('id') id: number) {
+        try {
+            const project = await this.prisma.tproject.findUnique({
+                where: {id: id}
+            });
+
+            return !Number.isInteger(project?.id)
+                ? { success: false, reason: "UNKNOWN" }
+                : {
+                success: true,
+                name: project.name
+            }
+        }
+        catch (_) {
+            return { success: false, reason: "UNKNOWN" }
+        }
+    }
+
     async createProject(@Param('userId') userId: number, @Param('name') name: string) {
         try {
             const project = await this.prisma.tproject.create({

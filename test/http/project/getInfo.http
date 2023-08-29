@@ -1,0 +1,7 @@
+GET http://{{host}}:{{port}}/project/info
+Cookie: session={{session}}
+Content-Type: application/json
+
+{
+    "id": "{{projectId}}"
+}
