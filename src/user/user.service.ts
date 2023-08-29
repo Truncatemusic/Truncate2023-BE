@@ -32,4 +32,20 @@ export class UserService {
 
         return { success: true }
     }
+
+    async getProjects(@Param('userId') userId: number) {
+        const projects = await this.prisma.tproject.findMany({
+            where: {
+                tprojectuser: {
+                    some: {
+                        user_id: userId,
+                    },
+                },
+            },
+        });
+
+        return projects.map(project => ({
+            name: project.name
+        }))
+    }
 }

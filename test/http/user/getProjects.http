@@ -1,0 +1,2 @@
+GET http://{{host}}:{{port}}/user/projects
+Cookie: session={{session}}
