@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
 
-    static INVALID_SESSION_RESPONSE = {"success": false, "reason": "INVALID_SESSION"}
+    static INVALID_SESSION_RESPONSE = {'success': false, 'reason': 'INVALID_SESSION'}
 
     constructor(private readonly prisma: PrismaClient) {}
 
@@ -89,8 +89,11 @@ export class AuthService {
         }
     }
 
-    async getSession(@Param('session') session: string) {
-        const result = await this.prisma.tsession.findFirst({where: {session}});
+    async getSession(@Param('session') session: string|Request) {
+        const result = await this.prisma.tsession.findFirst({where: {
+            session: typeof session === 'string' ? session : session['cookies']['session']
+        }});
+
         return {
             session: result?.session,
             user_id: result?.user_id,
@@ -98,7 +101,7 @@ export class AuthService {
     }
 
     async validateSession(@Req() request: Request) {
-        return !!(await this.getSession(request['cookies']['session'])).session
+        return !!(await this.getSession(request)).session;
     }
 
     async updateSession(@Param('session') session: string) {
