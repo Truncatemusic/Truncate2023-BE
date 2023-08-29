@@ -76,8 +76,8 @@ export class AuthController {
     async updateSession(@Body() body: { session: string }) {
         try {
             const session = await this.prisma.tsession.update({
-                where: {session: body.session},
-                data: {timestamp: new Date()},
+                where: { session: body.session },
+                data: { timestamp: new Date() },
                 select: { session: true }
             });
 
