@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS tuser (
     id        INT PRIMARY KEY AUTO_INCREMENT,
+    email     VARCHAR(255) NOT NULL,
+    password  VARCHAR(255) NOT NULL,
     username  VARCHAR(255) NOT NULL,
     firstname VARCHAR(255),
     lastname  VARCHAR(255),
@@ -7,8 +9,9 @@ CREATE TABLE IF NOT EXISTS tuser (
 );
 
 CREATE TABLE IF NOT EXISTS tsession (
-    session CHAR(64) PRIMARY KEY,
-    user_id INT,
+    session   CHAR(64) PRIMARY KEY,
+    user_id   INT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (user_id) REFERENCES tuser(id)
 );

@@ -26,6 +26,8 @@ model tprojectuser {
 
 model tuser {
   id           Int            @id @default(autoincrement())
+  email        String         @db.VarChar(255)
+  password     String         @db.VarChar(255)
   username     String         @db.VarChar(255)
   firstname    String?        @db.VarChar(255)
   lastname     String?        @db.VarChar(255)
@@ -35,9 +37,10 @@ model tuser {
 }
 
 model tsession {
-  session String @id @db.Char(64)
-  user_id Int?
-  tuser   tuser? @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tsession_ibfk_1")
+  session   String    @id @db.Char(64)
+  user_id   Int?
+  timestamp DateTime? @default(now()) @db.Timestamp(0)
+  tuser     tuser?    @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tsession_ibfk_1")
 
   @@index([user_id], map: "user_id")
 }
