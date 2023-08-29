@@ -86,10 +86,18 @@ export class AuthService {
         }
     }
 
+    async getSession(@Param('session') session: string) {
+        const result = await this.prisma.tsession.findFirst({where: {session}});
+        return {
+            session: result?.session,
+            user_id: result?.user_id,
+        }
+    }
+
     async updateSession(@Param('session') session: string) {
         try {
             const result = await this.prisma.tsession.update({
-                where: { session: session },
+                where: { session },
                 data: { timestamp: new Date() },
                 select: { session: true }
             });
