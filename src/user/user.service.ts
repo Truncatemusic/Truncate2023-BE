@@ -6,7 +6,13 @@ import * as bcrypt from 'bcrypt';
 export class UserService {
     constructor(private readonly prisma: PrismaClient) {}
 
-    async register(@Param('email') email: string, @Param('username') username: string, @Param('password') password: string) {
+    async register(
+        @Param('email') email: string,
+        @Param('username') username: string,
+        @Param('password') password: string,
+        @Param('firstname') firstname?: string,
+        @Param('firstname') lastname?: string
+    ) {
         if (Number.isInteger((await this.prisma.tuser.findFirst({
             where: { email: email },
             select: { id: true }
@@ -24,6 +30,8 @@ export class UserService {
                 email:    email,
                 username: username,
                 password: (await bcrypt.hash(password, 10)).toString(),
+                firstname: firstname,
+                lastname: lastname
             }
         });
 
