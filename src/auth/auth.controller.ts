@@ -1,4 +1,4 @@
-import {Body, Controller, Post} from '@nestjs/common';
+import {Body, Controller, Post, Patch} from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import {randomBytes} from 'crypto';
 import * as bcrypt from 'bcrypt';
@@ -72,13 +72,21 @@ export class AuthController {
         return { success: true, session };
     }
 
-    @Post('validate')
-    async validateSession(@Body() body: { session: string }) {
-        const session = await this.prisma.tsession.findUnique({
-            where: { session: body.session },
-            select: { user_id: true }
-        });
+    @Patch('updateSession')
+    async updateSession(@Body() body: { session: string }) {
+        try {
+            const session = await this.prisma.tsession.update({
+                where: {session: body.session},
+                data: {timestamp: new Date()},
+                select: { session: true }
+            });
 
-        return { success: Number.isInteger(session?.user_id) };
+            return session?.session
+                ? { success: true }
+                : { success: false, reason: "UNKNOWN" }
+        }
+        catch (_) {
+            return { success: false, reason: "INVALID_SESSION" }
+        }
     }
 }
