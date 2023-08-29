@@ -19,4 +19,15 @@ export class ProjectController {
             body.name
         );
     }
+
+    @Post('rename')
+    async rename(@Req() request: Request, @Body() body: {id: number, name: string}) {
+        if (!await this.authService.validateSession(request))
+            return AuthService.INVALID_SESSION_RESPONSE
+
+        return await this.service.renameProject(
+            body.id,
+            body.name
+        );
+    }
 }

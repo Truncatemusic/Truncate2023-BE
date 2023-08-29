@@ -20,10 +20,24 @@ export class ProjectService {
                 }
             })
 
-            return { success: true }
+            return { success: true, project_id: project.id }
         }
         catch (_) {
             return { success: false, reason: "UNKNOWN" }
+        }
+    }
+
+    async renameProject(@Param('id') id: number|string, @Param('name') name: string) {
+        try {
+            await this.prisma.tproject.update({
+                where: { id: parseInt(String(id)) },
+                data: { name }
+            });
+
+            return { success: true }
+        }
+        catch (_) {
+            return { success: false, reason: 'UNKNOWN' }
         }
     }
 }
