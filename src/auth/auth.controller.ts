@@ -1,4 +1,4 @@
-import {Body, Controller, Post, Patch, Req} from '@nestjs/common';
+import {Body, Controller, Post, Patch, Req, Get} from '@nestjs/common';
 import {AuthService} from './auth.service';
 
 @Controller('auth')
@@ -25,5 +25,10 @@ export class AuthController {
         if (!await this.service.validateSession(request))
             return AuthService.INVALID_SESSION_RESPONSE
         return await this.service.updateSession(request['cookies']['session']);
+    }
+
+    @Get('validateSession')
+    async validateSession(@Req() request: Request) {
+        return {success: await this.service.validateSession(request)};
     }
 }
