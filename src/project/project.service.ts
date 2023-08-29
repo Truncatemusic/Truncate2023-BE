@@ -27,10 +27,10 @@ export class ProjectService {
         }
     }
 
-    async renameProject(@Param('id') id: number|string, @Param('name') name: string) {
+    async renameProject(@Param('id') id: number, @Param('name') name: string) {
         try {
             await this.prisma.tproject.update({
-                where: { id: parseInt(String(id)) },
+                where: { id },
                 data: { name }
             });
 

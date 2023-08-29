@@ -26,7 +26,7 @@ export class ProjectController {
             return AuthService.INVALID_SESSION_RESPONSE
 
         return await this.service.renameProject(
-            body.id,
+            parseInt(String(body.id)),
             body.name
         );
     }
