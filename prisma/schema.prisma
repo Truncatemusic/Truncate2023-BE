@@ -31,4 +31,13 @@ model tuser {
   lastname     String?        @db.VarChar(255)
   birthdate    DateTime?      @db.Date
   tprojectuser tprojectuser[]
+  tsession     tsession[]
+}
+
+model tsession {
+  session String @id @db.Char(64)
+  user_id Int?
+  tuser   tuser? @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tsession_ibfk_1")
+
+  @@index([user_id], map: "user_id")
 }

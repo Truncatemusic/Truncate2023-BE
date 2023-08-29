@@ -6,6 +6,13 @@ CREATE TABLE IF NOT EXISTS tuser (
     birthdate DATE
 );
 
+CREATE TABLE IF NOT EXISTS tsession (
+    session CHAR(64) PRIMARY KEY,
+    user_id INT,
+
+    FOREIGN KEY (user_id) REFERENCES tuser(id)
+);
+
 CREATE TABLE IF NOT EXISTS tproject (
     id   INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL
