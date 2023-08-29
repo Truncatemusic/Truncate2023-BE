@@ -1,10 +1,13 @@
-import { Injectable, Param } from '@nestjs/common';
+import {Injectable, Param, Req} from '@nestjs/common';
 import {PrismaClient} from '@prisma/client';
 import {randomBytes} from 'crypto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
+
+    static INVALID_SESSION_RESPONSE = {"success": false, "reason": "INVALID_SESSION"}
+
     constructor(private readonly prisma: PrismaClient) {}
 
     async register(@Param('email') email: string, @Param('username') username: string, @Param('password') password: string) {
@@ -92,6 +95,10 @@ export class AuthService {
             session: result?.session,
             user_id: result?.user_id,
         }
+    }
+
+    async validateSession(@Req() request: Request) {
+        return !!(await this.getSession(request['cookies']['session'])).session
     }
 
     async updateSession(@Param('session') session: string) {

@@ -4,17 +4,18 @@ import { config } from 'dotenv';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { ValidationPipe } from '@nestjs/common';
-import * as cors from 'cors'; // Import cors module
+import * as cookieParser from 'cookie-parser';
+import * as cors from 'cors';
 
 async function bootstrap() {
   config();
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.useGlobalPipes(new ValidationPipe());
-  app.useStaticAssets(join(__dirname, '..', 'public')); // Adjust the path to your static assets
+  app.useStaticAssets(join(__dirname, '..', 'public'));
 
-  // Use the cors module to enable CORS
   app.use(cors());
+  app.use(cookieParser());
 
   await app.listen(3000);
 }

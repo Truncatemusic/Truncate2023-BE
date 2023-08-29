@@ -1,6 +1,2 @@
 PATCH http://{{host}}:{{port}}/auth/updateSession
-Content-Type: application/json
-
-{
-    "session": "{{session}}"
-}
+Cookie: session={{session}}
