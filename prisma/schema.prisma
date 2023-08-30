@@ -8,9 +8,10 @@ datasource db {
 }
 
 model tproject {
-  id           Int            @id @default(autoincrement()) @db.UnsignedInt
-  name         String         @db.VarChar(255)
-  tprojectuser tprojectuser[]
+  id              Int               @id @default(autoincrement()) @db.UnsignedInt
+  name            String            @db.VarChar(255)
+  tprojectuser    tprojectuser[]
+  tprojectversion tprojectversion[]
 }
 
 model tprojectuser {
@@ -42,4 +43,13 @@ model tsession {
   tuser     tuser?    @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tsession_ibfk_1")
 
   @@index([user_id], map: "user_id")
+}
+
+model tprojectversion {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  project_id    Int?      @db.UnsignedInt
+  versionNumber Int       @db.UnsignedInt
+  tproject      tproject? @relation(fields: [project_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversion_ibfk_1")
+
+  @@unique([project_id, versionNumber], map: "project_id")
 }

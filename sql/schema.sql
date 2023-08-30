@@ -28,3 +28,12 @@ CREATE TABLE IF NOT EXISTS tprojectuser (
     FOREIGN KEY (user_id)    REFERENCES tuser(id),
     FOREIGN KEY (project_id) REFERENCES tproject(id)
 );
+
+CREATE TABLE IF NOT EXISTS tprojectversion (
+    id            INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    project_id    INT UNSIGNED,
+    versionNumber INT UNSIGNED NOT NULL,
+
+    FOREIGN KEY (project_id) REFERENCES tproject(id),
+    UNIQUE (project_id, versionNumber)
+);

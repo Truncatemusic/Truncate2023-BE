@@ -31,12 +31,8 @@ export class ProjectService {
                 }
             });
 
-            await this.prisma.tprojectuser.create({
-                data: {
-                    user_id: userId,
-                    project_id: project.id,
-                }
-            })
+            await this.addVersion(project.id)
+            await this.addUserToProject(project.id, userId)
 
             return { success: true, project_id: project.id }
         }
@@ -73,5 +69,40 @@ export class ProjectService {
         catch (_) {
             return { success: false, reason: 'UNKNOWN' }
         }
+    }
+
+    async addUserToProject(@Param('id') projectId: number, @Param('userId') userId: number) {
+        await this.prisma.tprojectuser.create({
+            data: {
+                project_id: projectId,
+                user_id: userId,
+            }
+        })
+    }
+
+    async addVersion(@Param('id') projectId: number) {
+        const version = await this.prisma.tprojectversion.create({
+            data: {
+                project_id: projectId,
+                versionNumber: await this.getLastVersions(projectId) || 1
+            }
+        })
+        return version.versionNumber
+    }
+
+    async getLastVersions(@Param('id') projectId: number) {
+        const version = await this.prisma.tprojectversion.groupBy({
+            by: ['project_id'],
+            where: {
+                project_id: projectId
+            },
+            _max: {
+                versionNumber: true
+            }
+        })
+
+        return version?.[0]
+            ? version[0]._max.versionNumber
+            : false;
     }
 }
