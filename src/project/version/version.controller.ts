@@ -10,11 +10,15 @@ export class VersionController {
     ) {}
 
     @Post('create')
-    async createVersion(@Req() request: Request, @Body() body: {projectId: number}) {
+    async createVersion(@Req() request: Request, @Body() body: {projectId: number, songBPM?: number, songKey?: string}) {
         if (!await this.authService.validateSession(request))
             return AuthService.INVALID_SESSION_RESPONSE
 
-        const result = await this.service.addVersion(parseInt(String(body.projectId)))
+        const result = await this.service.addVersion(
+            parseInt(String(body.projectId)),
+            body.songBPM ? parseInt(String(body.songBPM)) : undefined,
+            body.songKey
+        )
         return result
             ? {success: true, version: result}
             : {success: false, reason: "UNKNOWN"}
