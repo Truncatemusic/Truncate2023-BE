@@ -1,5 +1,5 @@
 import {Injectable, Param} from '@nestjs/common';
-import {PrismaClient} from "@prisma/client";
+import {PrismaClient} from '@prisma/client';
 
 @Injectable()
 export class ProjectService {
@@ -12,14 +12,14 @@ export class ProjectService {
             });
 
             return !Number.isInteger(project?.id)
-                ? { success: false, reason: "UNKNOWN" }
+                ? { success: false, reason: 'UNKNOWN' }
                 : {
                 success: true,
                 name: project.name
             }
         }
         catch (_) {
-            return { success: false, reason: "UNKNOWN" }
+            return { success: false, reason: 'UNKNOWN' }
         }
     }
 
@@ -41,7 +41,7 @@ export class ProjectService {
             return { success: true, project_id: project.id }
         }
         catch (_) {
-            return { success: false, reason: "UNKNOWN" }
+            return { success: false, reason: 'UNKNOWN' }
         }
     }
 
