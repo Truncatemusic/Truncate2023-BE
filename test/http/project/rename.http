@@ -1,4 +1,4 @@
-POST http://{{host}}:{{port}}/project/rename
+PATCH http://{{host}}:{{port}}/project/rename
 Cookie: session={{session}}
 Content-Type: application/json
 

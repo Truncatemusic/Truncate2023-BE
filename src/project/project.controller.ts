@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Post, Req} from '@nestjs/common';
+import {Body, Controller, Get, Patch, Post, Req} from '@nestjs/common';
 import {ProjectService} from './project.service';
 import {AuthService} from '../auth/auth.service';
 
@@ -28,7 +28,7 @@ export class ProjectController {
         );
     }
 
-    @Post('rename')
+    @Patch('rename')
     async rename(@Req() request: Request, @Body() body: {id: number, name: string}) {
         if (!await this.authService.validateSession(request))
             return AuthService.INVALID_SESSION_RESPONSE
