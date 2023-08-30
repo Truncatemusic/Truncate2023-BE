@@ -25,7 +25,13 @@ export class VersionController {
         if (!await this.authService.validateSession(request))
             return AuthService.INVALID_SESSION_RESPONSE
 
-        const result = await this.service.getFiles(parseInt(String(body.projectId)), parseInt(String(body.versionNumber)))
-        return result
+        const versionId = await this.service.getVersionId(parseInt(String(body.projectId)), parseInt(String(body.versionNumber)))
+        if (!versionId)
+            return {success: false, reason: 'INVALID_PROJECT_OR_VERSION'}
+
+        return (await this.service.getFiles(versionId)).map(file => ({
+            id:   file.id,
+            type: file.type
+        }))
     }
 }

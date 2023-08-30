@@ -16,6 +16,17 @@ export class VersionService {
         return version.versionNumber
     }
 
+    async getVersionId(@Param('projectId') projectId: number, @Param('versionNumber') versionNumber: number) {
+        const result = await this.prisma.tprojectversion.findFirst({
+            where: {
+                project_id: projectId,
+                versionNumber: versionNumber
+            },
+            select: { id: true }
+        })
+        return result?.id || false
+    }
+
     async getLastVersions(@Param('id') projectId: number) {
         const version = await this.prisma.tprojectversion.groupBy({
             by: ['project_id'],
@@ -32,15 +43,20 @@ export class VersionService {
             : false;
     }
 
-    async getFiles(@Param('id') projectId: number, @Param('versionNumber') versionNumber: number) {
-        const files = await this.prisma.tprojectversionfile.findMany({
+    async getFiles(@Param('versionId') versionId: number) {
+        return (await this.prisma.tprojectversionfile.findMany({
             where: {
-                tprojectversion: {
-                    project_id: projectId,
-                    versionNumber: versionNumber
-                }
+                projectversion_id: versionId
             }
-        })
-        return files
+        }))
+    }
+
+    async insertFile(@Param('versionId') versionId: number, @Param('id') id: string, @Param('type') type: string) {
+        return (await this.prisma.tprojectversionfile.create({
+            data: {
+                projectversion_id: versionId,
+                id, type
+            }
+        }))
     }
 }
