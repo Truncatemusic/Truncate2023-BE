@@ -14,6 +14,13 @@ export class UserController {
         return await this.service.register(body.email, body.username, body.password, body.firstname, body.lastname);
     }
 
+    @Get('info')
+    async getInfo(@Req() request: Request) {
+        if (!await this.authService.validateSession(request))
+            return AuthService.INVALID_SESSION_RESPONSE
+        return await this.service.getInfo((await this.authService.getSession(request)).user_id)
+    }
+
     @Get('projects')
     async getProjects(@Req() request: Request) {
         if (!await this.authService.validateSession(request))

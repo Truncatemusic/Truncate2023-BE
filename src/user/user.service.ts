@@ -41,6 +41,23 @@ export class UserService {
         return { success: true }
     }
 
+    async getInfo(@Param('userId') userId: number) {
+        const {email, username, firstname, lastname} = await this.prisma.tuser.findFirst({
+            where: { id: userId },
+            select: {
+                email: true,
+                username: true,
+                firstname: true,
+                lastname: true
+            }
+        })
+        return {
+            success: true,
+            email, username,
+            firstname, lastname
+        }
+    }
+
     async getProjects(@Param('userId') userId: number) {
         const projects = await this.prisma.tproject.findMany({
             where: {
