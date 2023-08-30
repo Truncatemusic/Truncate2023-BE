@@ -49,6 +49,9 @@ model tprojectversion {
   id                  Int                   @id @default(autoincrement()) @db.UnsignedInt
   project_id          Int?                  @db.UnsignedInt
   versionNumber       Int                   @db.UnsignedInt
+  timestamp           DateTime?             @default(now()) @db.Timestamp(0)
+  songBPM             Int?                  @db.UnsignedSmallInt
+  songKey             String?               @db.VarChar(10)
   tproject            tproject?             @relation(fields: [project_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversion_ibfk_1")
   tprojectversionfile tprojectversionfile[]
 

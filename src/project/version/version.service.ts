@@ -6,7 +6,7 @@ export class VersionService {
     constructor(private readonly prisma: PrismaClient) {}
 
     async addVersion(@Param('id') projectId: number) {
-        const lastVersion = await this.getLastVersions(projectId)
+        const lastVersion = await this.getLastVersionId(projectId)
         const version = await this.prisma.tprojectversion.create({
             data: {
                 project_id: projectId,
@@ -27,7 +27,7 @@ export class VersionService {
         return result?.id || false
     }
 
-    async getLastVersions(@Param('id') projectId: number) {
+    async getLastVersionId(@Param('id') projectId: number) {
         const version = await this.prisma.tprojectversion.groupBy({
             by: ['project_id'],
             where: {
@@ -41,6 +41,18 @@ export class VersionService {
         return version?.[0]
             ? version[0]._max.versionNumber
             : false;
+    }
+
+    async getVersion(@Param('id') projectId: number, @Param('versionNumber') versionNumber: number) {
+        const result = await this.prisma.tprojectversion.findFirst({
+            where: {
+                project_id: projectId,
+                versionNumber: versionNumber
+            }
+        })
+        return result?.versionNumber
+            ? result
+            : false
     }
 
     async getFiles(@Param('versionId') versionId: number) {

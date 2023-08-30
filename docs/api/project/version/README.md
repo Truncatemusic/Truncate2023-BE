@@ -36,7 +36,54 @@
 ```
 
 ---
-## get in version stored files
+## get the last project version
+
+### Request `GET /project/version/last`
+
+#### Body
+
+`session` _cookie required_
+
+```json
+{
+    "projectId": "<id of the project>"
+}
+```
+
+### Responses
+
+#### unknown error
+
+```json
+{
+  "success": false,
+  "reason": "UNKNOWN"
+}
+```
+
+#### invalid project id
+
+```json
+{
+  "success": false,
+  "reason": "INVALID_PROJECT"
+}
+```
+
+#### last project version
+
+```json
+{
+  "success": true,
+  "versionNumber": <version number>,
+  "timestamp": "<version-created timestamp>",
+  "songBPM": <song bpm | null>,
+  "songKey": "<song key | null>"
+}
+```
+
+---
+## get files stored in version
 
 ### Request `GET /project/version/files`
 

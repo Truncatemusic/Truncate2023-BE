@@ -33,6 +33,9 @@ CREATE TABLE IF NOT EXISTS tprojectversion (
     id            INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     project_id    INT UNSIGNED,
     versionNumber INT UNSIGNED NOT NULL,
+    timestamp     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    songBPM       SMALLINT UNSIGNED,
+    songKey       VARCHAR(10),
 
     FOREIGN KEY (project_id) REFERENCES tproject(id),
     UNIQUE (project_id, versionNumber)
