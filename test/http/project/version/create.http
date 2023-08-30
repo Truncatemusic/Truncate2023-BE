@@ -1,0 +1,7 @@
+POST http://{{host}}:{{port}}/project/version/create
+Cookie: session={{session}}
+Content-Type: application/json
+
+{
+    "projectId": "{{projectId}}"
+}
