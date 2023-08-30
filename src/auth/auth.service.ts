@@ -73,6 +73,13 @@ export class AuthService {
         }
     }
 
+    async getUserId(@Param('session') session: string|Request) {
+        const result = await this.getSession(session)
+        return !result?.session
+            ? false
+            : result.user_id
+    }
+
     async validateSession(@Req() request: Request) {
         return !!(await this.getSession(request)).session;
     }

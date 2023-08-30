@@ -11,20 +11,22 @@ export class UserController {
 
     @Post('register')
     async register(@Body() body: { email: string, username: string, password: string, firstname?: string, lastname?: string }) {
-        return await this.service.register(body.email, body.username, body.password, body.firstname, body.lastname);
+        return await this.service.register(body.email, body.username, body.password, body.firstname, body.lastname)
     }
 
     @Get('info')
     async getInfo(@Req() request: Request) {
-        if (!await this.authService.validateSession(request))
-            return AuthService.INVALID_SESSION_RESPONSE
-        return await this.service.getInfo((await this.authService.getSession(request)).user_id)
+        const userId = await this.authService.getUserId(request)
+        return userId
+            ? await this.service.getInfo(userId)
+            : AuthService.INVALID_SESSION_RESPONSE
     }
 
     @Get('projects')
     async getProjects(@Req() request: Request) {
-        if (!await this.authService.validateSession(request))
-            return AuthService.INVALID_SESSION_RESPONSE
-        return await this.service.getProjects((await this.authService.getSession(request)).user_id);
+        const userId = await this.authService.getUserId(request)
+        return userId
+            ? await this.service.getProjects(userId)
+            : AuthService.INVALID_SESSION_RESPONSE
     }
 }

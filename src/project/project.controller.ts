@@ -19,11 +19,11 @@ export class ProjectController {
 
     @Post('create')
     async create(@Req() request: Request, @Body() body: {name: string}) {
-        if (!await this.authService.validateSession(request))
-            return AuthService.INVALID_SESSION_RESPONSE
+        const userId = await this.authService.getUserId(request)
+        if (!userId) return AuthService.INVALID_SESSION_RESPONSE
 
         return await this.service.createProject(
-            (await this.authService.getSession(request)).user_id,
+            userId,
             body.name
         );
     }
