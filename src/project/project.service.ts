@@ -1,9 +1,13 @@
 import {Injectable, Param} from '@nestjs/common';
 import {PrismaClient} from '@prisma/client';
+import {VersionService} from "./version/version.service";
 
 @Injectable()
 export class ProjectService {
-    constructor(private readonly prisma: PrismaClient) {}
+    constructor(
+        private readonly prisma: PrismaClient,
+        private readonly versionService: VersionService
+    ) {}
 
     async getInfo(@Param('id') id: number) {
         try {
@@ -31,7 +35,7 @@ export class ProjectService {
                 }
             });
 
-            await this.addVersion(project.id)
+            await this.versionService.addVersion(project.id)
             await this.addUserToProject(project.id, userId)
 
             return { success: true, project_id: project.id }
@@ -78,32 +82,5 @@ export class ProjectService {
                 user_id: userId,
             }
         })
-    }
-
-    async addVersion(@Param('id') projectId: number) {
-        const lastVersion = await this.getLastVersions(projectId)
-        const version = await this.prisma.tprojectversion.create({
-            data: {
-                project_id: projectId,
-                versionNumber: lastVersion ? lastVersion+1 : 1
-            }
-        })
-        return version.versionNumber
-    }
-
-    async getLastVersions(@Param('id') projectId: number) {
-        const version = await this.prisma.tprojectversion.groupBy({
-            by: ['project_id'],
-            where: {
-                project_id: projectId
-            },
-            _max: {
-                versionNumber: true
-            }
-        })
-
-        return version?.[0]
-            ? version[0]._max.versionNumber
-            : false;
     }
 }
