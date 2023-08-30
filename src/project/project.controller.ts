@@ -38,4 +38,12 @@ export class ProjectController {
             body.name
         );
     }
+
+    @Post('delete')
+    async delete(@Req() request: Request, @Body() body: {id: number}) {
+        if (!await this.authService.validateSession(request))
+            return AuthService.INVALID_SESSION_RESPONSE
+
+        return await this.service.deleteProject(parseInt(String(body.id)));
+    }
 }

@@ -58,4 +58,20 @@ export class ProjectService {
             return { success: false, reason: 'UNKNOWN' }
         }
     }
+
+    async deleteProject(@Param('id') id: number) {
+        try {
+            await this.prisma.tprojectuser.deleteMany({
+                where: {project_id: id}
+            })
+            await this.prisma.tproject.delete({
+                where: {id}
+            })
+
+            return { success: true }
+        }
+        catch (_) {
+            return { success: false, reason: 'UNKNOWN' }
+        }
+    }
 }
