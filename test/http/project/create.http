@@ -3,5 +3,7 @@ Cookie: session={{session}}
 Content-Type: application/json
 
 {
-    "name": "{{projectName}}"
+    "name": "{{projectName}}",
+    "songBPM": "{{projectSongBPM}}",
+    "songKey": "{{projectSongKey}}"
 }

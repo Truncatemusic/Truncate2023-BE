@@ -18,13 +18,15 @@ export class ProjectController {
     }
 
     @Post('create')
-    async create(@Req() request: Request, @Body() body: {name: string}) {
+    async create(@Req() request: Request, @Body() body: {name: string, songBPM?: number, songKey?: string}) {
         const userId = await this.authService.getUserId(request)
         if (!userId) return AuthService.INVALID_SESSION_RESPONSE
 
         return await this.service.createProject(
             userId,
-            body.name
+            body.name,
+            body.songBPM ? parseInt(String(body.songBPM)) : undefined,
+            body.songKey
         );
     }
 

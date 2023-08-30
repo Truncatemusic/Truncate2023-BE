@@ -27,7 +27,7 @@ export class ProjectService {
         }
     }
 
-    async createProject(@Param('userId') userId: number, @Param('name') name: string) {
+    async createProject(@Param('userId') userId: number, @Param('name') name: string, @Param('songBPM') songBPM?: number, @Param('songKey') songKey?: string) {
         try {
             const project = await this.prisma.tproject.create({
                 data: {
@@ -35,7 +35,7 @@ export class ProjectService {
                 }
             });
 
-            await this.versionService.addVersion(project.id)
+            await this.versionService.addVersion(project.id, songBPM, songKey)
             await this.addUserToProject(project.id, userId)
 
             return { success: true, project_id: project.id }

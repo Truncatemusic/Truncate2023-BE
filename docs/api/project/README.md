@@ -15,7 +15,9 @@
 
 ```json
 {
-    "name": "<name of the new project>"
+  "name": "<name of the new project>",
+  "songBPM": <bpm | null>,
+  "songKey": "<key | null>"
 }
 ```
 
