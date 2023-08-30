@@ -8,15 +8,15 @@ datasource db {
 }
 
 model tproject {
-  id           Int            @id @default(autoincrement())
+  id           Int            @id @default(autoincrement()) @db.UnsignedInt
   name         String         @db.VarChar(255)
   tprojectuser tprojectuser[]
 }
 
 model tprojectuser {
-  id         Int       @id @default(autoincrement())
-  user_id    Int?
-  project_id Int?
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id    Int?      @db.UnsignedInt
+  project_id Int?      @db.UnsignedInt
   tuser      tuser?    @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectuser_ibfk_1")
   tproject   tproject? @relation(fields: [project_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectuser_ibfk_2")
 
@@ -25,7 +25,7 @@ model tprojectuser {
 }
 
 model tuser {
-  id           Int            @id @default(autoincrement())
+  id           Int            @id @default(autoincrement()) @db.UnsignedInt
   email        String         @db.VarChar(255)
   password     String         @db.VarChar(255)
   username     String         @db.VarChar(255)
@@ -37,7 +37,7 @@ model tuser {
 
 model tsession {
   session   String    @id @db.Char(64)
-  user_id   Int?
+  user_id   Int?      @db.UnsignedInt
   timestamp DateTime? @default(now()) @db.Timestamp(0)
   tuser     tuser?    @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tsession_ibfk_1")
 
