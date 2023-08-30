@@ -37,3 +37,11 @@ CREATE TABLE IF NOT EXISTS tprojectversion (
     FOREIGN KEY (project_id) REFERENCES tproject(id),
     UNIQUE (project_id, versionNumber)
 );
+
+CREATE TABLE IF NOT EXISTS tprojectversionfile (
+    id                CHAR(128) PRIMARY KEY,
+    projectversion_id INT UNSIGNED,
+    type              CHAR(3),
+
+    FOREIGN KEY (projectversion_id) REFERENCES tprojectversion(id)
+)

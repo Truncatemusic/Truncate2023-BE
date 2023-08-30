@@ -10,10 +10,12 @@ import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { VersionController } from './project/version/version.controller';
 import { VersionService } from './project/version/version.service';
+import { FileController } from './project/file/file.controller';
+import { FileService } from './project/file/file.service';
 
 @Module({
   imports: [],
-  controllers: [AppController, AuthController, ProjectController, UserController, VersionController],
-  providers: [AppService, PrismaClient, AuthService, ProjectService, UserService, VersionService],
+  controllers: [AppController, AuthController, ProjectController, UserController, VersionController, FileController],
+  providers: [AppService, PrismaClient, AuthService, ProjectService, UserService, VersionService, FileService],
 })
 export class AppModule {}

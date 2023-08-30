@@ -46,10 +46,20 @@ model tsession {
 }
 
 model tprojectversion {
-  id            Int       @id @default(autoincrement()) @db.UnsignedInt
-  project_id    Int?      @db.UnsignedInt
-  versionNumber Int       @db.UnsignedInt
-  tproject      tproject? @relation(fields: [project_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversion_ibfk_1")
+  id                  Int                   @id @default(autoincrement()) @db.UnsignedInt
+  project_id          Int?                  @db.UnsignedInt
+  versionNumber       Int                   @db.UnsignedInt
+  tproject            tproject?             @relation(fields: [project_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversion_ibfk_1")
+  tprojectversionfile tprojectversionfile[]
 
   @@unique([project_id, versionNumber], map: "project_id")
+}
+
+model tprojectversionfile {
+  id                String           @id @db.Char(128)
+  projectversion_id Int?             @db.UnsignedInt
+  type              String?          @db.Char(3)
+  tprojectversion   tprojectversion? @relation(fields: [projectversion_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversionfile_ibfk_1")
+
+  @@index([projectversion_id], map: "projectversion_id")
 }

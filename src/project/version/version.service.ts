@@ -31,4 +31,16 @@ export class VersionService {
             ? version[0]._max.versionNumber
             : false;
     }
+
+    async getFiles(@Param('id') projectId: number, @Param('versionNumber') versionNumber: number) {
+        const files = await this.prisma.tprojectversionfile.findMany({
+            where: {
+                tprojectversion: {
+                    project_id: projectId,
+                    versionNumber: versionNumber
+                }
+            }
+        })
+        return files
+    }
 }
