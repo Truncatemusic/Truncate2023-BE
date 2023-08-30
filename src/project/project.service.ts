@@ -81,10 +81,11 @@ export class ProjectService {
     }
 
     async addVersion(@Param('id') projectId: number) {
+        const lastVersion = await this.getLastVersions(projectId)
         const version = await this.prisma.tprojectversion.create({
             data: {
                 project_id: projectId,
-                versionNumber: await this.getLastVersions(projectId) || 1
+                versionNumber: lastVersion ? lastVersion+1 : 1
             }
         })
         return version.versionNumber
