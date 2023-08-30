@@ -12,6 +12,9 @@ export class AuthController {
 
     @Post('logout')
     async logout(@Req() request: Request) {
+        if (!await this.service.validateSession(request))
+            return AuthService.INVALID_SESSION_RESPONSE
+
         return await this.service.logout(request['cookies']['session']);
     }
 
@@ -24,6 +27,8 @@ export class AuthController {
 
     @Get('validateSession')
     async validateSession(@Req() request: Request) {
+        if (!await this.service.validateSession(request))
+            return AuthService.INVALID_SESSION_RESPONSE
         return {success: await this.service.validateSession(request)};
     }
 }

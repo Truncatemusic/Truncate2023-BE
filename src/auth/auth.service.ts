@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
 
-    static INVALID_SESSION_RESPONSE = {'success': false, 'reason': 'INVALID_SESSION'}
+    static INVALID_SESSION_RESPONSE = {success: false, reason: 'INVALID_SESSION'}
 
     constructor(private readonly prisma: PrismaClient) {}
 
@@ -58,7 +58,7 @@ export class AuthService {
                 : { success: false, reason: 'UNKNOWN' }
         }
         catch (_) {
-            return { success: false, reason: 'INVALID_SESSION' }
+            return { success: false, reason: 'UNKNOWN' }
         }
     }
 
@@ -97,7 +97,7 @@ export class AuthService {
                 : { success: false, reason: 'UNKNOWN' }
         }
         catch (_) {
-            return { success: false, reason: 'INVALID_SESSION' }
+            return { success: false, reason: 'UNKNOWN' }
         }
     }
 }

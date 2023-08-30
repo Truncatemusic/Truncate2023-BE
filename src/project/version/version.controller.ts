@@ -17,7 +17,7 @@ export class VersionController {
         const result = await this.service.addVersion(parseInt(String(body.projectId)))
         return result
             ? {success: true, version: result}
-            : {success: false}
+            : {success: false, reason: "UNKNOWN"}
     }
 
     @Get('files')

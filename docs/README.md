@@ -1,0 +1,3 @@
+# Docs
+
+- [API Docs](api)
