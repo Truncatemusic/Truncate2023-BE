@@ -99,15 +99,22 @@ export class FileService {
 
     private async saveAudioFile(buffer: Buffer, type: string) {
         const id = FileService.generateFileId(buffer),
-              path = FileService.getAudioFilePath(id, type)
+              audioFilePath = FileService.getAudioFilePath(id, type),
+              waveformPath = FileService.getWaveformFilePath(id)
 
-        if (!existsSync(path)) {
-            writeFileSync(path, buffer)
+        let addedWaveform = false
+        if (!existsSync(waveformPath)) {
             writeFileSync(FileService.getWaveformFilePath(id), await this.generateWaveform(buffer))
-            return {id, added: true}
+            addedWaveform = true
         }
 
-        return {id, added: false}
+        let addedAudio = false
+        if (!existsSync(audioFilePath)) {
+            writeFileSync(audioFilePath, buffer)
+            addedAudio = true
+        }
+
+        return {id, addedAudio, addedWaveform}
     }
 
     async addAudioFile(versionId: number, buffer: Buffer, type: string) {
