@@ -5,7 +5,7 @@ import {Injectable, StreamableFile} from '@nestjs/common';
 import {createHash} from 'crypto';
 import {join} from 'path';
 import {PrismaClient} from "@prisma/client";
-import {extension as mimeExtension} from 'mime';
+import {extension as mimeExtension} from 'mime-types';
 
 @Injectable()
 export class FileService {
