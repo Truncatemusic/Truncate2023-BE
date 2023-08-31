@@ -19,6 +19,7 @@ async function bootstrap() {
       credentials: true,
       allowedHeaders: [
           "Access-Control-Allow-Origin",
+          "Access-Control-Allow-Headers",
           "Access-Control-Allow-Credentials"
       ]
   });
