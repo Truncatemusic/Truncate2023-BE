@@ -29,7 +29,7 @@ _empty or audio file stream_
 ---
 ## upload audio file
 
-### Request `POST /audio/upload/<project-id>/<version-number>`
+### Request `POST /project/version/file/audio/upload/<project-id>/<version-number>`
 
 #### Body
 
