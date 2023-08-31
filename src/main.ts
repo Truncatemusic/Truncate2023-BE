@@ -17,6 +17,10 @@ async function bootstrap() {
   app.enableCors({
       origin: 'http://localhost:4200',
       credentials: true,
+      allowedHeaders: [
+          "Access-Control-Allow-Origin",
+          "Access-Control-Allow-Credentials"
+      ]
   });
   await app.listen(3000);
 }
