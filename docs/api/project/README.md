@@ -23,6 +23,15 @@
 
 ### Responses
 
+#### invalid project name
+
+```json
+{
+  "success": false,
+  "reason": "INVALID_PROJECT_NAME"
+}
+```
+
 #### unknown error
 
 ```json
