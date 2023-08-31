@@ -38,10 +38,16 @@ export class ProjectService {
                 }
             });
 
-            await this.versionService.addVersion(project.id, songBPM, songKey)
+            const versionNumber = await this.versionService.addVersion(project.id, songBPM, songKey)
             await this.addUserToProject(project.id, userId)
 
-            return { success: true, project_id: project.id }
+            return {
+                success: true,
+                project_id: project.id,
+                versionNumber,
+                songBPM,
+                songKey
+            }
         }
         catch (_) {
             return { success: false, reason: 'UNKNOWN' }
