@@ -28,6 +28,9 @@ export class ProjectService {
     }
 
     async createProject(@Param('userId') userId: number, @Param('name') name: string, @Param('songBPM') songBPM?: number, @Param('songKey') songKey?: string) {
+        if (!name || !String(name).trim())
+            return { success: false, reason: 'INVALID_PROJECT_NAME' }
+
         try {
             const project = await this.prisma.tproject.create({
                 data: {
