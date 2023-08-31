@@ -116,7 +116,7 @@ export class FileService {
 
     async addAudioFile(versionId: number, buffer: Buffer, type: string) {
         const {id} = await this.saveAudioFile(buffer, type)
-        const result = await this.prisma.tprojectversionfile.findUnique({
+        const result = await this.prisma.tprojectversionfile.findFirst({
             where: {
                 id, type,
                 projectversion_id: versionId,
