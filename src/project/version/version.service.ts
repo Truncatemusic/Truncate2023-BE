@@ -64,13 +64,4 @@ export class VersionService {
             }
         }))
     }
-
-    async insertFile(@Param('versionId') versionId: number, @Param('id') id: string, @Param('type') type: string) {
-        return (await this.prisma.tprojectversionfile.create({
-            data: {
-                projectversion_id: versionId,
-                id, type
-            }
-        }))
-    }
 }

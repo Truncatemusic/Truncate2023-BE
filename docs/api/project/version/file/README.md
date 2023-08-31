@@ -25,3 +25,34 @@ _empty or file stream_
 ### Responses
 
 _empty or audio file stream_
+
+---
+## upload audio file
+
+### Request `POST /audio/upload/<project-id>/<version-number>`
+
+#### Body
+
+`form-data` content type
+
+`session` _cookie required_
+
+### Responses
+
+#### invalid project or version
+
+```json
+{
+  "success": false,
+  "reason": "INVALID_PROJECT_OR_VERSION"
+}
+```
+
+#### file uploaded and added successfully
+
+```json
+{
+  "success": true,
+  "id": "<128-byte file id>"
+}
+```

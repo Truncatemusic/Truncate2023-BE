@@ -59,10 +59,10 @@ model tprojectversion {
 }
 
 model tprojectversionfile {
-  id                String           @id @db.Char(128)
-  projectversion_id Int?             @db.UnsignedInt
-  type              String?          @db.Char(3)
-  tprojectversion   tprojectversion? @relation(fields: [projectversion_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversionfile_ibfk_1")
+  id                String          @db.Char(128)
+  projectversion_id Int             @db.UnsignedInt
+  type              String          @db.Char(3)
+  tprojectversion   tprojectversion @relation(fields: [projectversion_id], references: [id], onUpdate: Restrict, map: "tprojectversionfile_ibfk_1")
 
-  @@index([projectversion_id], map: "projectversion_id")
+  @@id([projectversion_id, id, type])
 }

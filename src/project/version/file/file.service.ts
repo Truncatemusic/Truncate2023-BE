@@ -1,9 +1,10 @@
-import {createReadStream, existsSync, promises as fsPromises} from 'fs';
+import {createReadStream, existsSync, promises as fsPromises, writeFileSync} from 'fs';
 import * as wav from 'node-wav';
 import { createCanvas } from 'canvas';
 import {Injectable, StreamableFile} from '@nestjs/common';
 import {createHash} from 'crypto';
 import {join} from 'path';
+import {PrismaClient} from "@prisma/client";
 
 @Injectable()
 export class FileService {
@@ -22,9 +23,16 @@ export class FileService {
         return join(this.ROOT_PATH_WAVEFORM, id+".png")
     }
 
-    static generateFileId() {
+    static getTypeFromMIME(mime: string) {
+        switch (mime) {
+            case "audio/wave": return "wav"
+            default: return undefined
+        }
+    }
+
+    static generateFileId(buffer: Buffer) {
         return createHash('sha512')
-            .update(new Date().getTime().toString())
+            .update(buffer)
             .digest('hex')
             .substring(0, 128)
     }
@@ -78,6 +86,8 @@ export class FileService {
         await fsPromises.writeFile(waveformFile, canvas.toBuffer('image/png'))
     }
 
+    constructor(private readonly prisma: PrismaClient) {}
+
     getWaveformImage(id: string) {
         const waveformFilePath = FileService.getWaveformFilePath(id)
         return existsSync(waveformFilePath)
@@ -90,5 +100,38 @@ export class FileService {
         return existsSync(audioFilePath)
             ? new StreamableFile(createReadStream(audioFilePath))
             : null
+    }
+
+    private async saveAudioFile(buffer: Buffer, type: string) {
+        const id = FileService.generateFileId(buffer),
+              path = FileService.getAudioFilePath(id, type)
+
+        if (!existsSync(path)) {
+            writeFileSync(path, buffer)
+            return {id, added: true}
+        }
+
+        return {id, added: false}
+    }
+
+    async addAudioFile(versionId: number, buffer: Buffer, type: string) {
+        const {id} = await this.saveAudioFile(buffer, type)
+        const result = await this.prisma.tprojectversionfile.findUnique({
+            where: {
+                id, type,
+                projectversion_id: versionId,
+            },
+            select: { projectversion_id: true }
+        })
+
+        if (!result?.projectversion_id)
+            await this.prisma.tprojectversionfile.create({
+                data: {
+                    id, type,
+                    projectversion_id: versionId,
+                }
+            })
+
+        return id
     }
 }

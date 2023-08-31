@@ -42,9 +42,10 @@ CREATE TABLE IF NOT EXISTS tprojectversion (
 );
 
 CREATE TABLE IF NOT EXISTS tprojectversionfile (
-    id                CHAR(128) PRIMARY KEY,
+    id                CHAR(128),
     projectversion_id INT UNSIGNED,
     type              CHAR(3),
 
+    PRIMARY KEY (projectversion_id, id, type),
     FOREIGN KEY (projectversion_id) REFERENCES tprojectversion(id)
 )
