@@ -25,7 +25,7 @@ export class FileService {
     }
 
     static getTypeFromMIME(mimetype: string) {
-        return mimeExtension(mimetype)
+        return mimeExtension(mimetype) || undefined
     }
 
     static generateFileId(buffer: Buffer) {
