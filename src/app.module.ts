@@ -10,8 +10,8 @@ import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { VersionController } from './project/version/version.controller';
 import { VersionService } from './project/version/version.service';
-import { FileController } from './project/file/file.controller';
-import { FileService } from './project/file/file.service';
+import { FileController } from './project/version/file/file.controller';
+import { FileService } from './project/version/file/file.service';
 
 @Module({
   imports: [],
