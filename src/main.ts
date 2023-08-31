@@ -14,9 +14,11 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useStaticAssets(join(__dirname, '..', 'public'));
 
-  app.use(cors());
   app.use(cookieParser());
-
+  app.enableCors({
+      origin: 'http://localhost:4200',
+      credentials: true,
+  });
   await app.listen(3000);
 }
 
