@@ -1,4 +1,4 @@
-import {createReadStream, existsSync, promises as fsPromises, writeFileSync} from 'fs';
+import {createReadStream, existsSync, writeFileSync} from 'fs';
 import * as wav from 'node-wav';
 import { createCanvas } from 'canvas';
 import {Injectable, StreamableFile} from '@nestjs/common';
@@ -35,7 +35,9 @@ export class FileService {
             .substring(0, 128)
     }
 
-    static async generateWaveform(audioFile: string|Buffer, waveformFile: string, waveformOptions?: object) {
+    constructor(private readonly prisma: PrismaClient) {}
+
+    private async generateWaveform(audioBuffer: Buffer, waveformOptions?: object) {
         const options = {
             width:           8000,
             height:          1000,
@@ -46,11 +48,7 @@ export class FileService {
             ...waveformOptions
         }
 
-        if (typeof audioFile === "string")
-            audioFile = this.getAudioFilePath(audioFile)
-        waveformFile = this.getWaveformFilePath(waveformFile)
-
-        const wavData = wav.decode(await fsPromises.readFile(audioFile))
+        const wavData = wav.decode(audioBuffer)
         const samplesPerFrame = Math.floor(wavData["channelData"][0].length / options.width)
 
         const averageLoudnessArray = []
@@ -82,10 +80,8 @@ export class FileService {
         }
         context.stroke()
 
-        await fsPromises.writeFile(waveformFile, canvas.toBuffer('image/png'))
+        return canvas.toBuffer('image/png')
     }
-
-    constructor(private readonly prisma: PrismaClient) {}
 
     getWaveformImage(id: string) {
         const waveformFilePath = FileService.getWaveformFilePath(id)
@@ -107,6 +103,7 @@ export class FileService {
 
         if (!existsSync(path)) {
             writeFileSync(path, buffer)
+            writeFileSync(FileService.getWaveformFilePath(id), await this.generateWaveform(buffer))
             return {id, added: true}
         }
 
