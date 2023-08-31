@@ -81,6 +81,7 @@
 ```json
 [
   {
+    "id": "<project id>",
     "name": "<project name>"
   }
 ]

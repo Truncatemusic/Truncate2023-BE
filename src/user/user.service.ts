@@ -67,9 +67,10 @@ export class UserService {
                     },
                 },
             },
-        });
+        })
 
         return projects.map(project => ({
+            id:   project.id,
             name: project.name
         }))
     }
