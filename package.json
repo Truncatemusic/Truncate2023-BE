@@ -33,6 +33,7 @@
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.3.1",
     "mariadb": "^3.2.0",
+    "mime-types": "^2.1.35",
     "mysql": "^2.18.1",
     "mysql2": "^3.6.0",
     "node-wav": "^0.0.2",

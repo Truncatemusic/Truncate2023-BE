@@ -5,6 +5,7 @@ import {Injectable, StreamableFile} from '@nestjs/common';
 import {createHash} from 'crypto';
 import {join} from 'path';
 import {PrismaClient} from "@prisma/client";
+import mime from 'mime';
 
 @Injectable()
 export class FileService {
@@ -23,11 +24,8 @@ export class FileService {
         return join(this.ROOT_PATH_WAVEFORM, id+".png")
     }
 
-    static getTypeFromMIME(mime: string) {
-        switch (mime) {
-            case "audio/wave": return "wav"
-            default: return undefined
-        }
+    static getTypeFromMIME(mimetype: string) {
+        return mime.extension(mimetype)
     }
 
     static generateFileId(buffer: Buffer) {
