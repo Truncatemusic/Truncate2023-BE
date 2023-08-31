@@ -1,0 +1,2 @@
+GET http://{{host}}:{{port}}/project/version/file/audio/{{audioFileType}}/{{audioFileId}}
+Cookie: session={{session}}

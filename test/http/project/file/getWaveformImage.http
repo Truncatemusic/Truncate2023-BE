@@ -1,0 +1,2 @@
+GET http://{{host}}:{{port}}/project/version/file/waveformImage/{{audioFileId}}
+Cookie: session={{session}}

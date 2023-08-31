@@ -1,8 +1,7 @@
-import { promises as fsPromises } from 'fs';
+import {createReadStream, existsSync, promises as fsPromises} from 'fs';
 import * as wav from 'node-wav';
 import { createCanvas } from 'canvas';
-import {Injectable} from '@nestjs/common';
-import {PrismaClient} from "@prisma/client";
+import {Injectable, StreamableFile} from '@nestjs/common';
 import {createHash} from 'crypto';
 import {join} from 'path';
 
@@ -11,6 +10,17 @@ export class FileService {
 
     static ROOT_PATH_AUDIO = "files/audio"
     static ROOT_PATH_WAVEFORM = "files/waveform"
+
+    static getAudioFilePath(fileOrId: string, type?: string) {
+        return join(
+            this.ROOT_PATH_AUDIO,
+            type? fileOrId + "." + type
+                : fileOrId)
+    }
+
+    static getWaveformFilePath(id: string) {
+        return join(this.ROOT_PATH_WAVEFORM, id+".png")
+    }
 
     static generateFileId() {
         return createHash('sha512')
@@ -30,8 +40,8 @@ export class FileService {
             ...waveformOptions
         }
 
-        audioFile    = join(process.cwd(), this.ROOT_PATH_AUDIO,    audioFile)
-        waveformFile = join(process.cwd(), this.ROOT_PATH_WAVEFORM, waveformFile)
+        audioFile    = this.getAudioFilePath(audioFile)
+        waveformFile = this.getWaveformFilePath(waveformFile)
 
         const wavData = wav.decode(await fsPromises.readFile(audioFile))
         const samplesPerFrame = Math.floor(wavData["channelData"][0].length / options.width)
@@ -68,5 +78,17 @@ export class FileService {
         await fsPromises.writeFile(waveformFile, canvas.toBuffer('image/png'))
     }
 
-    constructor(private readonly prisma: PrismaClient) {}
+    getWaveformImage(id: string) {
+        const waveformFilePath = FileService.getWaveformFilePath(id)
+        return existsSync(waveformFilePath)
+            ? new StreamableFile(createReadStream(FileService.getWaveformFilePath(id)))
+            : null
+    }
+
+    getAudio(id: string, type: string) {
+        const audioFilePath = FileService.getAudioFilePath(id, type)
+        return existsSync(audioFilePath)
+            ? new StreamableFile(createReadStream(audioFilePath))
+            : null
+    }
 }
