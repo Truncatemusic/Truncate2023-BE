@@ -1,4 +1,4 @@
-import {Injectable, Param, Req} from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import {PrismaClient} from '@prisma/client';
 import {randomBytes} from 'crypto';
 import * as bcrypt from 'bcrypt';
