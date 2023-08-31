@@ -5,7 +5,7 @@ import {Injectable, StreamableFile} from '@nestjs/common';
 import {createHash} from 'crypto';
 import {join} from 'path';
 import {PrismaClient} from "@prisma/client";
-import mime from 'mime';
+import {extension as mimeExtension} from 'mime';
 
 @Injectable()
 export class FileService {
@@ -25,7 +25,7 @@ export class FileService {
     }
 
     static getTypeFromMIME(mimetype: string) {
-        return mime.extension(mimetype)
+        return mimeExtension(mimetype)
     }
 
     static generateFileId(buffer: Buffer) {
@@ -35,7 +35,7 @@ export class FileService {
             .substring(0, 128)
     }
 
-    static async generateWaveform(audioFile: string, waveformFile: string, waveformOptions?: object) {
+    static async generateWaveform(audioFile: string|Buffer, waveformFile: string, waveformOptions?: object) {
         const options = {
             width:           8000,
             height:          1000,
@@ -46,7 +46,8 @@ export class FileService {
             ...waveformOptions
         }
 
-        audioFile    = this.getAudioFilePath(audioFile)
+        if (typeof audioFile === "string")
+            audioFile = this.getAudioFilePath(audioFile)
         waveformFile = this.getWaveformFilePath(waveformFile)
 
         const wavData = wav.decode(await fsPromises.readFile(audioFile))
