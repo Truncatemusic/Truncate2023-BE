@@ -15,8 +15,9 @@
 
 ```json
 {
+  "project_id": "<id of the new project>",
+  "versionNumber": "<version number of the new project>",
   "name": "<name of the new project>",
-  "versionNumber": "<version number>",
   "songBPM": <bpm | null>,
   "songKey": "<key | null>"
 }

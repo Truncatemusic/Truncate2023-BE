@@ -45,6 +45,7 @@ export class ProjectService {
                 success: true,
                 project_id: project.id,
                 versionNumber,
+                name: project.name,
                 songBPM,
                 songKey
             }
