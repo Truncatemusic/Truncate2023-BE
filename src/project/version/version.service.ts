@@ -5,7 +5,7 @@ import {PrismaClient} from "@prisma/client";
 export class VersionService {
     constructor(private readonly prisma: PrismaClient) {}
 
-    async addVersion(@Param('id') projectId: number, @Param('songBPM') songBPM?: number, @Param('songKey') songKey?: string) {
+    async addVersion(projectId: number, songBPM?: number, songKey?: string) {
         const lastVersion = await this.getLastVersionId(projectId)
         const version = await this.prisma.tprojectversion.create({
             data: {
@@ -18,7 +18,7 @@ export class VersionService {
         return version.versionNumber
     }
 
-    async getVersionId(@Param('projectId') projectId: number, @Param('versionNumber') versionNumber: number) {
+    async getVersionId(projectId: number, versionNumber: number) {
         const result = await this.prisma.tprojectversion.findFirst({
             where: {
                 project_id: projectId,
@@ -29,7 +29,7 @@ export class VersionService {
         return result?.id || false
     }
 
-    async getLastVersionId(@Param('id') projectId: number) {
+    async getLastVersionId(projectId: number) {
         const version = await this.prisma.tprojectversion.groupBy({
             by: ['project_id'],
             where: {
@@ -45,7 +45,7 @@ export class VersionService {
             : false;
     }
 
-    async getVersion(@Param('id') projectId: number, @Param('versionNumber') versionNumber: number) {
+    async getVersion(projectId: number, versionNumber: number) {
         const result = await this.prisma.tprojectversion.findFirst({
             where: {
                 project_id: projectId,
@@ -57,7 +57,7 @@ export class VersionService {
             : false
     }
 
-    async getFiles(@Param('versionId') versionId: number) {
+    async getFiles(versionId: number) {
         return (await this.prisma.tprojectversionfile.findMany({
             where: {
                 projectversion_id: versionId

@@ -9,7 +9,7 @@ export class ProjectService {
         private readonly versionService: VersionService
     ) {}
 
-    async getInfo(@Param('id') id: number) {
+    async getInfo(id: number) {
         try {
             const project = await this.prisma.tproject.findUnique({
                 where: {id: id}
@@ -27,7 +27,7 @@ export class ProjectService {
         }
     }
 
-    async createProject(@Param('userId') userId: number, @Param('name') name: string, @Param('songBPM') songBPM?: number, @Param('songKey') songKey?: string) {
+    async createProject(userId: number, name: string, songBPM?: number, songKey?: string) {
         if (!name || !String(name).trim())
             return { success: false, reason: 'INVALID_PROJECT_NAME' }
 
@@ -55,7 +55,7 @@ export class ProjectService {
         }
     }
 
-    async renameProject(@Param('id') id: number, @Param('name') name: string) {
+    async renameProject(id: number, name: string) {
         try {
             await this.prisma.tproject.update({
                 where: { id },
@@ -69,7 +69,7 @@ export class ProjectService {
         }
     }
 
-    async deleteProject(@Param('id') id: number) {
+    async deleteProject(id: number) {
         try {
             await this.prisma.tprojectuser.deleteMany({
                 where: {project_id: id}
@@ -85,7 +85,7 @@ export class ProjectService {
         }
     }
 
-    async addUserToProject(@Param('id') projectId: number, @Param('userId') userId: number) {
+    async addUserToProject(projectId: number, userId: number) {
         await this.prisma.tprojectuser.create({
             data: {
                 project_id: projectId,

@@ -10,7 +10,7 @@ export class AuthService {
 
     constructor(private readonly prisma: PrismaClient) {}
 
-    async login(@Param('login') login: string, @Param('password') password: string) {
+    async login(login: string, password: string) {
         let user = await this.prisma.tuser.findFirst({
             where: { username: login },
             select: { password: true, id: true }
@@ -46,7 +46,7 @@ export class AuthService {
         return { success: true, session };
     }
 
-    async logout(@Param('session') session: string) {
+    async logout(session: string) {
         try {
             const result = await this.prisma.tsession.delete({
                 where: { session },
@@ -62,7 +62,7 @@ export class AuthService {
         }
     }
 
-    async getSession(@Param('session') session: string|Request) {
+    async getSession(session: string|Request) {
         session = typeof session === 'string' ? session : session['cookies']['session']
         if (!session)
             return { exists: false }
@@ -80,18 +80,18 @@ export class AuthService {
         }
     }
 
-    async getUserId(@Param('session') session: string|Request) {
+    async getUserId(session: string|Request) {
         const result = await this.getSession(session)
         return result.exists
             ? result.user_id
             : false
     }
 
-    async validateSession(@Req() request: Request) {
+    async validateSession(request: Request) {
         return (await this.getSession(request)).exists;
     }
 
-    async updateSession(@Param('session') session: string) {
+    async updateSession(session: string) {
         try {
             const result = await this.prisma.tsession.update({
                 where: { session },

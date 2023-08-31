@@ -6,13 +6,7 @@ import * as bcrypt from 'bcrypt';
 export class UserService {
     constructor(private readonly prisma: PrismaClient) {}
 
-    async register(
-        @Param('email') email: string,
-        @Param('username') username: string,
-        @Param('password') password: string,
-        @Param('firstname') firstname?: string,
-        @Param('firstname') lastname?: string
-    ) {
+    async register(email: string, username: string, password: string, firstname?: string, lastname?: string) {
         if (Number.isInteger((await this.prisma.tuser.findFirst({
             where: { email: email },
             select: { id: true }
@@ -41,7 +35,7 @@ export class UserService {
         return { success: true }
     }
 
-    async getInfo(@Param('userId') userId: number) {
+    async getInfo(userId: number) {
         const {email, username, firstname, lastname} = await this.prisma.tuser.findFirst({
             where: { id: userId },
             select: {
@@ -58,7 +52,7 @@ export class UserService {
         }
     }
 
-    async getProjects(@Param('userId') userId: number) {
+    async getProjects(userId: number) {
         const projects = await this.prisma.tproject.findMany({
             where: {
                 tprojectuser: {
