@@ -63,11 +63,18 @@ export class AuthService {
     }
 
     async getSession(@Param('session') session: string|Request) {
-        const result = await this.prisma.tsession.findFirst({where: {
-            session: typeof session === 'string' ? session : session['cookies']['session']
-        }});
+        session = typeof session === 'string' ? session : session['cookies']['session']
+        if (!session)
+            return { exists: false }
+
+        const result = await this.prisma.tsession.findFirst({
+            where: {
+                session: typeof session === 'string' ? session : session['cookies']['session']
+            }
+        });
 
         return {
+            exists:  result?.session && result?.user_id,
             session: result?.session,
             user_id: result?.user_id,
         }
@@ -75,13 +82,13 @@ export class AuthService {
 
     async getUserId(@Param('session') session: string|Request) {
         const result = await this.getSession(session)
-        return !result?.session
-            ? false
-            : result.user_id
+        return result.exists
+            ? result.user_id
+            : false
     }
 
     async validateSession(@Req() request: Request) {
-        return !!(await this.getSession(request)).session;
+        return (await this.getSession(request)).exists;
     }
 
     async updateSession(@Param('session') session: string) {
