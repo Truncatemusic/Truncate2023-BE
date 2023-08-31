@@ -58,15 +58,6 @@
 
 ### Responses
 
-#### unknown error
-
-```json
-{
-  "success": false,
-  "reason": "UNKNOWN"
-}
-```
-
 #### invalid project id
 
 ```json

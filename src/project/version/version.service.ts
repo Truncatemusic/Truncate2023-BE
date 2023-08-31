@@ -57,6 +57,14 @@ export class VersionService {
             : false
     }
 
+    async getLastVersion(projectId: number) {
+        const lastVersionId = await this.getLastVersionId(projectId)
+        if (!lastVersionId)
+            return false
+
+        return await this.getVersion(projectId, lastVersionId)
+    }
+
     async getFiles(versionId: number) {
         return (await this.prisma.tprojectversionfile.findMany({
             where: {

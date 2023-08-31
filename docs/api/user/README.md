@@ -82,7 +82,13 @@
 [
   {
     "id": "<project id>",
-    "name": "<project name>"
+    "name": "<project name>",
+    "lastVersion": {
+      "versionNumber": <version number>,
+      "timestamp": "<version-created timestamp>",
+      "songBPM": <song bpm | null>,
+      "songKey": "<song key | null>"
+    }
   }
 ]
 ```

@@ -30,12 +30,8 @@ export class VersionController {
             return AuthService.INVALID_SESSION_RESPONSE
 
         const projectId = parseInt(String(body.projectId)),
-              lastVersionId = await this.service.getLastVersionId(projectId)
+              lastVersion = await this.service.getLastVersion(projectId)
 
-        if (!lastVersionId)
-            return { success: false, reason: "INVALID_PROJECT" }
-
-        const lastVersion = await this.service.getVersion(projectId, lastVersionId)
         return lastVersion
             ? {
                 success:       true,
@@ -44,7 +40,7 @@ export class VersionController {
                 songBPM:       lastVersion.songBPM,
                 songKey:       lastVersion.songKey
             }
-            : { success: false, reason: "UNKNOWN" }
+            : { success: false, reason: "INVALID_PROJECT" }
     }
 
     @Get('files')

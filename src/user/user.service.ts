@@ -1,10 +1,14 @@
 import {Injectable, Param} from '@nestjs/common';
 import {PrismaClient} from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import {VersionService} from "../project/version/version.service";
 
 @Injectable()
 export class UserService {
-    constructor(private readonly prisma: PrismaClient) {}
+    constructor(
+        private readonly prisma: PrismaClient,
+        private readonly versionService: VersionService
+    ) {}
 
     async register(email: string, username: string, password: string, firstname?: string, lastname?: string) {
         if (Number.isInteger((await this.prisma.tuser.findFirst({
@@ -53,7 +57,7 @@ export class UserService {
     }
 
     async getProjects(userId: number) {
-        const projects = await this.prisma.tproject.findMany({
+        const projectResults = await this.prisma.tproject.findMany({
             where: {
                 tprojectuser: {
                     some: {
@@ -63,9 +67,22 @@ export class UserService {
             },
         })
 
-        return projects.map(project => ({
-            id:   project.id,
-            name: project.name
-        }))
+        const projects = []
+        for (const project of projectResults) {
+            const version = await this.versionService.getLastVersion(project.id)
+            if (!version) continue
+
+            projects.push({
+                id: project.id,
+                name: project.name,
+                lastVersion: {
+                    versionNumber: version.versionNumber,
+                    timestamp: version.timestamp,
+                    songBPM: version.songBPM,
+                    songKey: version.songKey
+                }
+            })
+        }
+        return projects
     }
 }
