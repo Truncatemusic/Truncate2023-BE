@@ -155,3 +155,58 @@
   "success": true
 }
 ```
+
+---
+## add user to a project / update user role
+
+### Request `POST /project/addUser`
+
+#### Body
+
+`session` _cookie required_
+
+```json
+{
+  "id": "<id of the project>",
+  "user_id": <id if the user to add>,
+  "role": "<A = Admin | S = Spectator>"
+}
+```
+
+### Responses
+
+#### invalid role
+
+```json
+{
+  "success": false,
+  "reason": "INVALID_ROLE"
+}
+```
+
+#### unknown error
+
+```json
+{
+  "success": false,
+  "reason": "UNKNOWN"
+}
+```
+
+#### successfully added user
+
+```json
+{
+  "success": true,
+  "action": "ADDED"
+}
+```
+
+#### successfully updated user role
+
+```json
+{
+  "success": true,
+  "action": "UPDATED"
+}
+```

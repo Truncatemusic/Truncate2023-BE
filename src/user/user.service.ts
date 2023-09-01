@@ -39,6 +39,13 @@ export class UserService {
         return { success: true }
     }
 
+    async userExists(userId: number) {
+        return !!((await this.prisma.tuser.findUnique({
+                where: {id: userId},
+                select: {id: true}
+            }))?.id)
+    }
+
     async getInfo(userId: number) {
         const {email, username, firstname, lastname} = await this.prisma.tuser.findFirst({
             where: { id: userId },

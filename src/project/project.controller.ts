@@ -48,4 +48,15 @@ export class ProjectController {
 
         return await this.service.deleteProject(parseInt(String(body.id)));
     }
+
+    @Post('addUser')
+    async addUser(@Req() request: Request, @Body() body: {id: number, user_id: number, role: string}) {
+        if (!await this.authService.validateSession(request))
+            return AuthService.INVALID_SESSION_RESPONSE
+
+        if (body.role !== "A" && body.role !== "S")
+            return { success: false, message: "INVALID_ROLE" }
+
+        return await this.service.addUserToProject(parseInt(String(body.id)), parseInt(String(body.user_id)), body.role)
+    }
 }

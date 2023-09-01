@@ -1,11 +1,13 @@
 import {Injectable} from '@nestjs/common';
 import {PrismaClient} from '@prisma/client';
 import {VersionService} from "./version/version.service";
+import {UserService} from "../user/user.service";
 
 @Injectable()
 export class ProjectService {
     constructor(
         private readonly prisma: PrismaClient,
+        private readonly userService: UserService,
         private readonly versionService: VersionService
     ) {}
 
@@ -84,12 +86,35 @@ export class ProjectService {
     }
 
     async addUserToProject(projectId: number, userId: number, role: "O"|"A"|"S") {
-        await this.prisma.tprojectuser.create({
-            data: {
-                project_id: projectId,
-                user_id: userId,
-                role
+        try {
+            if (!await this.userService.userExists(userId))
+                return { success: false, reason: 'USER_DOES_NOT_EXIST' }
+
+            const projectUserId = (await this.prisma.tprojectuser.findFirst({
+                where: {
+                    project_id: projectId,
+                    user_id: userId
+                },
+                select: { id: true }
+            }))?.id
+
+            if (projectUserId) {
+                await this.prisma.tprojectuser.update({
+                    where: { id: projectUserId },
+                    data: { role }
+                })
+                return { success: true, action: "UPDATED" }
             }
-        })
+
+            await this.prisma.tprojectuser.create({
+                data: {
+                    project_id: projectId,
+                    user_id: userId,
+                    role
+                }
+            })
+            return { success: true, action: "ADDED" }
+        }
+        catch (_) { return {success: false, reason: 'UNKNOWN'} }
     }
 }
