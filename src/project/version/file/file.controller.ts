@@ -22,8 +22,11 @@ export class FileController {
         if (!versionId)
             return {success: false, reason: 'INVALID_PROJECT_OR_VERSION'}
 
-        const fileId = await this.service.addAudioFile(versionId, file.buffer, FileService.getTypeFromMIME(file.mimetype))
-        return {success: true, id: fileId}
+        if (!file.mimetype.includes("audio/wav"))
+            return {success: false, reason: 'INVALID_FILE_TYPE'}
+
+        const {waveId} = await this.service.addAudioFile(versionId, file.buffer)
+        return {success: true, id: waveId}
     }
 
     @Get('waveformImage/:id')

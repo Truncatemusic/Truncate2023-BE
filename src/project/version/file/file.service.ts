@@ -1,16 +1,17 @@
-import {createReadStream, existsSync, writeFileSync} from 'fs';
+import {createReadStream, existsSync, writeFileSync, readFileSync, unlinkSync} from 'fs';
 import * as wav from 'node-wav';
 import { createCanvas } from 'canvas';
 import {Injectable, StreamableFile} from '@nestjs/common';
 import {createHash} from 'crypto';
 import {join} from 'path';
 import {PrismaClient} from "@prisma/client";
-import {extension as mimeExtension} from 'mime-types';
+import * as Mp32Wav from "mp3-to-wav"
 
 @Injectable()
 export class FileService {
 
     static ROOT_PATH_AUDIO = "files/audio"
+    static ROOT_PATH_AUDIO_TMP = FileService.ROOT_PATH_AUDIO + "/tmp"
     static ROOT_PATH_WAVEFORM = "files/waveform"
 
     static getAudioFilePath(fileOrId: string, type?: string) {
@@ -22,10 +23,6 @@ export class FileService {
 
     static getWaveformFilePath(id: string) {
         return join(this.ROOT_PATH_WAVEFORM, id+".png")
-    }
-
-    static getTypeFromMIME(mimetype: string) {
-        return mimeExtension(mimetype) || undefined
     }
 
     static generateFileId(buffer: Buffer) {
@@ -48,8 +45,8 @@ export class FileService {
             ...waveformOptions
         }
 
-        const wavData = wav.decode(audioBuffer)
-        const samplesPerFrame = Math.floor(wavData["channelData"][0].length / options.width)
+        const wavData = wav.decode(audioBuffer),
+              samplesPerFrame = Math.floor(wavData["channelData"][0].length / options.width)
 
         const averageLoudnessArray = []
         let   highestLoudness = 0
@@ -83,6 +80,13 @@ export class FileService {
         return canvas.toBuffer('image/png')
     }
 
+    private isWaveBuffer(buffer: Buffer) {
+        try {
+            wav.decode(buffer)
+            return true
+        } catch (_) { return false }
+    }
+
     getWaveformImage(id: string) {
         const waveformFilePath = FileService.getWaveformFilePath(id)
         return existsSync(waveformFilePath)
@@ -97,44 +101,75 @@ export class FileService {
             : null
     }
 
-    private async saveAudioFile(buffer: Buffer, type: string) {
-        const id = FileService.generateFileId(buffer),
-              audioFilePath = FileService.getAudioFilePath(id, type),
-              waveformPath = FileService.getWaveformFilePath(id)
+    private async saveAudioFile(buffer: Buffer) {
+        let mp3Id = undefined
+        if (!this.isWaveBuffer(buffer)) {
+            mp3Id = FileService.generateFileId(buffer)
+
+            const mp3AudioFilePath = FileService.getAudioFilePath(mp3Id, "mp3")
+            if (!existsSync(mp3AudioFilePath))
+                writeFileSync(mp3AudioFilePath, buffer)
+
+            await (new Mp32Wav(mp3AudioFilePath, FileService.ROOT_PATH_AUDIO_TMP)).exec(undefined)
+            const mp3ToWaveAudioFilePath = join(FileService.ROOT_PATH_AUDIO_TMP, mp3Id + ".wav")
+            buffer = readFileSync(mp3ToWaveAudioFilePath)
+            unlinkSync(mp3ToWaveAudioFilePath)
+        }
+
+        const waveId = FileService.generateFileId(buffer),
+              waveAudioFilePath = FileService.getAudioFilePath(waveId, "wav"),
+              waveformPath = FileService.getWaveformFilePath(waveId)
 
         let addedWaveform = false
         if (!existsSync(waveformPath)) {
-            writeFileSync(FileService.getWaveformFilePath(id), await this.generateWaveform(buffer))
+            writeFileSync(FileService.getWaveformFilePath(waveId), await this.generateWaveform(buffer))
             addedWaveform = true
         }
 
-        let addedAudio = false
-        if (!existsSync(audioFilePath)) {
-            writeFileSync(audioFilePath, buffer)
-            addedAudio = true
+        let addedWaveAudio = false
+        if (!existsSync(waveAudioFilePath)) {
+            writeFileSync(waveAudioFilePath, buffer)
+            addedWaveAudio = true
         }
 
-        return {id, addedAudio, addedWaveform}
+        return {waveId, mp3Id, addedWaveAudio, addedMP3Audio: !!mp3Id, addedWaveform}
     }
 
-    async addAudioFile(versionId: number, buffer: Buffer, type: string) {
-        const {id} = await this.saveAudioFile(buffer, type)
-        const result = await this.prisma.tprojectversionfile.findFirst({
+    async addAudioFile(versionId: number, buffer: Buffer) {
+        const {waveId, mp3Id, addedMP3Audio} = await this.saveAudioFile(buffer)
+
+        if (!((await this.prisma.tprojectversionfile.findFirst({
             where: {
-                id, type,
+                id: waveId,
+                type: "wav",
                 projectversion_id: versionId,
             },
             select: { projectversion_id: true }
-        })
-
-        if (!result?.projectversion_id)
+        }))?.projectversion_id))
             await this.prisma.tprojectversionfile.create({
                 data: {
-                    id, type,
+                    id: waveId,
+                    type: "wav",
                     projectversion_id: versionId,
                 }
             })
 
-        return id
+        if (addedMP3Audio && !((await this.prisma.tprojectversionfile.findFirst({
+            where: {
+                id: mp3Id,
+                type: "mp3",
+                projectversion_id: versionId,
+            },
+            select: { projectversion_id: true }
+        }))?.projectversion_id))
+            await this.prisma.tprojectversionfile.create({
+                data: {
+                    id: mp3Id,
+                    type: "mp3",
+                    projectversion_id: versionId,
+                }
+            })
+
+        return {waveId, mp3Id}
     }
 }

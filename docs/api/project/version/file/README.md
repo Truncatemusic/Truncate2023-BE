@@ -48,6 +48,15 @@ _empty or audio file stream_
 }
 ```
 
+#### invalid file type
+
+```json
+{
+  "success": false,
+  "reason": "INVALID_FILE_TYPE"
+}
+```
+
 #### file uploaded and added successfully
 
 ```json
