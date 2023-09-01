@@ -2,11 +2,13 @@ import {Injectable} from '@nestjs/common';
 import {PrismaClient} from '@prisma/client';
 import {VersionService} from "./version/version.service";
 import {UserService} from "../user/user.service";
+import {AuthService} from "../auth/auth.service";
 
 @Injectable()
 export class ProjectService {
     constructor(
         private readonly prisma: PrismaClient,
+        private readonly authService: AuthService,
         private readonly userService: UserService,
         private readonly versionService: VersionService
     ) {}
@@ -83,6 +85,23 @@ export class ProjectService {
         catch (_) {
             return { success: false, reason: 'UNKNOWN' }
         }
+    }
+
+    async getUserRole(projectId: number, userId: number) {
+        return (await this.prisma.tprojectuser.findFirst({
+            where: {
+                project_id: projectId,
+                user_id: userId
+            },
+            select: { role: true }
+        }))?.role || null
+    }
+
+    async getUserRoleBySession(projectId: number, request: Request) {
+        const userId = await this.authService.getUserId(request)
+        return userId
+            ? await this.getUserRole(projectId, userId)
+            : null
     }
 
     async addUserToProject(projectId: number, userId: number, role: "O"|"A"|"S") {

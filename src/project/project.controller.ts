@@ -11,7 +11,8 @@ export class ProjectController {
 
     @Get('info')
     async getInfo(@Req() request: Request, @Body() body: {id: number}) {
-        if (!await this.authService.validateSession(request))
+        const userRole = await this.service.getUserRoleBySession(parseInt(String(body.id)), request)
+        if (!userRole)
             return AuthService.INVALID_SESSION_RESPONSE
 
         return await this.service.getInfo(parseInt(String(body.id)));
@@ -32,7 +33,8 @@ export class ProjectController {
 
     @Patch('rename')
     async rename(@Req() request: Request, @Body() body: {id: number, name: string}) {
-        if (!await this.authService.validateSession(request))
+        const userRole = await this.service.getUserRoleBySession(parseInt(String(body.id)), request)
+        if (userRole !== "O" && userRole !== "A")
             return AuthService.INVALID_SESSION_RESPONSE
 
         return await this.service.renameProject(
@@ -43,7 +45,8 @@ export class ProjectController {
 
     @Post('delete')
     async delete(@Req() request: Request, @Body() body: {id: number}) {
-        if (!await this.authService.validateSession(request))
+        const userRole = await this.service.getUserRoleBySession(parseInt(String(body.id)), request)
+        if (userRole !== "O")
             return AuthService.INVALID_SESSION_RESPONSE
 
         return await this.service.deleteProject(parseInt(String(body.id)));
@@ -51,10 +54,11 @@ export class ProjectController {
 
     @Post('addUser')
     async addUser(@Req() request: Request, @Body() body: {id: number, user_id: number, role: string}) {
-        if (!await this.authService.validateSession(request))
+        const userRole = await this.service.getUserRoleBySession(parseInt(String(body.id)), request)
+        if (userRole !== "O")
             return AuthService.INVALID_SESSION_RESPONSE
 
-        if (body.role !== "A" && body.role !== "S")
+        if (body.role !== "O" && body.role !== "A" && body.role !== "S")
             return { success: false, message: "INVALID_ROLE" }
 
         return await this.service.addUserToProject(parseInt(String(body.id)), parseInt(String(body.user_id)), body.role)
