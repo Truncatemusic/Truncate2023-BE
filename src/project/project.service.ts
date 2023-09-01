@@ -39,7 +39,7 @@ export class ProjectService {
             });
 
             const versionNumber = await this.versionService.addVersion(project.id, songBPM, songKey)
-            await this.addUserToProject(project.id, userId)
+            await this.addUserToProject(project.id, userId, "A")
 
             return {
                 success: true,
@@ -85,11 +85,12 @@ export class ProjectService {
         }
     }
 
-    async addUserToProject(projectId: number, userId: number) {
+    async addUserToProject(projectId: number, userId: number, role: "O"|"A"|"S") {
         await this.prisma.tprojectuser.create({
             data: {
                 project_id: projectId,
                 user_id: userId,
+                role
             }
         })
     }

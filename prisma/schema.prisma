@@ -18,6 +18,7 @@ model tprojectuser {
   id         Int       @id @default(autoincrement()) @db.UnsignedInt
   user_id    Int?      @db.UnsignedInt
   project_id Int?      @db.UnsignedInt
+  role       String    @db.Char(1)
   tuser      tuser?    @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectuser_ibfk_1")
   tproject   tproject? @relation(fields: [project_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectuser_ibfk_2")
 

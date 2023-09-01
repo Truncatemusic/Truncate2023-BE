@@ -48,4 +48,6 @@ CREATE TABLE IF NOT EXISTS tprojectversionfile (
 
     PRIMARY KEY (projectversion_id, id, type),
     FOREIGN KEY (projectversion_id) REFERENCES tprojectversion(id)
-)
+);
+
+ALTER TABLE tprojectuser ADD role CHAR(1) NOT NULL;
