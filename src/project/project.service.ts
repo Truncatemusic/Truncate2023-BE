@@ -33,9 +33,7 @@ export class ProjectService {
 
         try {
             const project = await this.prisma.tproject.create({
-                data: {
-                    name: name
-                }
+                data: { name: name }
             });
 
             const versionNumber = await this.versionService.addVersion(project.id, songBPM, songKey)
