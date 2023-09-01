@@ -72,4 +72,24 @@ export class VersionService {
             }
         }))
     }
+
+    async setSongBPM(versionId: number, songBPM: number) {
+        try {
+            await this.prisma.tprojectversion.update({
+                where: {id: versionId},
+                data: {songBPM}
+            })
+            return true
+        } catch (_) { return false }
+    }
+
+    async setSongKey(versionId: number, songKey: string) {
+        try {
+            await this.prisma.tprojectversion.update({
+                where: {id: versionId},
+                data: {songKey}
+            })
+            return true
+        } catch (_) { return false }
+    }
 }

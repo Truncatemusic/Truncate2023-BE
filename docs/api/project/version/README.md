@@ -116,3 +116,42 @@
   }
 ]
 ```
+
+---
+## set version info (songBPM, songKey, ...)
+
+### Request `PATCH /project/version/info`
+
+#### Body
+
+`session` _cookie required_
+
+```json
+{
+  "projectId": "<id of the project>",
+  "versionNumber": "<version number>",
+  "songBPM": <new song BPM | null>,
+  "songKey": "<new song Key | null>"
+}
+```
+
+### Responses
+
+#### invalid project or version
+
+```json
+{
+  "success": false,
+  "reason": "INVALID_PROJECT_OR_VERSION"
+}
+```
+
+#### successfully updated info
+
+```json
+{
+  "success": true,
+  "updatedSongBPM": true|false,
+  "updatedSongKey": true|false
+}
+```

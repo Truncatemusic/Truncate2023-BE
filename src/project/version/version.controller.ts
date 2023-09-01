@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Post, Req} from '@nestjs/common';
+import {Body, Controller, Get, Patch, Post, Req} from '@nestjs/common';
 import {VersionService} from "./version.service";
 import {AuthService} from "../../auth/auth.service";
 
@@ -56,5 +56,25 @@ export class VersionController {
             id:   file.id,
             type: file.type
         }))
+    }
+
+    @Patch('info')
+    async setSongInfo(@Req() request: Request, @Body() body: {projectId: number, versionNumber: number, songBPM?: number, songKey?: string}) {
+        if (!await this.authService.validateSession(request))
+            return AuthService.INVALID_SESSION_RESPONSE
+
+        const versionId = await this.service.getVersionId(parseInt(String(body.projectId)), parseInt(String(body.versionNumber)))
+        if (!versionId)
+            return {success: false, reason: 'INVALID_PROJECT_OR_VERSION'}
+
+        return {
+            success: true,
+            updatedSongBPM: body.songBPM
+                ? await this.service.setSongBPM(versionId, parseInt(String(body.songBPM)))
+                : false,
+            updatedSongKey: body.songKey
+                ? await this.service.setSongKey(versionId, body.songKey)
+                : false,
+        }
     }
 }
