@@ -39,7 +39,7 @@ export class ProjectService {
             });
 
             const versionNumber = await this.versionService.addVersion(project.id, songBPM, songKey)
-            await this.addUserToProject(project.id, userId, "A")
+            await this.addUserToProject(project.id, userId, "O")
 
             return {
                 success: true,
