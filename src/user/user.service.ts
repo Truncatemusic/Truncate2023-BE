@@ -79,7 +79,11 @@ export class UserService {
                     versionNumber: version.versionNumber,
                     timestamp: version.timestamp,
                     songBPM: version.songBPM,
-                    songKey: version.songKey
+                    songKey: version.songKey,
+                    files: (await this.versionService.getFiles(version.id)).map(file => ({
+                        id:   file.id,
+                        type: file.type
+                    }))
                 }
             })
         }

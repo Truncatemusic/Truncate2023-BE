@@ -87,7 +87,13 @@
       "versionNumber": <version number>,
       "timestamp": "<version-created timestamp>",
       "songBPM": <song bpm | null>,
-      "songKey": "<song key | null>"
+      "songKey": "<song key | null>",
+      "files": [
+        {
+          "id": "<128-byte file id>",
+          "type": "<file type - like wav, mp3,...>"
+        }
+      ]
     }
   }
 ]
