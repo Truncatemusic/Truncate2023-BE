@@ -73,6 +73,18 @@ export class ProjectService {
 
     async deleteProject(id: number) {
         try {
+            await this.prisma.tprojectversionfile.deleteMany({
+                where: {
+                    tprojectversion: {
+                        project_id: id
+                    }
+                }
+            })
+            await this.prisma.tprojectversion.deleteMany({
+                where: {
+                    project_id: id
+                }
+            })
             await this.prisma.tprojectuser.deleteMany({
                 where: {project_id: id}
             })
