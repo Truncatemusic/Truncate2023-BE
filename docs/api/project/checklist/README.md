@@ -41,7 +41,7 @@
 ```json
 {
   "success": true,
-  "id": <project entry id>
+  "id": "<project entry id>"
 }
 ```
 
@@ -67,11 +67,11 @@
 ```json
 [
   {
-    "id": <entry id>,
-    "user_id": <author user id>,
+    "id": "<entry id>",
+    "user_id": "<author user id>",
     "timestamp": "<entry created timestamp>",
     "text": "<entry text>",
-    "checkedVersionNumber": <versionNumber the entry got checked | null if not checked>
+    "checkedVersionNumber": "<versionNumber the entry got checked | null if not checked>"
   }
 ]
 ```
@@ -88,7 +88,7 @@
 ```json
 {
   "projectId": "<project id>",
-  "versionNumber": <project version number>,
+  "versionNumber": "<project version number>",
   "entryId": "<id of the entry to check>"
 }
 ```

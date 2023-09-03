@@ -16,7 +16,7 @@
 ```json
 {
   "projectId": "<id of the project to add new version>",
-  "songBPM": <bpm | null>,
+  "songBPM": "<bpm | null>",
   "songKey": "<key | null>"
 }
 ```
@@ -37,7 +37,7 @@
 ```json
 {
   "success": true,
-  "version": <version number of the new version>
+  "version": "<version number of the new version>"
 }
 ```
 
@@ -72,9 +72,9 @@
 ```json
 {
   "success": true,
-  "versionNumber": <version number>,
+  "versionNumber": "<version number>",
   "timestamp": "<version-created timestamp>",
-  "songBPM": <song bpm | null>,
+  "songBPM": "<song bpm | null>",
   "songKey": "<song key | null>"
 }
 ```
@@ -130,7 +130,7 @@
 {
   "projectId": "<id of the project>",
   "versionNumber": "<version number>",
-  "songBPM": <new song BPM | null>,
+  "songBPM": "<new song BPM | null>",
   "songKey": "<new song Key | null>"
 }
 ```
@@ -151,7 +151,7 @@
 ```json
 {
   "success": true,
-  "updatedSongBPM": true|false,
-  "updatedSongKey": true|false
+  "updatedSongBPM": "<true|false>",
+  "updatedSongKey": "<true|false>"
 }
 ```

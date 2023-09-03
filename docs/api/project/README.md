@@ -19,7 +19,7 @@
   "project_id": "<id of the new project>",
   "versionNumber": "<version number of the new project>",
   "name": "<name of the new project>",
-  "songBPM": <bpm | null>,
+  "songBPM": "<bpm | null>",
   "songKey": "<key | null>"
 }
 ```
@@ -49,7 +49,7 @@
 ```json
 {
   "success": true,
-  "project_id": <id of the new created project>
+  "project_id": "<id of the new created project>"
 }
 ```
 
@@ -169,8 +169,8 @@
 ```json
 {
   "id": "<id of the project>",
-  "user_id": <id if the user to add>,
-  "role": "<A = Admin | S = Spectator>"
+  "user_id": "<id if the user to add>",
+  "role": "<O = Owner | A = Admin | S = Spectator>"
 }
 ```
 
