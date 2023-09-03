@@ -22,7 +22,7 @@ export class ChecklistController {
     @Post('entry/add')
     async addEntry(@Req() request: Request, @Body() body: {projectId: number, text: string}) {
         const userRole = await this.projectService.getUserRoleBySession(parseInt(String(body.projectId)), request)
-        if (!userRole) return AuthService.INVALID_SESSION_RESPONSE
+        if (userRole !== "O" && userRole !== "A") return AuthService.INVALID_SESSION_RESPONSE
 
         const userId = await this.authService.getUserId(request)
         if (!userId) return AuthService.INVALID_SESSION_RESPONSE
