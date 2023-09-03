@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS tprojectchecklist (
     text                     VARCHAR(255) NOT NULL,
     checkedProjectversion_id INT UNSIGNED DEFAULT NULL,
 
-    FOREIGN KEY (project_id) REFERENCES tproject(id),
-    FOREIGN KEY (user_id)    REFERENCES tuser(id)
+    FOREIGN KEY (project_id)               REFERENCES tproject(id),
+    FOREIGN KEY (user_id)                  REFERENCES tuser(id),
+    FOREIGN KEY (checkedProjectversion_id) REFERENCES tprojectversion(id)
 );

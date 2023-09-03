@@ -55,6 +55,7 @@ model tprojectversion {
   timestamp           DateTime?             @default(now()) @db.Timestamp(0)
   songBPM             Int?                  @db.UnsignedSmallInt
   songKey             String?               @db.VarChar(10)
+  tprojectchecklist   tprojectchecklist[]
   tproject            tproject?             @relation(fields: [project_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversion_ibfk_1")
   tprojectversionfile tprojectversionfile[]
 
@@ -71,15 +72,17 @@ model tprojectversionfile {
 }
 
 model tprojectchecklist {
-  id                       Int       @id @default(autoincrement()) @db.UnsignedInt
-  project_id               Int?      @db.UnsignedInt
-  user_id                  Int?      @db.UnsignedInt
-  timestamp                DateTime? @default(now()) @db.Timestamp(0)
-  text                     String    @db.VarChar(255)
-  checkedProjectversion_id Int?      @db.UnsignedInt
-  tproject                 tproject? @relation(fields: [project_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_1")
-  tuser                    tuser?    @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_2")
+  id                       Int              @id @default(autoincrement()) @db.UnsignedInt
+  project_id               Int?             @db.UnsignedInt
+  user_id                  Int?             @db.UnsignedInt
+  timestamp                DateTime?        @default(now()) @db.Timestamp(0)
+  text                     String           @db.VarChar(255)
+  checkedProjectversion_id Int?             @db.UnsignedInt
+  tproject                 tproject?        @relation(fields: [project_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_1")
+  tuser                    tuser?           @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_2")
+  tprojectversion          tprojectversion? @relation(fields: [checkedProjectversion_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_3")
 
   @@index([project_id], map: "project_id")
   @@index([user_id], map: "user_id")
+  @@index([checkedProjectversion_id], map: "checkedProjectversion_id")
 }

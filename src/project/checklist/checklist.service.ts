@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import {PrismaClient} from "@prisma/client";
+import {VersionService} from "../version/version.service";
 
 @Injectable()
 export class ChecklistService {
-    constructor(private readonly prisma: PrismaClient) {}
+    constructor(
+        private readonly prisma: PrismaClient,
+        private readonly versionService: VersionService
+    ) {}
 
     async addEntry(projectId: number, userId: number, text: string) {
         try {
@@ -23,5 +27,33 @@ export class ChecklistService {
                     : "UNKNOWN"
             }
         }
+    }
+
+    async getEntries(projectId: number) {
+        const entries = await this.prisma.tprojectchecklist.findMany({
+            where: {
+                project_id: projectId
+            },
+            select: {
+                id: true,
+                user_id: true,
+                timestamp: true,
+                text: true,
+                checkedProjectversion_id: true
+            }
+        })
+        const entriesOut = []
+        for (const i in entries) {
+            entriesOut.push({
+                id: entries[i].id,
+                user_id: entries[i].user_id,
+                timestamp: entries[i].timestamp,
+                text: entries[i].text,
+                checkedVersionNumber: entries[i].checkedProjectversion_id
+                    ? await this.versionService.getVersionNumber(entries[i].checkedProjectversion_id)
+                    : null
+            })
+        }
+        return entriesOut
     }
 }
