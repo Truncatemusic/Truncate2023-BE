@@ -50,7 +50,7 @@ export class ChecklistService {
                 timestamp: entries[i].timestamp,
                 text: entries[i].text,
                 checkedVersionNumber: entries[i].checkedProjectversion_id
-                    ? await this.versionService.getVersionNumber(entries[i].checkedProjectversion_id)
+                    ? (await this.versionService.getVersionNumber(entries[i].checkedProjectversion_id))?.versionNumber || null
                     : null
             })
         }
