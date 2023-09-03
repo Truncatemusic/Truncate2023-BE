@@ -12,10 +12,12 @@ import { VersionController } from './project/version/version.controller';
 import { VersionService } from './project/version/version.service';
 import { FileController } from './project/version/file/file.controller';
 import { FileService } from './project/version/file/file.service';
+import { ChecklistService } from './project/checklist/checklist.service';
+import { ChecklistController } from './project/checklist/checklist.controller';
 
 @Module({
   imports: [],
-  controllers: [AppController, AuthController, ProjectController, UserController, VersionController, FileController],
-  providers: [AppService, PrismaClient, AuthService, ProjectService, UserService, VersionService, FileService],
+  controllers: [AppController, AuthController, ProjectController, UserController, VersionController, FileController, ChecklistController],
+  providers: [AppService, PrismaClient, AuthService, ProjectService, UserService, VersionService, FileService, ChecklistService],
 })
 export class AppModule {}

@@ -1,0 +1,8 @@
+POST http://{{host}}:{{port}}/project/checklist/entry/add
+Cookie: session={{session}}
+Content-Type: application/json
+
+{
+  "projectId": "{{projectId}}",
+  "text": "{{projectChecklistEntryText}}"
+}

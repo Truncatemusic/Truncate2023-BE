@@ -3,6 +3,7 @@
 ## sub APIs
 
 - [`/project/version`](version)
+- [`/project/checklist`](checklist)
 
 ---
 ## create a new project
