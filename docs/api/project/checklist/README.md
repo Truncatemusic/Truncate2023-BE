@@ -75,3 +75,39 @@
   }
 ]
 ```
+
+---
+## check project checklist entry
+
+### Request `PATCH /project/checklist/entry/check`
+
+#### Body
+
+`session` _cookie required_
+
+```json
+{
+  "projectId": "<project id>",
+  "versionNumber": <project version number>,
+  "entryId": "<id of the entry to check>"
+}
+```
+
+### Responses
+
+#### unknown error
+
+```json
+{
+  "success": false,
+  "reason": "UNKNOWN"
+}
+```
+
+#### successfully checked entry
+
+```json
+{
+  "success": true
+}
+```

@@ -56,4 +56,26 @@ export class ChecklistService {
         }
         return entriesOut
     }
+
+    async checkEntry(entryId: number, versionId: number) {
+        try {
+            await this.prisma.tprojectchecklist.update({
+                where: { id: entryId },
+                data: { checkedProjectversion_id: versionId }
+            })
+            return { success: true }
+        }
+        catch(_) { return { success: false, reason: "UNKNOWN" } }
+    }
+
+    async uncheckEntry(entryId: number) {
+        try {
+            await this.prisma.tprojectchecklist.update({
+                where: { id: entryId },
+                data: { checkedProjectversion_id: null }
+            })
+            return { success: true }
+        }
+        catch(_) { return { success: false, reason: "UNKNOWN" } }
+    }
 }
