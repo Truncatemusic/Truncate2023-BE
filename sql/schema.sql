@@ -64,3 +64,5 @@ CREATE TABLE IF NOT EXISTS tprojectchecklist (
     FOREIGN KEY (user_id)                  REFERENCES tuser(id),
     FOREIGN KEY (checkedProjectversion_id) REFERENCES tprojectversion(id)
 );
+
+ALTER TABLE tprojectversionfile ADD duration INT UNSIGNED NOT NULL DEFAULT 0;

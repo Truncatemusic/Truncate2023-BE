@@ -34,6 +34,11 @@ export class FileService {
 
     constructor(private readonly prisma: PrismaClient) {}
 
+    private getWaveDurationMS(audioBuffer: Buffer) {
+        const wavData = wav.decode(audioBuffer)
+        return wavData["channelData"][0].length / wavData.sampleRate * 1e3
+    }
+
     private async generateWaveform(audioBuffer: Buffer, waveformOptions?: object) {
         const options = {
             width:           8000,
@@ -132,11 +137,11 @@ export class FileService {
             addedWaveAudio = true
         }
 
-        return {waveId, mp3Id, addedWaveAudio, addedMP3Audio: !!mp3Id, addedWaveform}
+        return {waveId, mp3Id, addedWaveAudio, addedMP3Audio: !!mp3Id, addedWaveform, duration: this.getWaveDurationMS(buffer)}
     }
 
     async addAudioFile(versionId: number, buffer: Buffer) {
-        const {waveId, mp3Id, addedMP3Audio} = await this.saveAudioFile(buffer)
+        const {waveId, mp3Id, addedMP3Audio, duration} = await this.saveAudioFile(buffer)
 
         if (!((await this.prisma.tprojectversionfile.findFirst({
             where: {
@@ -151,6 +156,7 @@ export class FileService {
                     id: waveId,
                     type: "wav",
                     projectversion_id: versionId,
+                    duration: Math.floor(duration)
                 }
             })
 
@@ -158,7 +164,7 @@ export class FileService {
             where: {
                 id: mp3Id,
                 type: "mp3",
-                projectversion_id: versionId,
+                projectversion_id: versionId
             },
             select: { projectversion_id: true }
         }))?.projectversion_id))
@@ -166,7 +172,7 @@ export class FileService {
                 data: {
                     id: mp3Id,
                     type: "mp3",
-                    projectversion_id: versionId,
+                    projectversion_id: versionId
                 }
             })
 
