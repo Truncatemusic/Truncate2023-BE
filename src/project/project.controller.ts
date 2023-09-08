@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Patch, Post, Req} from '@nestjs/common';
+import {Body, Controller, Get, Patch, Post, Query, Req} from '@nestjs/common';
 import {ProjectService} from './project.service';
 import {AuthService} from '../auth/auth.service';
 
@@ -10,12 +10,14 @@ export class ProjectController {
     ) {}
 
     @Get('info')
-    async getInfo(@Req() request: Request, @Body() body: {id: number}) {
-        const userRole = await this.service.getUserRoleBySession(parseInt(String(body.id)), request)
+    async getInfo(@Req() request: Request, @Query("id") id: number) {
+        id = parseInt(String(id))
+
+        const userRole = await this.service.getUserRoleBySession(id, request)
         if (!userRole)
             return AuthService.INVALID_SESSION_RESPONSE
 
-        return await this.service.getInfo(parseInt(String(body.id)));
+        return await this.service.getInfo(id)
     }
 
     @Post('create')

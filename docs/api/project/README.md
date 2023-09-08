@@ -56,17 +56,9 @@
 ---
 ## get project information
 
-### Request `GET /project/info`
-
-#### Body
+### Request `GET /project/info?id=<project_id>`
 
 `session` _cookie required_
-
-```json
-{
-    "id": "<id of the project>"
-}
-```
 
 ### Responses
 
