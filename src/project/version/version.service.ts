@@ -66,11 +66,11 @@ export class VersionService {
     }
 
     async getVersionNumber(projectVersionId: number) {
-        return await this.prisma.tprojectversion.findUnique({
+        return (await this.prisma.tprojectversion.findUnique({
             where: {
                 id: projectVersionId
             }
-        })
+        }))
     }
 
     async getFiles(versionId: number) {
