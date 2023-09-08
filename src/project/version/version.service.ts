@@ -57,6 +57,17 @@ export class VersionService {
             : false
     }
 
+    async getVersions(projectId: number) {
+        return (await this.prisma.tprojectversion.findMany({
+            where: {
+                project_id: projectId
+            },
+            orderBy: {
+                versionNumber: 'asc'
+            }
+        }))
+    }
+
     async getLastVersion(projectId: number) {
         const lastVersionId = await this.getLastVersionId(projectId)
         if (!lastVersionId)

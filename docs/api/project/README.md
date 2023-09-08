@@ -84,7 +84,15 @@
 ```json
 {
   "success": true,
-  "name": "<project name>"
+  "name": "<project name>",
+  "versions": [
+    {
+      "versionNumber": "<version number>",
+      "timestamp": "<version-created timestamp>",
+      "songBPM": "<song bpm | null>",
+      "songKey": "<song key | null>"
+    }
+  ]
 }
 ```
 

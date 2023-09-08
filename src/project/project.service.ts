@@ -22,8 +22,14 @@ export class ProjectService {
             return !Number.isInteger(project?.id)
                 ? { success: false, reason: 'UNKNOWN' }
                 : {
-                success: true,
-                name: project.name
+                    success: true,
+                    name: project.name,
+                    versions: (await this.versionService.getVersions(project.id)).map(version => ({
+                        versionNumber: version.versionNumber,
+                        timestamp:     version.timestamp,
+                        songBPM:       version.songBPM,
+                        songKey:       version.songKey
+                    }))
             }
         }
         catch (_) {
