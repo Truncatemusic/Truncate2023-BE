@@ -82,18 +82,9 @@
 ---
 ## get files stored in version
 
-### Request `GET /project/version/files`
-
-#### Body
+### Request `GET /project/version/files/<project-id>/<versionNumber>`
 
 `session` _cookie required_
-
-```json
-{
-  "projectId": "<id of the project>",
-  "versionNumber": "<version number>"
-}
-```
 
 ### Responses
 
