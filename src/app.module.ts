@@ -17,7 +17,24 @@ import { ChecklistController } from './project/checklist/checklist.controller';
 
 @Module({
   imports: [],
-  controllers: [AppController, AuthController, ProjectController, UserController, VersionController, FileController, ChecklistController],
-  providers: [AppService, PrismaClient, AuthService, ProjectService, UserService, VersionService, FileService, ChecklistService],
+  controllers: [
+    AppController,
+    AuthController,
+    ProjectController,
+    UserController,
+    VersionController,
+    FileController,
+    ChecklistController,
+  ],
+  providers: [
+    AppService,
+    PrismaClient,
+    AuthService,
+    ProjectService,
+    UserService,
+    VersionService,
+    FileService,
+    ChecklistService,
+  ],
 })
 export class AppModule {}
