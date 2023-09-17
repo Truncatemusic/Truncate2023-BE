@@ -101,9 +101,13 @@ export class FileService {
 
     getAudio(id: string, type: string) {
         const audioFilePath = FileService.getAudioFilePath(id, type)
-        return existsSync(audioFilePath)
-            ? new StreamableFile(createReadStream(audioFilePath))
-            : null
+        if (!existsSync(audioFilePath))
+            return null
+
+        const readStream = createReadStream(audioFilePath)
+        readStream.on('error', () => {})
+
+        return new StreamableFile(readStream)
     }
 
     private async saveAudioFile(buffer: Buffer) {
