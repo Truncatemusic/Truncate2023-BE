@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query, Req } from '@nestjs/common';
 import { VersionService } from './version.service';
 import { AuthService } from '../../auth/auth.service';
 
@@ -55,18 +46,18 @@ export class VersionController {
       : { success: false, reason: 'INVALID_PROJECT' };
   }
 
-  @Get('files/:projectId/:versionNumber')
+  @Get('files')
   async getFiles(
     @Req() request: Request,
-    @Param('projectId') projectId: number,
-    @Param('versionNumber') versionNumber: number,
+    @Query('id') id: number,
+    @Query('version') version: number,
   ) {
     if (!(await this.authService.validateSession(request)))
       return AuthService.INVALID_SESSION_RESPONSE;
 
     const versionId = await this.service.getVersionId(
-      parseInt(String(projectId)),
-      parseInt(String(versionNumber)),
+      parseInt(String(id)),
+      parseInt(String(version)),
     );
     if (!versionId)
       return { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };

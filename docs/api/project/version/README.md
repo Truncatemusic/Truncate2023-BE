@@ -74,7 +74,7 @@
 ---
 ## get files stored in version
 
-### Request `GET /project/version/files/<project-id>/<versionNumber>`
+### Request `GET /project/version/files?id=<project_id>&version=<version_number>`
 
 `session` _cookie required_
 

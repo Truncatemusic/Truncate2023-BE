@@ -1,8 +1,2 @@
-GET http://{{host}}:{{port}}/project/version/files
+GET http://{{host}}:{{port}}/project/version/files?id={{projectId}}&version={{versionNumber}}
 Cookie: session={{session}}
-Content-Type: application/json
-
-{
-    "projectId": "{{projectId}}",
-    "versionNumber": "{{versionNumber}}"
-}
