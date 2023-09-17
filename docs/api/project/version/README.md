@@ -44,17 +44,9 @@
 ---
 ## get the last project version
 
-### Request `GET /project/version/last`
-
-#### Body
+### Request `GET /project/version/last?id=<project_id>`
 
 `session` _cookie required_
-
-```json
-{
-    "projectId": "<id of the project>"
-}
-```
 
 ### Responses
 

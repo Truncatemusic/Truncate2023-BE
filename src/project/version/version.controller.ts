@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { VersionService } from './version.service';
 import { AuthService } from '../../auth/auth.service';
 
@@ -28,14 +37,11 @@ export class VersionController {
   }
 
   @Get('last')
-  async getLastVersions(
-    @Req() request: Request,
-    @Body() body: { projectId: number },
-  ) {
+  async getLastVersions(@Req() request: Request, @Query('id') id: number) {
     if (!(await this.authService.validateSession(request)))
       return AuthService.INVALID_SESSION_RESPONSE;
 
-    const projectId = parseInt(String(body.projectId)),
+    const projectId = parseInt(String(id)),
       lastVersion = await this.service.getLastVersion(projectId);
 
     return lastVersion

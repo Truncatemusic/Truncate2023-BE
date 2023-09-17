@@ -1,7 +1,2 @@
-GET http://{{host}}:{{port}}/project/version/last
+GET http://{{host}}:{{port}}/project/version/last?id={{projectId}}
 Cookie: session={{session}}
-Content-Type: application/json
-
-{
-    "projectId": "{{projectId}}"
-}
