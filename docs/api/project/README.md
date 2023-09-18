@@ -49,7 +49,8 @@
 ```json
 {
   "success": true,
-  "project_id": "<id of the new created project>"
+  "project_id": "<id of the new created project>",
+  "versionNumber": "<init version number of the new project>"
 }
 ```
 
