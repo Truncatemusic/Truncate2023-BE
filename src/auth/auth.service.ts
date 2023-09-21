@@ -15,17 +15,19 @@ export class AuthService {
   async login(login: string, password: string) {
     let user = await this.prisma.tuser.findFirst({
       where: { username: login },
-      select: { password: true, id: true },
+      select: { password: true, id: true, blocked: true },
     });
 
     if (!Number.isInteger(user?.id))
       user = await this.prisma.tuser.findFirst({
         where: { email: login },
-        select: { password: true, id: true },
+        select: { password: true, id: true, blocked: true },
       });
 
     if (!Number.isInteger(user?.id))
       return { success: false, reason: 'USER_DOES_NOT_EXIST' };
+
+    if (user.blocked) return { success: false, reason: 'USER_IS_BLOCKED' };
 
     if (!(await bcrypt.compare(password, user.password)))
       return { success: false, reason: 'PASSWORD_INCORRECT' };

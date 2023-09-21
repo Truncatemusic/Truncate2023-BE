@@ -34,6 +34,7 @@ model tuser {
   username          String              @db.VarChar(255)
   firstname         String?             @db.VarChar(255)
   lastname          String?             @db.VarChar(255)
+  blocked           Boolean
   tprojectchecklist tprojectchecklist[]
   tprojectuser      tprojectuser[]
   tsession          tsession[]

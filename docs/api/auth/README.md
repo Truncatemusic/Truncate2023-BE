@@ -35,6 +35,15 @@
 }
 ```
 
+#### user is blocked
+
+```json
+{
+  "success": false,
+  "reason": "USER_IS_BLOCKED"
+}
+```
+
 #### successfully logged in
 
 ```json

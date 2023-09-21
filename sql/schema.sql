@@ -66,3 +66,7 @@ CREATE TABLE IF NOT EXISTS tprojectchecklist (
 );
 
 ALTER TABLE tprojectversionfile ADD duration INT UNSIGNED NOT NULL DEFAULT 0;
+
+ALTER TABLE tuser ADD blocked BOOLEAN DEFAULT TRUE;
+UPDATE tuser SET blocked=0 WHERE blocked IS NULL;
+ALTER TABLE tuser MODIFY blocked BOOLEAN NOT NULL;
