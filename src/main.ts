@@ -19,9 +19,7 @@ async function bootstrap() {
 
   app.use(cookieParser());
   app.enableCors({
-    origin:
-      env.CORS_ORIGIN ||
-      'http://localhost:4200, truncatemusic.de, www.truncatemusic.de, api.truncatemusic.de, www.api.truncatemusic.de',
+    origin: env.CORS_ORIGIN,
     credentials: true,
     allowedHeaders: ['content-type'],
   });
