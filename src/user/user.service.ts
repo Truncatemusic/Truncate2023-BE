@@ -48,6 +48,7 @@ export class UserService {
         password: (await bcrypt.hash(password, 10)).toString(),
         firstname: firstname,
         lastname: lastname,
+        blocked: true,
       },
     });
 

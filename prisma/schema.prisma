@@ -8,11 +8,10 @@ datasource db {
 }
 
 model tproject {
-  id                Int                 @id @default(autoincrement()) @db.UnsignedInt
-  name              String              @db.VarChar(255)
-  tprojectchecklist tprojectchecklist[]
-  tprojectuser      tprojectuser[]
-  tprojectversion   tprojectversion[]
+  id              Int               @id @default(autoincrement()) @db.UnsignedInt
+  name            String            @db.VarChar(255)
+  tprojectuser    tprojectuser[]
+  tprojectversion tprojectversion[]
 }
 
 model tprojectuser {
@@ -28,16 +27,14 @@ model tprojectuser {
 }
 
 model tuser {
-  id                Int                 @id @default(autoincrement()) @db.UnsignedInt
-  email             String              @db.VarChar(255)
-  password          String              @db.VarChar(255)
-  username          String              @db.VarChar(255)
-  firstname         String?             @db.VarChar(255)
-  lastname          String?             @db.VarChar(255)
-  blocked           Boolean
-  tprojectchecklist tprojectchecklist[]
-  tprojectuser      tprojectuser[]
-  tsession          tsession[]
+  id           Int            @id @default(autoincrement()) @db.UnsignedInt
+  email        String         @db.VarChar(255)
+  password     String         @db.VarChar(255)
+  username     String         @db.VarChar(255)
+  firstname    String?        @db.VarChar(255)
+  lastname     String?        @db.VarChar(255)
+  tprojectuser tprojectuser[]
+  tsession     tsession[]
 }
 
 model tsession {
@@ -56,7 +53,6 @@ model tprojectversion {
   timestamp           DateTime?             @default(now()) @db.Timestamp(0)
   songBPM             Int?                  @db.UnsignedSmallInt
   songKey             String?               @db.VarChar(10)
-  tprojectchecklist   tprojectchecklist[]
   tproject            tproject?             @relation(fields: [project_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversion_ibfk_1")
   tprojectversionfile tprojectversionfile[]
 
@@ -67,24 +63,7 @@ model tprojectversionfile {
   id                String          @db.Char(128)
   projectversion_id Int             @db.UnsignedInt
   type              String          @db.Char(3)
-  duration          Int             @default(0) @db.UnsignedInt
   tprojectversion   tprojectversion @relation(fields: [projectversion_id], references: [id], onUpdate: Restrict, map: "tprojectversionfile_ibfk_1")
 
   @@id([projectversion_id, id, type])
-}
-
-model tprojectchecklist {
-  id                       Int              @id @default(autoincrement()) @db.UnsignedInt
-  project_id               Int?             @db.UnsignedInt
-  user_id                  Int?             @db.UnsignedInt
-  timestamp                DateTime?        @default(now()) @db.Timestamp(0)
-  text                     String           @db.VarChar(255)
-  checkedProjectversion_id Int?             @db.UnsignedInt
-  tproject                 tproject?        @relation(fields: [project_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_1")
-  tuser                    tuser?           @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_2")
-  tprojectversion          tprojectversion? @relation(fields: [checkedProjectversion_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_3")
-
-  @@index([project_id], map: "project_id")
-  @@index([user_id], map: "user_id")
-  @@index([checkedProjectversion_id], map: "checkedProjectversion_id")
 }
