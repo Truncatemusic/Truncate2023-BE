@@ -27,17 +27,17 @@ jobs:
     - name: Print User
       run: whoami
 
-    - name: Transfer Secret to Server
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        port: ${{ secrets.SERVER_SSH_PORT }}
-        script: echo "${{ secrets.SETUP_ENV }}" > /home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/.env
+#    - name: Transfer Secret to Server
+#      uses: appleboy/ssh-action@v1.0.0
+#      with:
+#        host: ${{ secrets.SERVER_HOST }}
+#        username: ${{ secrets.SERVER_USERNAME }}
+#        key: ${{ secrets.SERVER_SSH_KEY }}
+#        port: ${{ secrets.SERVER_SSH_PORT }}
+#        script: echo "${{ secrets.SETUP_ENV }}" > /home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/.env
 
-    - name: Set Environment Variables
-      run: echo "${{ secrets.SETUP_ENV }}" > .env
+#    - name: Set Environment Variables
+#      run: echo "${{ secrets.SETUP_ENV }}" > .env
 
     - name: Install Dependencies
       run: npm i
