@@ -16,6 +16,10 @@ jobs:
       matrix:
         node-version: [18.x]
 
+    container:
+      image: docker:20.10.9
+      options: --privileged
+
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
