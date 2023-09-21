@@ -16,10 +16,6 @@ jobs:
       matrix:
         node-version: [18.x]
 
-    container:
-      image: docker:20.10.9
-      options: --privileged
-
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
@@ -28,31 +24,34 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    - name: Print User
-      run: whoami
+    #- name: Print User
+    #  run: whoami
 
-    - name: Check Docker Access
-      run: |
-        # Check if the current user is a member of the docker group
-        if groups $USER | grep &>/dev/null '\bdocker\b'; then
-          echo "User has Docker access."
-        else
-          echo "User does not have Docker access. Please grant Docker access and retry."
-          exit 1
-        fi
-      shell: bash
+    #- name: Check Docker Access
+    #  run: |
+    #    # Check if the current user is a member of the docker group
+    #    if groups $USER | grep &>/dev/null '\bdocker\b'; then
+    #      echo "User has Docker access."
+    #    else
+    #      echo "User does not have Docker access. Please grant Docker access and retry."
+    #      exit 1
+    #    fi
+    #  shell: bash
 
     - name: Transfer Secret to Server
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        port: ${{ secrets.SERVER_SSH_PORT }}
-        script: echo "${{ secrets.SETUP_ENV }}" > /home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/.env
+      run: |
+        echo "${{ secrets.SERVER_SSH_KEY }}" > ./sshkey.key
+        echo "${{ secrets.SETUP_ENV }}" > .env
+        scp -i ./sshkey.key .env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/.env
 
-    - name: Set Environment Variables
-      run: echo "${{ secrets.SETUP_ENV }}" > .env
+    #- name: Transfer Secret to Server
+    #  uses: appleboy/ssh-action@v1.0.0
+    #  with:
+    #    host: ${{ secrets.SERVER_HOST }}
+    #    username: ${{ secrets.SERVER_USERNAME }}
+    #    key: ${{ secrets.SERVER_SSH_KEY }}
+    #    port: ${{ secrets.SERVER_SSH_PORT }}
+    #    script: echo "${{ secrets.SETUP_ENV }}" > /home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/.env
 
     - name: Install Dependencies
       run: npm i
