@@ -33,3 +33,6 @@ jobs:
     - name: Generate Prisma Client
       run: npx prisma generate
 
+    - name: Restart Backend Api
+      run: pm2 restart Truncate-Backend
+
