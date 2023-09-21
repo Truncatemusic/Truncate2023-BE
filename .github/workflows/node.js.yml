@@ -36,7 +36,7 @@ jobs:
       run: npm run migrate
 
     - name: Generate Prisma Client
-      run: npx prisma generate
+      run: npx prisma db pull && npx prisma generate
 
     - name: Build Nest.js Application
       run: npm run build
