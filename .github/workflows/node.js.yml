@@ -41,8 +41,10 @@ jobs:
     - name: Transfer Secret to Server
       run: |
         echo "${{ secrets.SERVER_SSH_KEY }}" > ./sshkey.key
-        echo "${{ secrets.SETUP_ENV }}" > .env
-        scp -i ./sshkey.key .env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/.env
+        echo "${{ secrets.SETUP_ENV }}" > ./.env
+        cat ./sshkey.key
+        cat ./.env
+        scp -i ./sshkey.key ./.env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/.env
 
     #- name: Transfer Secret to Server
     #  uses: appleboy/ssh-action@v1.0.0
