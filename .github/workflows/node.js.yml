@@ -27,6 +27,17 @@ jobs:
     - name: Print User
       run: whoami
 
+    - name: Check Docker Access
+      run: |
+        # Check if the current user is a member of the docker group
+        if groups $USER | grep &>/dev/null '\bdocker\b'; then
+          echo "User has Docker access."
+        else
+          echo "User does not have Docker access. Please grant Docker access and retry."
+          exit 1
+        fi
+      shell: bash
+
 #    - name: Transfer Secret to Server
 #      uses: appleboy/ssh-action@v1.0.0
 #      with:
