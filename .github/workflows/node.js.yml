@@ -24,16 +24,22 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    - name: Install Dependencies
-      run: npm i
+    - name: Transfer Secret to Server
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_SSH_PORT }}
+        script: echo "${{ secrets.$SETUP_ENV }}" > /home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/.env
 
     - name: Set Environment Variables
       env:
         SETUP_ENV: ${{ secrets.SETUP_ENV }}
       run: echo "$SETUP_ENV" > .env
 
-    - name: Transfer Secret to Server
-      run: scp -i ${{ secrets.SERVER_SSH_KEY }} .env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/
+    - name: Install Dependencies
+      run: npm i
 
     - name: Migrate Database
       run: npm run migrate
