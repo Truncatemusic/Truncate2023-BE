@@ -35,11 +35,11 @@ jobs:
     - name: Migrate Database
       run: npm run migrate
 
-    - name: Build Nest.js Application
-      run: npm run build
-
     - name: Generate Prisma Client
       run: npx prisma generate
+
+    - name: Build Nest.js Application
+      run: npm run build
 
     - name: Transfer Secret to Server
       run: scp -i ${{ secrets.SERVER_SSH_KEY }} .env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/
