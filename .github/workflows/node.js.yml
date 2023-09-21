@@ -32,17 +32,17 @@ jobs:
         SETUP_ENV: ${{ secrets.SETUP_ENV }}
       run: echo "$SETUP_ENV" > .env
 
+    - name: Transfer Secret to Server
+      run: scp -i ${{ secrets.SERVER_SSH_KEY }} .env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/
+
     - name: Migrate Database
       run: npm run migrate
 
     - name: Generate Prisma Client
-      run: npx prisma db pull && npx prisma generate
+      run: npx prisma generate
 
     - name: Build Nest.js Application
       run: npm run build
-
-    - name: Transfer Secret to Server
-      run: scp -i ${{ secrets.SERVER_SSH_KEY }} .env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/
 
     - name: Restart Backend Api
       run: pm2 restart Truncate-Backend
