@@ -33,5 +33,3 @@ jobs:
     - name: Generate Prisma Client
       run: npx prisma generate
 
-    - name: Start Node.js Server
-      run: node dist/main &
