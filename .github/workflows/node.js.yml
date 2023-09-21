@@ -27,6 +27,11 @@ jobs:
     - name: Install Dependencies
       run: npm i
 
+    - name: Set Environment Variables
+      env:
+        SETUP_ENV: ${{ secrets.SETUP_ENV }}
+      run: echo "$SETUP_ENV" > .env
+
     - name: Migrate Database
       run: npm run migrate
 
@@ -35,6 +40,15 @@ jobs:
 
     - name: Generate Prisma Client
       run: npx prisma generate
+
+    - name: Transfer Secret to Server
+      uses: appleboy/ssh-action@v0.4.0
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_SSH_PORT }}
+        script: echo "${{ secrets.SETUP_ENV }}" > /home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/.env
 
     - name: Restart Backend Api
       run: pm2 restart Truncate-Backend
