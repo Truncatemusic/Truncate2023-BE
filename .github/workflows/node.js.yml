@@ -37,6 +37,9 @@ jobs:
     - name: Migrate Database
       run: npm run migrate
 
+    - name: Pull DB
+      run: npx prisma db pull
+
     - name: Generate Prisma Client
       run: npx prisma generate
 
