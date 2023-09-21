@@ -34,6 +34,4 @@ jobs:
       run: npx prisma generate
 
     - name: Start Node.js Server
-      run: |
-        node dist/main &
-        wait-on http://localhost:3000
+      run: node dist/main &
