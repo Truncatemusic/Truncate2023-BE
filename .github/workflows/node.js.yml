@@ -43,11 +43,15 @@ jobs:
 #    - name: Migrate Database
 #      run: npm run migrate
 
-    - name: Build Nest.js Application
-      run: npm run build
+    - name: Pull db
+
+      run: npx prisma db pull
 
     - name: Generate Prisma Client
       run: npx prisma generate
+
+    - name: Build Nest.js Application
+      run: npm run build
 
     - name: Restart Backend Api
       run: pm2 restart Truncate-Backend
