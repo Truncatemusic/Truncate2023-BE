@@ -23,7 +23,15 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm i
-    - run: nest build
-    - run: prisma generate
-    - run: node dist/main
+
+    - name: Install Dependencies
+      run: npm i
+
+    - name: Build Nest.js Application
+      run: npm run build
+
+    - name: Generate Prisma Client
+      run: npx prisma generate
+
+    - name: Start Node.js Server
+      run: node dist/main
