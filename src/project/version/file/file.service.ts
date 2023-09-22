@@ -12,12 +12,15 @@ import { createHash } from 'crypto';
 import { join } from 'path';
 import { PrismaClient } from '@prisma/client';
 import * as Mp32Wav from 'mp3-to-wav';
+import { env } from 'process';
 
 @Injectable()
 export class FileService {
-  static ROOT_PATH_AUDIO = 'files/audio';
-  static ROOT_PATH_AUDIO_TMP = FileService.ROOT_PATH_AUDIO + '/tmp';
-  static ROOT_PATH_WAVEFORM = 'files/waveform';
+  static ROOT_PATH = env.STORAGE_DIR;
+
+  static ROOT_PATH_AUDIO = join(FileService.ROOT_PATH, 'audio');
+  static ROOT_PATH_AUDIO_TMP = join(FileService.ROOT_PATH_AUDIO, 'tmp');
+  static ROOT_PATH_WAVEFORM = join(FileService.ROOT_PATH, 'waveform');
 
   static getAudioFilePath(fileOrId: string, type?: string) {
     return join(this.ROOT_PATH_AUDIO, type ? fileOrId + '.' + type : fileOrId);
