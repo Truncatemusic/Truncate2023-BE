@@ -24,15 +24,12 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    - name: Store SSH Private Key
+    - name: Transfer Secret to Server
       run: |
         echo "${{ secrets.SERVER_SSH_KEY }}" > ./private_key
         chmod 600 ./private_key
-
-    - name: Transfer Secret to Server
-      run: |
         echo "${{ secrets.SETUP_ENV }}" > ./.env
-        scp -v -o StrictHostKeyChecking=no -i ./private_key ./.env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/.env
+        scp -o StrictHostKeyChecking=no -i ./private_key ./.env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/.env
 
     - name: Install Dependencies
       run: npm i
@@ -40,7 +37,9 @@ jobs:
     - name: Compile Mail Template SCSS
       run: |
         npm run sass:mail
-        scp -vr -o StrictHostKeyChecking=no -i ./private_key ./template/mail/css/ ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/template/mail/css/
+        echo "${{ secrets.SERVER_SSH_KEY }}" > ./private_key
+        chmod 600 ./private_key
+        scp -o StrictHostKeyChecking=no -i ./private_key ./template/mail/css/style.css ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/template/mail/css/style.css
 
     - name: Migrate Database
       run: npm run migrate
