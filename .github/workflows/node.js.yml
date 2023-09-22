@@ -29,7 +29,7 @@ jobs:
         echo "${{ secrets.SERVER_SSH_KEY }}" > ./private_key
         chmod 600 ./private_key
         echo "${{ secrets.SETUP_ENV }}" > ./.env
-        scp -o StrictHostKeyChecking=no -i ./private_key ./.env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/.env
+        scp -v -o StrictHostKeyChecking=no -i ./private_key ./.env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/.env
 
     - name: Install Dependencies
       run: npm i
