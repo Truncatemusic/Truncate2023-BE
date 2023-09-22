@@ -13,7 +13,6 @@ export class MailService {
   async sendMail(
     to: string,
     subject: string,
-    title: string,
     template: string,
     param: object = {},
     theme: string = 'light',
@@ -59,7 +58,7 @@ export class MailService {
                 ).toString()
               : ''),
 
-          title,
+          subject
         },
       });
       return { success: true };
