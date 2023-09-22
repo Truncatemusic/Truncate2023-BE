@@ -14,9 +14,29 @@ import { FileController } from './project/version/file/file.controller';
 import { FileService } from './project/version/file/file.service';
 import { ChecklistService } from './project/checklist/checklist.service';
 import { ChecklistController } from './project/checklist/checklist.controller';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { MailService } from './mail/mail.service';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { env } from 'process';
 
 @Module({
-  imports: [],
+  imports: [
+    MailerModule.forRoot({
+      transport: env.SMTP_HOST,
+      defaults: {
+        from: env.SMTP_FROM,
+      },
+      template: {
+        dir: MailService.DIR,
+        adapter: new HandlebarsAdapter(undefined, {
+          inlineCssEnabled: true,
+        }),
+        options: {
+          strict: true,
+        },
+      },
+    }),
+  ],
   controllers: [
     AppController,
     AuthController,
@@ -35,6 +55,7 @@ import { ChecklistController } from './project/checklist/checklist.controller';
     VersionService,
     FileService,
     ChecklistService,
+    MailService,
   ],
 })
 export class AppModule {}
