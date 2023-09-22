@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import Handlebars from 'handlebars';
 import * as process from 'process';
-import { existsSync, readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 
 @Injectable()
 export class MailService {
@@ -15,7 +15,6 @@ export class MailService {
     subject: string,
     template: string,
     param: object = {},
-    theme: string = 'light',
   ) {
     try {
       await this.mailerService.sendMail({
@@ -38,27 +37,10 @@ export class MailService {
             ).toString(),
           )(param),
 
-          css:
-            readFileSync(
-              MailService.DIR + '/css/themes/' + theme + '.css',
-            ).toString() +
-            readFileSync(MailService.DIR + '/css/style.css').toString() +
-            readFileSync(
-              MailService.DIR + '/css/partials/header.css',
-            ).toString() +
-            readFileSync(
-              MailService.DIR + '/css/partials/main.css',
-            ).toString() +
-            readFileSync(
-              MailService.DIR + '/css/partials/footer.css',
-            ).toString() +
-            (existsSync(MailService.DIR + '/css/templates/' + template + '.css')
-              ? readFileSync(
-                  MailService.DIR + '/css/templates/' + template + '.css',
-                ).toString()
-              : ''),
+          css: readFileSync(MailService.DIR + '/css/style.css').toString(),
 
-          subject
+          subject,
+          template,
         },
       });
       return { success: true };
