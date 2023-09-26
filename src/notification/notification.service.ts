@@ -79,4 +79,40 @@ export class NotificationService {
       return notificationOut;
     });
   }
+
+  async setNotificationRead(notificationId: number) {
+    await this.prisma.tusernotification.update({
+      where: {
+        id: notificationId,
+      },
+      data: {
+        isRead: true,
+      },
+    });
+  }
+
+  async setNotificationUnread(notificationId: number) {
+    await this.prisma.tusernotification.update({
+      where: {
+        id: notificationId,
+      },
+      data: {
+        isRead: false,
+      },
+    });
+  }
+
+  async deleteNotification(notificationId: number) {
+    await this.prisma.tusernotificationparam.deleteMany({
+      where: {
+        notification_id: notificationId,
+      },
+    });
+
+    await this.prisma.tusernotification.delete({
+      where: {
+        id: notificationId,
+      },
+    });
+  }
 }
