@@ -31,6 +31,42 @@ export class NotificationService {
     return id;
   }
 
+  async getNotificationWithUserId(
+    notificationId: number,
+    userId: number,
+  ): Promise<NotificationInterface | undefined> {
+    const notification = await this.prisma.tusernotification.findFirst({
+      where: {
+        id: notificationId,
+        user_id: userId,
+      },
+    });
+
+    if (!notification) return undefined;
+
+    const params = await this.prisma.tusernotificationparam.findMany({
+      where: {
+        notification_id: notification.id,
+      },
+      select: {
+        paramKey: true,
+        paramValue: true,
+      },
+    });
+
+    return {
+      id: notification.id,
+      user_id: notification.user_id,
+      notificationTemplateId: notification.id,
+      timestamp: notification.timestamp,
+      isRead: notification.isRead,
+      params: params.map((param) => ({
+        key: param.paramKey,
+        value: param.paramValue,
+      })),
+    };
+  }
+
   async getNotifications(
     userId: number,
     isRead: boolean = undefined,
@@ -40,12 +76,6 @@ export class NotificationService {
 
     const notifications = await this.prisma.tusernotification.findMany({
       where,
-      select: {
-        id: true,
-        notificationTemplateId: true,
-        timestamp: true,
-        isRead: true,
-      },
     });
 
     const params = notifications.length
@@ -65,7 +95,11 @@ export class NotificationService {
 
     return notifications.map((notification) => {
       const notificationOut: NotificationInterface = {
+        id: notification.id,
+        user_id: notification.user_id,
         notificationTemplateId: notification.notificationTemplateId,
+        timestamp: notification.timestamp,
+        isRead: notification.isRead,
         params: [],
       };
 
@@ -91,10 +125,32 @@ export class NotificationService {
     });
   }
 
+  async setAllNotificationsRead(userId: number) {
+    await this.prisma.tusernotification.updateMany({
+      where: {
+        user_id: userId,
+      },
+      data: {
+        isRead: true,
+      },
+    });
+  }
+
   async setNotificationUnread(notificationId: number) {
     await this.prisma.tusernotification.update({
       where: {
         id: notificationId,
+      },
+      data: {
+        isRead: false,
+      },
+    });
+  }
+
+  async setAllNotificationsUnread(userId: number) {
+    await this.prisma.tusernotification.updateMany({
+      where: {
+        user_id: userId,
       },
       data: {
         isRead: false,
@@ -114,5 +170,10 @@ export class NotificationService {
         id: notificationId,
       },
     });
+  }
+
+  async deleteAllNotifications(userId: number, isRead: boolean = undefined) {
+    for (const notification of await this.getNotifications(userId, isRead))
+      await this.deleteNotification(notification.id);
   }
 }
