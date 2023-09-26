@@ -1,0 +1,2 @@
+POST http://{{host}}:{{port}}/notification/readAll
+Cookie: session={{session}}
