@@ -3,7 +3,13 @@
 ---
 ## get all notifications
 
-### Request `GET /notification/all`
+### Request `GET /notification/all?isRead=<readed_notifications>&from=<filter_from>&to=<filter_to>`
+
+#### Params
+
+- `isRead` - only readed or not readed notifications (`1` or `0`; unset to select every notification)
+- `from` - only list from this value (not required)
+- `to` - only list to this value (not required)
 
 `session` _cookie required_
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -10,11 +10,21 @@ export class NotificationController {
   ) {}
 
   @Get('all')
-  async getNotifications(@Req() request: Request) {
+  async getNotifications(
+    @Req() request: Request,
+    @Query('isRead') isRead?: string,
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+  ) {
     const userId = await this.authService.getUserId(request);
     if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
 
-    return await this.notificationService.getNotifications(userId);
+    return await this.notificationService.getNotifications(
+      userId,
+      isRead === '1' ? true : isRead === '0' ? false : undefined,
+      isNaN(parseInt(from)) ? undefined : parseInt(from),
+      isNaN(parseInt(to)) ? undefined : parseInt(to),
+    );
   }
 
   @Post('read')

@@ -70,12 +70,21 @@ export class NotificationService {
   async getNotifications(
     userId: number,
     isRead: boolean = undefined,
+    from: number = undefined,
+    to: number = undefined,
   ): Promise<NotificationInterface[]> {
-    const where =
-      isRead === undefined ? { user_id: userId } : { user_id: userId, isRead };
-
     const notifications = await this.prisma.tusernotification.findMany({
-      where,
+      where: {
+        user_id: userId,
+        isRead,
+      },
+      orderBy: {
+        timestamp: {
+          sort: 'desc',
+        },
+      },
+      skip: from,
+      take: from === undefined || to === undefined ? undefined : to - from + 1,
     });
 
     const params = notifications.length
