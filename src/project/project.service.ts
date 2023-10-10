@@ -3,11 +3,15 @@ import { PrismaClient } from '@prisma/client';
 import { VersionService } from './version/version.service';
 import { UserService } from '../user/user.service';
 import { AuthService } from '../auth/auth.service';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class ProjectService {
+  public readonly BUCKET_PREFIX = 'project-';
+
   constructor(
     private readonly prisma: PrismaClient,
+    private readonly storageService: StorageService,
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly versionService: VersionService,
@@ -47,29 +51,34 @@ export class ProjectService {
     if (!name || !String(name).trim())
       return { success: false, reason: 'INVALID_PROJECT_NAME' };
 
+    let project: { id: number; name: string }, versionNumber: number;
     try {
-      const project = await this.prisma.tproject.create({
+      project = await this.prisma.tproject.create({
         data: { name: name },
       });
 
-      const versionNumber = await this.versionService.addVersion(
+      versionNumber = await this.versionService.addVersion(
         project.id,
         songBPM,
         songKey,
       );
       await this.addUserToProject(project.id, userId, 'O');
-
-      return {
-        success: true,
-        project_id: project.id,
-        versionNumber,
-        name: project.name,
-        songBPM,
-        songKey,
-      };
     } catch (_) {
       return { success: false, reason: 'UNKNOWN' };
     }
+
+    await this.storageService.storage.createBucket(
+      this.BUCKET_PREFIX + project.id,
+    );
+
+    return {
+      success: true,
+      project_id: project.id,
+      versionNumber,
+      name: project.name,
+      songBPM,
+      songKey,
+    };
   }
 
   async renameProject(id: number, name: string) {
