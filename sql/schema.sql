@@ -70,3 +70,20 @@ ALTER TABLE tprojectversionfile ADD duration INT UNSIGNED NOT NULL DEFAULT 0;
 ALTER TABLE tuser ADD blocked BOOLEAN DEFAULT TRUE;
 UPDATE tuser SET blocked=0 WHERE blocked IS NULL;
 ALTER TABLE tuser MODIFY blocked BOOLEAN NOT NULL;
+
+CREATE TABLE IF NOT EXISTS tusernotification (
+    id                     INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    user_id                INT UNSIGNED,
+    notificationTemplateId SMALLINT UNSIGNED,
+    timestamp              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    isRead                 BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE IF NOT EXISTS tusernotificationparam (
+    id              INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    notification_id INT UNSIGNED,
+    paramKey        VARCHAR(100),
+    paramValue      VARCHAR(255),
+
+    FOREIGN KEY (notification_id) REFERENCES tusernotification(id)
+);

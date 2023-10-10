@@ -4,6 +4,7 @@
 
 - [`/auth`](auth)
 - [`/user`](user)
+- [`/notification`](notification)
 - [`/project`](project)
 
 ## Default Responses

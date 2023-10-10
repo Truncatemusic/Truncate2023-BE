@@ -1,0 +1,2 @@
+GET http://{{host}}:{{port}}/notification/all
+Cookie: session={{session}}

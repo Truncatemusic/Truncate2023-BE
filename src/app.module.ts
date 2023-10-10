@@ -18,6 +18,8 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { MailService } from './mail/mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { env } from 'process';
+import { NotificationService } from './notification/notification.service';
+import { NotificationController } from './notification/notification.controller';
 
 @Module({
   imports: [
@@ -45,6 +47,7 @@ import { env } from 'process';
     VersionController,
     FileController,
     ChecklistController,
+    NotificationController,
   ],
   providers: [
     AppService,
@@ -56,6 +59,7 @@ import { env } from 'process';
     FileService,
     ChecklistService,
     MailService,
+    NotificationService,
   ],
 })
 export class AppModule {}

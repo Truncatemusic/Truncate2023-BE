@@ -88,3 +88,22 @@ model tprojectchecklist {
   @@index([project_id], map: "project_id")
   @@index([user_id], map: "user_id")
 }
+
+model tusernotification {
+  id                     Int                      @id @default(autoincrement()) @db.UnsignedInt
+  user_id                Int?                     @db.UnsignedInt
+  notificationTemplateId Int?                     @db.UnsignedSmallInt
+  timestamp              DateTime?                @default(now()) @db.Timestamp(0)
+  isRead                 Boolean?                 @default(false)
+  tusernotificationparam tusernotificationparam[]
+}
+
+model tusernotificationparam {
+  id                Int                @id @default(autoincrement()) @db.UnsignedInt
+  notification_id   Int?               @db.UnsignedInt
+  paramKey          String?            @db.VarChar(100)
+  paramValue        String?            @db.VarChar(255)
+  tusernotification tusernotification? @relation(fields: [notification_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tusernotificationparam_ibfk_1")
+
+  @@index([notification_id], map: "notification_id")
+}

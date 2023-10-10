@@ -1,0 +1,7 @@
+POST http://{{host}}:{{port}}/notification/delete
+Cookie: session={{session}}
+Content-Type: application/json
+
+{
+  "notificationId": "{{userNotificationId}}"
+}
