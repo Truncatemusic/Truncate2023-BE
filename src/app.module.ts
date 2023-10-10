@@ -20,6 +20,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { env } from 'process';
 import { NotificationService } from './notification/notification.service';
 import { NotificationController } from './notification/notification.controller';
+import { StorageService } from './storage/storage.service';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { NotificationController } from './notification/notification.controller';
     ChecklistService,
     MailService,
     NotificationService,
+    StorageService,
   ],
 })
 export class AppModule {}
