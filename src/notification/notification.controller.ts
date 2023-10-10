@@ -27,6 +27,17 @@ export class NotificationController {
     );
   }
 
+  @Get('countOfUnread')
+  async getCountOfUnread(@Req() request: Request) {
+    const userId = await this.authService.getUserId(request);
+    if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
+
+    return {
+      success: true,
+      count: await this.notificationService.getCountOfUnreadNotifications(),
+    };
+  }
+
   @Post('read')
   async setNotificationRead(
     @Req() request: Request,

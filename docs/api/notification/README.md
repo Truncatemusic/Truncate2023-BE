@@ -35,6 +35,27 @@
 ```
 
 ---
+## get the count of all unread notifications
+
+### Request `GET /notification/countOfUnread`
+
+#### Params
+
+`session` _cookie required_
+
+### Responses
+
+#### count
+
+```json
+{
+  "success": true,
+  "count": "<count>"
+}
+```
+
+
+---
 ## set notification to read status
 
 ### Request `POST /notification/read`

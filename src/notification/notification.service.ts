@@ -123,6 +123,14 @@ export class NotificationService {
     });
   }
 
+  async getCountOfUnreadNotifications() {
+    return this.prisma.tusernotification.count({
+      where: {
+        isRead: false,
+      },
+    });
+  }
+
   async setNotificationRead(notificationId: number) {
     await this.prisma.tusernotification.update({
       where: {
