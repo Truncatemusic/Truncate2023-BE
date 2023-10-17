@@ -28,16 +28,17 @@ model tprojectuser {
 }
 
 model tuser {
-  id                Int                 @id @default(autoincrement()) @db.UnsignedInt
-  email             String              @db.VarChar(255)
-  password          String              @db.VarChar(255)
-  username          String              @db.VarChar(255)
-  firstname         String?             @db.VarChar(255)
-  lastname          String?             @db.VarChar(255)
-  blocked           Boolean
-  tprojectchecklist tprojectchecklist[]
-  tprojectuser      tprojectuser[]
-  tsession          tsession[]
+  id                 Int                  @id @default(autoincrement()) @db.UnsignedInt
+  email              String               @db.VarChar(255)
+  password           String               @db.VarChar(255)
+  username           String               @db.VarChar(255)
+  firstname          String?              @db.VarChar(255)
+  lastname           String?              @db.VarChar(255)
+  blocked            Boolean
+  tprojectchecklist  tprojectchecklist[]
+  tprojectuser       tprojectuser[]
+  tsession           tsession[]
+  tuserresetpassword tuserresetpassword[]
 }
 
 model tsession {
@@ -106,4 +107,13 @@ model tusernotificationparam {
   tusernotification tusernotification? @relation(fields: [notification_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tusernotificationparam_ibfk_1")
 
   @@index([notification_id], map: "notification_id")
+}
+
+model tuserresetpassword {
+  resetKey  String    @id @db.Char(32)
+  user_id   Int?      @db.UnsignedInt
+  timestamp DateTime? @default(now()) @db.Timestamp(0)
+  tuser     tuser?    @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tuserresetpassword_ibfk_1")
+
+  @@index([user_id], map: "user_id")
 }
