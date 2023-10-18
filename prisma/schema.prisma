@@ -112,6 +112,7 @@ model tusernotificationparam {
 model tuserresetpassword {
   resetKey  String    @id @db.Char(32)
   user_id   Int?      @db.UnsignedInt
+  isPrivate Boolean
   timestamp DateTime? @default(now()) @db.Timestamp(0)
   tuser     tuser?    @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tuserresetpassword_ibfk_1")
 

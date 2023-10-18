@@ -61,7 +61,8 @@
 #### key is valid
 ```json
 {
-  "valid": true
+  "valid": true,
+  "privateKey": "<new generated key>"
 }
 ```
 

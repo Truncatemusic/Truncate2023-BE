@@ -16,7 +16,10 @@ export class ResetPasswordController {
     const user_id = await this.userService.getUserByEmail(body.email);
     if (!user_id) return { success: false, reason: 'USER_DOES_NOT_EXIST' };
 
-    const resetKey = await this.resetPasswordService.addResetKey(user_id);
+    const resetKey = await this.resetPasswordService.addResetKey(
+      user_id,
+      false,
+    );
     //console.log('GENERATED_RESET_KEY', email, resetKey);
 
     // TODO: send email
@@ -26,14 +29,25 @@ export class ResetPasswordController {
 
   @Post('evaluate')
   async evaluateKey(@Body() body: { key: string }) {
+    const user_id = await this.resetPasswordService.evaluateResetKey(
+      body.key,
+      false,
+    );
+    if (!user_id) return { valid: false };
+
+    const resetKey = await this.resetPasswordService.addResetKey(user_id, true);
     return {
-      valid: !!(await this.resetPasswordService.evaluateResetKey(body.key)),
+      valid: true,
+      privateKey: resetKey,
     };
   }
 
   @Patch()
   async resetPassword(@Body() body: { key: string; password: string }) {
-    const user_id = await this.resetPasswordService.evaluateResetKey(body.key);
+    const user_id = await this.resetPasswordService.evaluateResetKey(
+      body.key,
+      true,
+    );
     if (!user_id) return { success: false, reason: 'INVALID_KEY' };
 
     await this.authService.deleteSessionsByUserId(user_id);

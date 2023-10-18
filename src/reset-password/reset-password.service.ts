@@ -24,22 +24,25 @@ export class ResetPasswordService {
     });
   }
 
-  async addResetKey(user_id: number): Promise<string> {
+  async addResetKey(user_id: number, isPrivate: boolean): Promise<string> {
     const { resetKey } = await this.prisma.tuserresetpassword.create({
-      data: { user_id, resetKey: this.randomResetKey },
+      data: { user_id, resetKey: this.randomResetKey, isPrivate },
       select: { resetKey: true },
     });
 
     return resetKey;
   }
 
-  async evaluateResetKey(key: string): Promise<number | null> {
+  async evaluateResetKey(
+    key: string,
+    isPrivate: boolean,
+  ): Promise<number | null> {
     await this.deleteExpiredResetKeys();
 
     let result: { user_id: number };
     try {
       result = await this.prisma.tuserresetpassword.delete({
-        where: { resetKey: key },
+        where: { resetKey: key, isPrivate },
         select: { user_id: true },
       });
     } catch (_) {
