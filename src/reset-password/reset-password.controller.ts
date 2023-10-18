@@ -24,6 +24,13 @@ export class ResetPasswordController {
     return resetKey ? { success: true } : { success: false, reason: 'UNKNOWN' };
   }
 
+  @Post('evaluate')
+  async evaluateKey(@Body() body: { key: string }) {
+    return {
+      valid: !!(await this.resetPasswordService.evaluateResetKey(body.key)),
+    };
+  }
+
   @Patch()
   async resetPassword(@Body() body: { key: string; password: string }) {
     const user_id = await this.resetPasswordService.evaluateResetKey(body.key);

@@ -37,6 +37,35 @@
 }
 ```
 
+---
+## evaluate key
+
+### Request `POST /reset-password/evaluate`
+
+#### Body
+```json
+{
+  "key": "<key>"
+}
+```
+
+### Responses
+
+#### key is invalid
+```json
+{
+  "valid": false
+}
+```
+
+#### key is valid
+```json
+{
+  "valid": true
+}
+```
+
+---
 ### Request `PATCH /reset-password`
 
 #### Body
