@@ -44,9 +44,12 @@ export class ResetPasswordController {
       },
     );
 
-    return resetKey && emailResult.success
-      ? { success: true }
-      : { success: false, reason: 'UNKNOWN' };
+    if (!emailResult.success) {
+      console.error(emailResult.error);
+      return { success: false, reason: 'UNKNOWN' };
+    }
+
+    return resetKey ? { success: true } : { success: false, reason: 'UNKNOWN' };
   }
 
   @Post('evaluate')
