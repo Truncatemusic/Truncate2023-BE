@@ -10,6 +10,10 @@ export class UserService {
     private readonly versionService: VersionService,
   ) {}
 
+  private async hashPassword(password: string): Promise<string> {
+    return (await bcrypt.hash(password, 10)).toString();
+  }
+
   async register(
     email: string,
     username: string,
@@ -45,7 +49,7 @@ export class UserService {
       data: {
         email: email,
         username: username,
-        password: (await bcrypt.hash(password, 10)).toString(),
+        password: await this.hashPassword(password),
         firstname: firstname,
         lastname: lastname,
         blocked: true,
@@ -58,6 +62,14 @@ export class UserService {
     return { success: true };
   }
 
+  async getUserByEmail(email: string) {
+    const result = await this.prisma.tuser.findFirst({
+      where: { email },
+      select: { id: true },
+    });
+    return result?.id || null;
+  }
+
   async userExists(userId: number) {
     return !!(
       await this.prisma.tuser.findUnique({
@@ -65,6 +77,22 @@ export class UserService {
         select: { id: true },
       })
     )?.id;
+  }
+
+  async updatePassword(userId: number, password: string): Promise<boolean> {
+    try {
+      await this.prisma.tuser.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          password: await this.hashPassword(password),
+        },
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   async getInfo(userId: number) {

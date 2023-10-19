@@ -110,4 +110,10 @@ export class AuthService {
       return { success: false, reason: 'UNKNOWN' };
     }
   }
+
+  async deleteSessionsByUserId(userId: number) {
+    await this.prisma.tsession.deleteMany({
+      where: { user_id: userId },
+    });
+  }
 }

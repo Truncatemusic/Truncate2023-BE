@@ -20,6 +20,9 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { env } from 'process';
 import { NotificationService } from './notification/notification.service';
 import { NotificationController } from './notification/notification.controller';
+import { TranslationService } from './translation/translation.service';
+import { ResetPasswordController } from './reset-password/reset-password.controller';
+import { ResetPasswordService } from './reset-password/reset-password.service';
 
 @Module({
   imports: [
@@ -48,6 +51,7 @@ import { NotificationController } from './notification/notification.controller';
     FileController,
     ChecklistController,
     NotificationController,
+    ResetPasswordController,
   ],
   providers: [
     AppService,
@@ -60,6 +64,8 @@ import { NotificationController } from './notification/notification.controller';
     ChecklistService,
     MailService,
     NotificationService,
+    TranslationService,
+    ResetPasswordService,
   ],
 })
 export class AppModule {}
