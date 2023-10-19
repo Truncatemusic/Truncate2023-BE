@@ -1,20 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { Translation as TranslationInterface } from './translation.interface';
+import { TranslationParam as TranslationParamInterface } from './translation-param.interface';
 
 @Injectable()
 export class TranslationService {
-  readonly DIR = '../assets/i18n';
+  readonly PATH = '../assets/i18n';
   readonly LANGUAGES = ['en'];
+  protected readonly PARAM_PREFIX = '%';
 
-  private translations: object[] = [];
+  private translations: TranslationInterface[] = [];
 
   constructor() {
     this.parseTranslations();
   }
 
   private getTranslationFile(language: string): string {
-    return join(this.DIR, language + '.json');
+    return join(this.PATH, language + '.json');
   }
 
   private parseTranslationFile(language: string): object {
@@ -28,7 +31,35 @@ export class TranslationService {
       this.translations[language] = this.parseTranslationFile(language);
   }
 
-  getTranslation(language: string): object {
-    return this.translations[language];
+  private replaceParam(translation: string, key: string, value?: string) {
+    return value
+      ? translation.replaceAll(
+          this.PARAM_PREFIX + key + this.PARAM_PREFIX,
+          value,
+        )
+      : translation;
+  }
+
+  private replaceParams(
+    translation: string,
+    params: TranslationParamInterface,
+  ) {
+    for (const key in params)
+      translation = this.replaceParam(translation, key, params[key]);
+    return translation;
+  }
+
+  getTranslation(
+    language: string,
+    key: string,
+    params: TranslationParamInterface = {},
+  ): string {
+    let translations: TranslationInterface | string =
+      this.translations[language];
+    for (const singleKey of key.split('.')) {
+      translations = translations[singleKey];
+      if (typeof translations === 'string') break;
+    }
+    return this.replaceParams(translations as string, params);
   }
 }
