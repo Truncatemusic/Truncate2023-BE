@@ -2,6 +2,8 @@ import { Body, Controller, Patch, Post } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { ResetPasswordService } from './reset-password.service';
 import { AuthService } from '../auth/auth.service';
+import { MailService } from '../mail/mail.service';
+import { env } from 'process';
 
 @Controller('reset-password')
 export class ResetPasswordController {
@@ -9,6 +11,7 @@ export class ResetPasswordController {
     private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly resetPasswordService: ResetPasswordService,
+    private readonly mailService: MailService,
   ) {}
 
   @Post()
@@ -20,11 +23,20 @@ export class ResetPasswordController {
       user_id,
       false,
     );
-    //console.log('GENERATED_RESET_KEY', email, resetKey);
 
-    // TODO: send email
+    const emailResult = await this.mailService.sendMail(
+      body.email,
+      'reset password',
+      'reset-password',
+      {
+        host: env.WEB_HOST,
+        resetKey,
+      },
+    );
 
-    return resetKey ? { success: true } : { success: false, reason: 'UNKNOWN' };
+    return resetKey && emailResult.success
+      ? { success: true }
+      : { success: false, reason: 'UNKNOWN' };
   }
 
   @Post('evaluate')
