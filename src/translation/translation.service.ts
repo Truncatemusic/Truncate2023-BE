@@ -3,10 +3,11 @@ import { readFileSync } from 'fs';
 import { Translation as TranslationInterface } from './translation.interface';
 import { TranslationParam as TranslationParamInterface } from './translation-param.interface';
 import * as process from 'process';
+import { join } from 'path';
 
 @Injectable()
 export class TranslationService {
-  readonly PATH = process.cwd() + '/assets/i18n';
+  readonly PATH = join(process.env.CWD || process.cwd(), '/assets/i18n');
   readonly LANGUAGES = ['en'];
   protected readonly PARAM_PREFIX = '%';
 
@@ -17,7 +18,7 @@ export class TranslationService {
   }
 
   private getTranslationFile(language: string): string {
-    return this.PATH + '/' + language + '.json';
+    return join(this.PATH, language + '.json');
   }
 
   private parseTranslationFile(language: string): object {

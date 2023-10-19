@@ -3,10 +3,14 @@ import { MailerService } from '@nestjs-modules/mailer';
 import Handlebars from 'handlebars';
 import * as process from 'process';
 import { readFileSync } from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class MailService {
-  static readonly DIR = process.cwd() + '/template/mail';
+  static readonly DIR = join(
+    process.env.CWD || process.cwd(),
+    '/template/mail',
+  );
 
   constructor(private readonly mailerService: MailerService) {}
 
