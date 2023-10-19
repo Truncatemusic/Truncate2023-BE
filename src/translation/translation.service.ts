@@ -6,7 +6,7 @@ import * as process from 'process';
 
 @Injectable()
 export class TranslationService {
-  readonly PATH = process.cwd() + 'assets/i18n';
+  readonly PATH = process.cwd() + '/assets/i18n';
   readonly LANGUAGES = ['en'];
   protected readonly PARAM_PREFIX = '%';
 
