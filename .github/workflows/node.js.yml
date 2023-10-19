@@ -54,5 +54,5 @@ jobs:
       run: npm run build
 
     - name: Restart Backend Api
-      run: pm2 restart Truncate-Backend
+      run: pm2 restart Truncate-Backend --cwd /home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE
 
