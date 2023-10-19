@@ -13,7 +13,7 @@ export class TranslationService {
   private translations: TranslationInterface[] = [];
 
   constructor() {
-    this.parseTranslations();
+    //this.parseTranslations();
   }
 
   private getTranslationFile(language: string): string {
