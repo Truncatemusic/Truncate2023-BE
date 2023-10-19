@@ -4,6 +4,7 @@
 
 - [`/auth`](auth)
 - [`/user`](user)
+- [`/reset-password`](reset-password)
 - [`/notification`](notification)
 - [`/project`](project)
 

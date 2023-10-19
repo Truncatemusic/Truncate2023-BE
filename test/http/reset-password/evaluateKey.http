@@ -1,0 +1,6 @@
+POST http://{{host}}:{{port}}/reset-password/evaluate
+Content-Type: application/json
+
+{
+    "key": "{{resetPasswordKey}}"
+}

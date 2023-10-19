@@ -87,3 +87,12 @@ CREATE TABLE IF NOT EXISTS tusernotificationparam (
 
     FOREIGN KEY (notification_id) REFERENCES tusernotification(id)
 );
+
+CREATE TABLE IF NOT EXISTS tuserresetpassword (
+    resetKey  CHAR(32) PRIMARY KEY,
+    user_id   INT UNSIGNED,
+    isPrivate BOOLEAN NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES tuser(id)
+);

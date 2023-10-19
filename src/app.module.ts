@@ -21,6 +21,9 @@ import { env } from 'process';
 import { NotificationService } from './notification/notification.service';
 import { NotificationController } from './notification/notification.controller';
 import { StorageService } from './storage/storage.service';
+import { TranslationService } from './translation/translation.service';
+import { ResetPasswordController } from './reset-password/reset-password.controller';
+import { ResetPasswordService } from './reset-password/reset-password.service';
 
 @Module({
   imports: [
@@ -49,6 +52,7 @@ import { StorageService } from './storage/storage.service';
     FileController,
     ChecklistController,
     NotificationController,
+    ResetPasswordController,
   ],
   providers: [
     AppService,
@@ -61,6 +65,8 @@ import { StorageService } from './storage/storage.service';
     ChecklistService,
     MailService,
     NotificationService,
+    TranslationService,
+    ResetPasswordService,
     StorageService,
   ],
 })
