@@ -4,6 +4,7 @@ import { ResetPasswordService } from './reset-password.service';
 import { AuthService } from '../auth/auth.service';
 import { MailService } from '../mail/mail.service';
 import { env } from 'process';
+import { TranslationService } from '../translation/translation.service';
 
 @Controller('reset-password')
 export class ResetPasswordController {
@@ -12,6 +13,7 @@ export class ResetPasswordController {
     private readonly authService: AuthService,
     private readonly resetPasswordService: ResetPasswordService,
     private readonly mailService: MailService,
+    private readonly translationService: TranslationService,
   ) {}
 
   @Post()
@@ -26,11 +28,19 @@ export class ResetPasswordController {
 
     const emailResult = await this.mailService.sendMail(
       body.email,
-      'reset password',
+      this.translationService.getTranslation(
+        'en',
+        'template.mail.resetPassword.subject',
+      ),
       'reset-password',
       {
-        host: env.WEB_HOST,
-        resetKey,
+        text: this.translationService.getTranslation(
+          'en',
+          'template.mail.resetPassword.text',
+          {
+            link: env.WEB_HOST + '/reset-password?k=' + resetKey,
+          },
+        ),
       },
     );
 

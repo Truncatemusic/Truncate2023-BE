@@ -1,1 +1,10 @@
-{}
+{
+  "template": {
+    "mail": {
+      "resetPassword": {
+        "subject": "Reset your Truncate password",
+        "text": "Hey!<br><br>You can reset the password to your Truncate account with the following link:<br><br><a href=\"%link%\">%link%</a>"
+      }
+    }
+  }
+}
