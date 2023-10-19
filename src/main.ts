@@ -8,9 +8,12 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
-import { env } from 'process';
+import { env, chdir, cwd } from 'process';
 
 async function bootstrap() {
+  if (env.CWD) chdir(env.CWD);
+  console.log('CWD:', cwd());
+
   config();
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
