@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { readFileSync } from 'fs';
 import { Translation as TranslationInterface } from './translation.interface';
 import { TranslationParam as TranslationParamInterface } from './translation-param.interface';
-import process from 'process';
+import * as process from 'process';
 
 @Injectable()
 export class TranslationService {
