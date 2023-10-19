@@ -79,7 +79,36 @@ export class ResetPasswordController {
     if (!(await this.userService.updatePassword(user_id, body.password)))
       return { success: false, reason: 'UNKNOWN' };
 
-    // TODO: send info email
+    const { email } = await this.userService.getInfo(user_id);
+
+    const emailResult = await this.mailService.sendMail(
+      email,
+      this.translationService.getTranslation(
+        'en',
+        'template.mail.resetPasswordSuccess.subject',
+      ),
+      'reset-password-success',
+      {
+        text: this.translationService.getTranslation(
+          'en',
+          'template.mail.resetPasswordSuccess.text',
+          {
+            datetime: new Date().toLocaleString('de-DE', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            }),
+          },
+        ),
+      },
+    );
+
+    if (!emailResult.success) {
+      console.error(emailResult.error);
+      return { success: false, reason: 'UNKNOWN' };
+    }
 
     return { success: true };
   }
