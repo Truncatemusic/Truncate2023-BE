@@ -6,7 +6,7 @@ import { TranslationParam as TranslationParamInterface } from './translation-par
 
 @Injectable()
 export class TranslationService {
-  readonly PATH = '../assets/i18n';
+  readonly PATH = 'assets/i18n';
   readonly LANGUAGES = ['en'];
   protected readonly PARAM_PREFIX = '%';
 
