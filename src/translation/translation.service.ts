@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { readFileSync } from 'fs';
-import { cwd } from 'process';
-import { join } from 'path';
 import { Translation as TranslationInterface } from './translation.interface';
 import { TranslationParam as TranslationParamInterface } from './translation-param.interface';
+import process from 'process';
 
 @Injectable()
 export class TranslationService {
-  readonly PATH = join(cwd(), 'assets/i18n');
+  readonly PATH = process.cwd() + 'assets/i18n';
   readonly LANGUAGES = ['en'];
   protected readonly PARAM_PREFIX = '%';
 
@@ -18,7 +17,7 @@ export class TranslationService {
   }
 
   private getTranslationFile(language: string): string {
-    return join(this.PATH, language + '.json');
+    return this.PATH + '/' + language + '.json';
   }
 
   private parseTranslationFile(language: string): object {
