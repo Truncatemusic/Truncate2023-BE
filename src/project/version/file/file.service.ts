@@ -13,6 +13,8 @@ import { join } from 'path';
 import { PrismaClient } from '@prisma/client';
 import * as Mp32Wav from 'mp3-to-wav';
 import { env } from 'process';
+import { StorageService } from '../../../storage/storage.service';
+import { ProjectService } from '../../project.service';
 
 @Injectable()
 export class FileService {
@@ -22,19 +24,30 @@ export class FileService {
   static ROOT_PATH_AUDIO_TMP = join(FileService.ROOT_PATH_AUDIO, 'tmp');
   static ROOT_PATH_WAVEFORM = join(FileService.ROOT_PATH, 'waveform');
 
+  static getAudioFileName(fileOrId: string, type?: string) {
+    return type ? fileOrId + '.' + type : fileOrId;
+  }
+
   static getAudioFilePath(fileOrId: string, type?: string) {
-    return join(this.ROOT_PATH_AUDIO, type ? fileOrId + '.' + type : fileOrId);
+    return join(this.ROOT_PATH_AUDIO, this.getAudioFileName(fileOrId, type));
+  }
+
+  static getWaveformFileName(id: string) {
+    return id + '.png';
   }
 
   static getWaveformFilePath(id: string) {
-    return join(this.ROOT_PATH_WAVEFORM, id + '.png');
+    return join(this.ROOT_PATH_WAVEFORM, this.getWaveformFileName(id));
   }
 
   static generateFileId(buffer: Buffer) {
     return createHash('sha512').update(buffer).digest('hex').substring(0, 128);
   }
 
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly storageService: StorageService,
+  ) {}
 
   private getWaveDurationMS(audioBuffer: Buffer) {
     const wavData = wav.decode(audioBuffer);
@@ -178,6 +191,59 @@ export class FileService {
     };
   }
 
+  private async upload(id: string) {
+    const projectId = await this.getProjectIdByFileId(id);
+    if (!projectId) return false;
+
+    if (existsSync(FileService.getWaveformFilePath(id)))
+      await this.storageService.uploadBuffer(
+        ProjectService.getBucketName(projectId),
+        FileService.getWaveformFileName(id),
+        readFileSync(FileService.getWaveformFilePath(id)),
+      );
+
+    if (existsSync(FileService.getAudioFilePath(id, 'wav')))
+      await this.storageService.uploadBuffer(
+        ProjectService.getBucketName(projectId),
+        FileService.getAudioFileName(id, 'wav'),
+        readFileSync(FileService.getAudioFilePath(id, 'wav')),
+      );
+    else if (existsSync(FileService.getAudioFilePath(id, 'mp3')))
+      await this.storageService.uploadBuffer(
+        ProjectService.getBucketName(projectId),
+        FileService.getAudioFileName(id, 'mp3'),
+        readFileSync(FileService.getAudioFilePath(id, 'mp3')),
+      );
+
+    return true;
+  }
+
+  private clear(id: string) {
+    for (const path of [
+      FileService.getWaveformFilePath(id),
+      FileService.getAudioFilePath(id, 'wav'),
+      FileService.getAudioFilePath(id, 'mp3'),
+    ])
+      if (existsSync(path)) unlinkSync(path);
+  }
+
+  async getProjectIdByFileId(fileId: string) {
+    return (
+      (
+        await this.prisma.tprojectversion.findFirst({
+          where: {
+            tprojectversionfile: {
+              some: {
+                id: fileId,
+              },
+            },
+          },
+          select: { project_id: true },
+        })
+      )?.project_id || null
+    );
+  }
+
   async addAudioFile(versionId: number, buffer: Buffer) {
     const { waveId, mp3Id, addedMP3Audio, duration } =
       await this.saveAudioFile(buffer);
@@ -203,6 +269,9 @@ export class FileService {
         },
       });
 
+    await this.upload(waveId);
+    this.clear(waveId);
+
     if (
       addedMP3Audio &&
       !(
@@ -215,7 +284,7 @@ export class FileService {
           select: { projectversion_id: true },
         })
       )?.projectversion_id
-    )
+    ) {
       await this.prisma.tprojectversionfile.create({
         data: {
           id: mp3Id,
@@ -223,6 +292,10 @@ export class FileService {
           projectversion_id: versionId,
         },
       });
+
+      await this.upload(mp3Id);
+      this.clear(mp3Id);
+    }
 
     return { waveId, mp3Id };
   }

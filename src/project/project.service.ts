@@ -4,10 +4,16 @@ import { VersionService } from './version/version.service';
 import { UserService } from '../user/user.service';
 import { AuthService } from '../auth/auth.service';
 import { StorageService } from '../storage/storage.service';
+import { env } from 'process';
 
 @Injectable()
 export class ProjectService {
-  public readonly BUCKET_PREFIX = 'project-';
+  static readonly BUCKET_PREFIX =
+    (env.GOOGLE_STORAGE_BUCKET_PREFIX || '') + 'truncate-project-';
+
+  static getBucketName(projectId: number) {
+    return this.BUCKET_PREFIX + projectId;
+  }
 
   constructor(
     private readonly prisma: PrismaClient,
@@ -63,12 +69,13 @@ export class ProjectService {
         songKey,
       );
       await this.addUserToProject(project.id, userId, 'O');
-    } catch (_) {
+    } catch (error) {
+      console.error(error);
       return { success: false, reason: 'UNKNOWN' };
     }
 
     await this.storageService.storage.createBucket(
-      this.BUCKET_PREFIX + project.id,
+      ProjectService.getBucketName(project.id),
     );
 
     return {

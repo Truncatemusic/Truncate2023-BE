@@ -9,4 +9,17 @@ export class StorageService {
   constructor() {
     this.storage = new Storage({ keyFilename: env.GOOGLE_STORAGE_KEYFILE });
   }
+
+  uploadBuffer(bucket: string, fileName: string, buffer: Buffer) {
+    return new Promise((resolve) => {
+      const stream = this.storage
+        .bucket(bucket)
+        .file(fileName)
+        .createWriteStream();
+
+      stream.once('error', (error) => resolve({ success: false, error }));
+      stream.once('finish', () => resolve({ success: true }));
+      stream.end(buffer);
+    });
+  }
 }
