@@ -68,7 +68,6 @@ model tprojectversionfile {
   id                String          @db.Char(128)
   projectversion_id Int             @db.UnsignedInt
   type              String          @db.Char(3)
-  duration          Int             @default(0) @db.UnsignedInt
   tprojectversion   tprojectversion @relation(fields: [projectversion_id], references: [id], onUpdate: Restrict, map: "tprojectversionfile_ibfk_1")
 
   @@id([projectversion_id, id, type])
