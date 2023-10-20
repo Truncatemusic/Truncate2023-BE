@@ -3,11 +3,22 @@ import { PrismaClient } from '@prisma/client';
 import { VersionService } from './version/version.service';
 import { UserService } from '../user/user.service';
 import { AuthService } from '../auth/auth.service';
+import { StorageService } from '../storage/storage.service';
+import { env } from 'process';
+import { ProjectUserRole } from './project-user-role.type';
 
 @Injectable()
 export class ProjectService {
+  static readonly BUCKET_PREFIX =
+    (env.GOOGLE_STORAGE_BUCKET_PREFIX || '') + 'truncate-project-';
+
+  static getBucketName(projectId: number) {
+    return this.BUCKET_PREFIX + projectId;
+  }
+
   constructor(
     private readonly prisma: PrismaClient,
+    private readonly storageService: StorageService,
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly versionService: VersionService,
@@ -47,29 +58,35 @@ export class ProjectService {
     if (!name || !String(name).trim())
       return { success: false, reason: 'INVALID_PROJECT_NAME' };
 
+    let project: { id: number; name: string }, versionNumber: number;
     try {
-      const project = await this.prisma.tproject.create({
+      project = await this.prisma.tproject.create({
         data: { name: name },
       });
 
-      const versionNumber = await this.versionService.addVersion(
+      versionNumber = await this.versionService.addVersion(
         project.id,
         songBPM,
         songKey,
       );
       await this.addUserToProject(project.id, userId, 'O');
-
-      return {
-        success: true,
-        project_id: project.id,
-        versionNumber,
-        name: project.name,
-        songBPM,
-        songKey,
-      };
-    } catch (_) {
+    } catch (error) {
+      console.error(error);
       return { success: false, reason: 'UNKNOWN' };
     }
+
+    await this.storageService.createBucket(
+      ProjectService.getBucketName(project.id),
+    );
+
+    return {
+      success: true,
+      project_id: project.id,
+      versionNumber,
+      name: project.name,
+      songBPM,
+      songKey,
+    };
   }
 
   async renameProject(id: number, name: string) {
@@ -111,6 +128,8 @@ export class ProjectService {
         where: { id },
       });
 
+      await this.storageService.deleteBucket(ProjectService.getBucketName(id));
+
       return { success: true };
     } catch (_) {
       return { success: false, reason: 'UNKNOWN' };
@@ -139,7 +158,7 @@ export class ProjectService {
   async addUserToProject(
     projectId: number,
     userId: number,
-    role: 'O' | 'A' | 'S',
+    role: ProjectUserRole,
   ) {
     try {
       if (!(await this.userService.userExists(userId)))

@@ -132,3 +132,6 @@ dist
 # compiled mail template css
 template/mail/css/*.css
 template/mail/css/*.map
+
+# (google) key files
+/*.key.json
