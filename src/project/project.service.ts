@@ -127,6 +127,8 @@ export class ProjectService {
         where: { id },
       });
 
+      await this.storageService.deleteBucket(ProjectService.getBucketName(id));
+
       return { success: true };
     } catch (_) {
       return { success: false, reason: 'UNKNOWN' };

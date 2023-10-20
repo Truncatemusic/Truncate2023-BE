@@ -14,6 +14,10 @@ export class StorageService {
     return await this.storage.createBucket(name);
   }
 
+  async deleteBucket(name: string) {
+    return await this.storage.bucket(name).delete();
+  }
+
   uploadBuffer(bucket: string, fileName: string, buffer: Buffer) {
     return new Promise((resolve) => {
       const stream = this.storage
