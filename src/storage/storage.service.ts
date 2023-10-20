@@ -2,7 +2,7 @@ import { Injectable, Scope } from '@nestjs/common';
 import { Storage } from '@google-cloud/storage';
 import { env } from 'process';
 import { Response } from 'express';
-import {join} from 'path';
+import { join } from 'path';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class StorageService {
