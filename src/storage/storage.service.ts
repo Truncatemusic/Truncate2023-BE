@@ -2,6 +2,7 @@ import { Injectable, Scope } from '@nestjs/common';
 import { Storage } from '@google-cloud/storage';
 import { env } from 'process';
 import { Response } from 'express';
+import { join } from 'path';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class StorageService {
@@ -10,7 +11,11 @@ export class StorageService {
   private readonly storage: Storage;
 
   constructor() {
-    this.storage = new Storage({ keyFilename: env.GOOGLE_STORAGE_KEYFILE });
+    this.storage = new Storage({
+      keyFilename: env.CWD
+        ? join(env.CWD, env.GOOGLE_STORAGE_KEYFILE)
+        : env.GOOGLE_STORAGE_KEYFILE,
+    });
   }
 
   async createBucket(name: string) {
