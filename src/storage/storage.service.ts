@@ -3,7 +3,7 @@ import { Storage } from '@google-cloud/storage';
 import { env } from 'process';
 import { Response } from 'express';
 import { join } from 'path';
-import { existsSync, readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class StorageService {
@@ -12,13 +12,14 @@ export class StorageService {
   private readonly storage: Storage;
 
   constructor() {
-    const keyfile = env.CWD
-      ? join(env.CWD, env.GOOGLE_STORAGE_KEYFILE)
-      : env.GOOGLE_STORAGE_KEYFILE;
-    console.log('GOOGLE_CLOUD_STORAGE_KEYFILE:', keyfile);
-    console.log('GOOGLE_CLOUD_STORAGE_KEYFILE EXISTS:', existsSync(keyfile));
     this.storage = new Storage({
-      credentials: JSON.parse(readFileSync(keyfile).toString()),
+      credentials: JSON.parse(
+        readFileSync(
+          env.CWD
+            ? join(env.CWD, env.GOOGLE_STORAGE_KEYFILE)
+            : env.GOOGLE_STORAGE_KEYFILE,
+        ).toString(),
+      ),
     });
   }
 
