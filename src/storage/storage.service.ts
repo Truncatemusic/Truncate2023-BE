@@ -4,10 +4,14 @@ import { env } from 'process';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class StorageService {
-  public readonly storage: Storage;
+  private readonly storage: Storage;
 
   constructor() {
     this.storage = new Storage({ keyFilename: env.GOOGLE_STORAGE_KEYFILE });
+  }
+
+  async createBucket(name: string) {
+    return await this.storage.createBucket(name);
   }
 
   uploadBuffer(bucket: string, fileName: string, buffer: Buffer) {

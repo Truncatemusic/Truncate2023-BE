@@ -74,7 +74,7 @@ export class ProjectService {
       return { success: false, reason: 'UNKNOWN' };
     }
 
-    await this.storageService.storage.createBucket(
+    await this.storageService.createBucket(
       ProjectService.getBucketName(project.id),
     );
 
