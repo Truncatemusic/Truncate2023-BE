@@ -3,7 +3,6 @@ import { Storage } from '@google-cloud/storage';
 import { env } from 'process';
 import { Response } from 'express';
 import { join } from 'path';
-import { readFileSync } from 'fs';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class StorageService {
@@ -13,13 +12,9 @@ export class StorageService {
 
   constructor() {
     this.storage = new Storage({
-      credentials: JSON.parse(
-        readFileSync(
-          env.CWD
-            ? join(env.CWD, env.GOOGLE_STORAGE_KEYFILE)
-            : env.GOOGLE_STORAGE_KEYFILE,
-        ).toString(),
-      ),
+      keyFilename: env.CWD
+        ? join(env.CWD, env.GOOGLE_STORAGE_KEYFILE)
+        : env.GOOGLE_STORAGE_KEYFILE,
     });
   }
 
