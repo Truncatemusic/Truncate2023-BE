@@ -1,13 +1,7 @@
-import {
-  createReadStream,
-  existsSync,
-  writeFileSync,
-  readFileSync,
-  unlinkSync,
-} from 'fs';
+import { existsSync, writeFileSync, readFileSync, unlinkSync } from 'fs';
 import * as wav from 'node-wav';
 import { createCanvas } from 'canvas';
-import { Injectable, StreamableFile } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { createHash } from 'crypto';
 import { join } from 'path';
 import { PrismaClient } from '@prisma/client';
@@ -15,6 +9,7 @@ import * as Mp32Wav from 'mp3-to-wav';
 import { env } from 'process';
 import { StorageService } from '../../../storage/storage.service';
 import { ProjectService } from '../../project.service';
+import { ProjectUserRole } from '../../project-user-role.type';
 
 @Injectable()
 export class FileService {
@@ -40,19 +35,17 @@ export class FileService {
     return join(this.ROOT_PATH_WAVEFORM, this.getWaveformFileName(id));
   }
 
-  static generateFileId(buffer: Buffer) {
-    return createHash('sha512').update(buffer).digest('hex').substring(0, 128);
+  static generateFileId() {
+    return createHash('sha512')
+      .update(new Date().getTime() + '' + Math.random())
+      .digest('hex')
+      .substring(0, 128);
   }
 
   constructor(
     private readonly prisma: PrismaClient,
     private readonly storageService: StorageService,
   ) {}
-
-  private getWaveDurationMS(audioBuffer: Buffer) {
-    const wavData = wav.decode(audioBuffer);
-    return (wavData['channelData'][0].length / wavData.sampleRate) * 1e3;
-  }
 
   private async generateWaveform(
     audioBuffer: Buffer,
@@ -123,29 +116,10 @@ export class FileService {
     }
   }
 
-  getWaveformImage(id: string) {
-    const waveformFilePath = FileService.getWaveformFilePath(id);
-    return existsSync(waveformFilePath)
-      ? new StreamableFile(
-          createReadStream(FileService.getWaveformFilePath(id)),
-        )
-      : null;
-  }
-
-  getAudio(id: string, type: string) {
-    const audioFilePath = FileService.getAudioFilePath(id, type);
-    if (!existsSync(audioFilePath)) return null;
-
-    const readStream = createReadStream(audioFilePath);
-    readStream.on('error', () => {});
-
-    return new StreamableFile(readStream);
-  }
-
   private async saveAudioFile(buffer: Buffer) {
     let mp3Id = undefined;
     if (!this.isWaveBuffer(buffer)) {
-      mp3Id = FileService.generateFileId(buffer);
+      mp3Id = FileService.generateFileId();
 
       const mp3AudioFilePath = FileService.getAudioFilePath(mp3Id, 'mp3');
       if (!existsSync(mp3AudioFilePath))
@@ -162,7 +136,7 @@ export class FileService {
       unlinkSync(mp3ToWaveAudioFilePath);
     }
 
-    const waveId = FileService.generateFileId(buffer),
+    const waveId = FileService.generateFileId(),
       waveAudioFilePath = FileService.getAudioFilePath(waveId, 'wav'),
       waveformPath = FileService.getWaveformFilePath(waveId);
 
@@ -187,7 +161,6 @@ export class FileService {
       addedWaveAudio,
       addedMP3Audio: !!mp3Id,
       addedWaveform,
-      duration: this.getWaveDurationMS(buffer),
     };
   }
 
@@ -227,6 +200,55 @@ export class FileService {
       if (existsSync(path)) unlinkSync(path);
   }
 
+  async getUserFileRole(
+    fileId: string,
+    userId: number,
+  ): Promise<ProjectUserRole | null> {
+    return (
+      ((
+        await this.prisma.tprojectuser.findFirst({
+          where: {
+            tproject: {
+              tprojectversion: {
+                some: {
+                  tprojectversionfile: {
+                    some: {
+                      id: fileId,
+                    },
+                  },
+                },
+              },
+            },
+            user_id: userId,
+          },
+          select: { role: true },
+        })
+      )?.role as ProjectUserRole) || null
+    );
+  }
+
+  async getFile(fileId: string) {
+    const result = await this.prisma.tprojectversionfile.findFirst({
+      where: {
+        id: fileId,
+      },
+    });
+    return result.id ? result : null;
+  }
+
+  async getUserFileAndRole(fileId: string, userId: number) {
+    const userFileRole = await this.getUserFileRole(fileId, userId);
+    return userFileRole
+      ? {
+          role: userFileRole,
+          file: await this.getFile(fileId),
+        }
+      : {
+          role: null,
+          file: undefined,
+        };
+  }
+
   async getProjectIdByFileId(fileId: string) {
     return (
       (
@@ -245,8 +267,7 @@ export class FileService {
   }
 
   async addAudioFile(versionId: number, buffer: Buffer) {
-    const { waveId, mp3Id, addedMP3Audio, duration } =
-      await this.saveAudioFile(buffer);
+    const { waveId, mp3Id, addedMP3Audio } = await this.saveAudioFile(buffer);
 
     if (
       !(
@@ -265,7 +286,6 @@ export class FileService {
           id: waveId,
           type: 'wav',
           projectversion_id: versionId,
-          duration: Math.floor(duration),
         },
       });
 

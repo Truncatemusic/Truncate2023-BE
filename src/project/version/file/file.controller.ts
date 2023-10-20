@@ -1,9 +1,11 @@
 import {
   Controller,
   Get,
+  HttpStatus,
   Param,
   Post,
   Req,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -11,12 +13,16 @@ import { AuthService } from '../../../auth/auth.service';
 import { FileService } from './file.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { VersionService } from '../version.service';
+import { StorageService } from '../../../storage/storage.service';
+import { Response } from 'express';
+import { ProjectService } from '../../project.service';
 
 @Controller('project/version/file')
 export class FileController {
   constructor(
     private readonly service: FileService,
     private readonly authService: AuthService,
+    private readonly storageService: StorageService,
     private readonly versionService: VersionService,
   ) {}
 
@@ -46,18 +52,48 @@ export class FileController {
   }
 
   @Get('waveformImage/:id')
-  async getWaveformImage(@Req() request: Request, @Param('id') id: string) {
-    if (!(await this.authService.validateSession(request))) return null;
-    return this.service.getWaveformImage(id);
+  async getWaveformImage(
+    @Req() request: Request,
+    @Res() response: Response,
+    @Param('id') id: string,
+  ) {
+    const userId = await this.authService.getUserId(request);
+    if (!userId) return response.status(HttpStatus.UNAUTHORIZED).send();
+
+    const { role, file } = await this.service.getUserFileAndRole(id, userId);
+    if (!role) return response.status(HttpStatus.UNAUTHORIZED).send();
+    if (!file) return response.status(HttpStatus.NOT_FOUND).send();
+
+    this.storageService.pipeFile(
+      response,
+      ProjectService.getBucketName(
+        await this.service.getProjectIdByFileId(file.id),
+      ),
+      FileService.getWaveformFileName(file.id),
+    );
   }
 
   @Get('audio/:type/:id')
   async getAudio(
     @Req() request: Request,
+    @Res() response: Response,
     @Param('type') type: string,
     @Param('id') id: string,
   ) {
-    if (!(await this.authService.validateSession(request))) return null;
-    return this.service.getAudio(id, type);
+    const userId = await this.authService.getUserId(request);
+    if (!userId) return response.status(HttpStatus.UNAUTHORIZED).send();
+
+    const { role, file } = await this.service.getUserFileAndRole(id, userId);
+    if (!role) return response.status(HttpStatus.UNAUTHORIZED).send();
+    if (!file) return response.status(HttpStatus.NOT_FOUND).send();
+
+    response.redirect(
+      await this.storageService.getFileTmpURL(
+        ProjectService.getBucketName(
+          await this.service.getProjectIdByFileId(file.id),
+        ),
+        FileService.getAudioFileName(file.id, file.type),
+      ),
+    );
   }
 }

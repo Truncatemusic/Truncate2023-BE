@@ -143,7 +143,6 @@ export class UserService {
             (file) => ({
               id: file.id,
               type: file.type,
-              duration: file.duration,
             }),
           ),
         },

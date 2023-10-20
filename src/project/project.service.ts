@@ -5,6 +5,7 @@ import { UserService } from '../user/user.service';
 import { AuthService } from '../auth/auth.service';
 import { StorageService } from '../storage/storage.service';
 import { env } from 'process';
+import { ProjectUserRole } from './project-user-role.type';
 
 @Injectable()
 export class ProjectService {
@@ -157,7 +158,7 @@ export class ProjectService {
   async addUserToProject(
     projectId: number,
     userId: number,
-    role: 'O' | 'A' | 'S',
+    role: ProjectUserRole,
   ) {
     try {
       if (!(await this.userService.userExists(userId)))

@@ -91,8 +91,7 @@
       "files": [
         {
           "id": "<128-byte file id>",
-          "type": "<file type - like wav, mp3,...>",
-          "duration": "<audio duration in ms>"
+          "type": "<file type - like wav, mp3,...>"
         }
       ]
     }

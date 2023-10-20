@@ -1,9 +1,12 @@
 import { Injectable, Scope } from '@nestjs/common';
 import { Storage } from '@google-cloud/storage';
 import { env } from 'process';
+import { Response } from 'express';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class StorageService {
+  private static URL_LIFETIME = 60 * 60 * 1e3; // 1h
+
   private readonly storage: Storage;
 
   constructor() {
@@ -29,5 +32,24 @@ export class StorageService {
       stream.once('finish', () => resolve({ success: true }));
       stream.end(buffer);
     });
+  }
+
+  async getFileTmpURL(bucketName: string, fileName: string) {
+    const [url] = await this.storage
+      .bucket(bucketName)
+      .file(fileName)
+      .getSignedUrl({
+        action: 'read',
+        expires: Date.now() + StorageService.URL_LIFETIME,
+      });
+    return url;
+  }
+
+  pipeFile(response: Response, bucketName: string, fileName: string) {
+    this.storage
+      .bucket(bucketName)
+      .file(fileName)
+      .createReadStream()
+      .pipe(response);
   }
 }

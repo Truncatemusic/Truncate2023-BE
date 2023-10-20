@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS tprojectchecklist (
     FOREIGN KEY (checkedProjectversion_id) REFERENCES tprojectversion(id)
 );
 
-ALTER TABLE tprojectversionfile ADD duration INT UNSIGNED NOT NULL DEFAULT 0;
+ALTER TABLE tprojectversionfile DROP COLUMN IF EXISTS duration;
 
 ALTER TABLE tuser ADD blocked BOOLEAN DEFAULT TRUE;
 UPDATE tuser SET blocked=0 WHERE blocked IS NULL;
