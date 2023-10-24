@@ -6,13 +6,13 @@ import { AppModule } from './app.module';
 import { config } from 'dotenv';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { env, chdir, cwd } from 'process';
 
 async function bootstrap() {
   if (env.CWD) chdir(env.CWD);
-  console.log('CWD:', cwd());
+  new Logger('bootstrap').log('CWD: ' + cwd());
 
   config();
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
