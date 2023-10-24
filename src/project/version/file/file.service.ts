@@ -1,19 +1,19 @@
 import { existsSync, writeFileSync, readFileSync, unlinkSync } from 'fs';
 import * as wav from 'node-wav';
-import { createCanvas } from 'canvas';
 import { Injectable } from '@nestjs/common';
 import { createHash } from 'crypto';
 import { join } from 'path';
 import { PrismaClient } from '@prisma/client';
 import * as Mp32Wav from 'mp3-to-wav';
-import { env } from 'process';
+import { env, cwd } from 'process';
 import { StorageService } from '../../../storage/storage.service';
 import { ProjectService } from '../../project.service';
 import { ProjectUserRole } from '../../project-user-role.type';
+import { AudiowaveformService } from '../../../audiowaveform/audiowaveform.service';
 
 @Injectable()
 export class FileService {
-  static ROOT_PATH = env.STORAGE_DIR;
+  static ROOT_PATH = join(env.CWD || cwd(), env.STORAGE_DIR || 'files');
 
   static ROOT_PATH_AUDIO = join(FileService.ROOT_PATH, 'audio');
   static ROOT_PATH_AUDIO_TMP = join(FileService.ROOT_PATH_AUDIO, 'tmp');
@@ -28,7 +28,7 @@ export class FileService {
   }
 
   static getWaveformFileName(id: string) {
-    return id + '.png';
+    return id + '-waveform.dat';
   }
 
   static getWaveformFilePath(id: string) {
@@ -45,66 +45,14 @@ export class FileService {
   constructor(
     private readonly prisma: PrismaClient,
     private readonly storageService: StorageService,
+    private readonly audiowaveformService: AudiowaveformService,
   ) {}
 
-  private async generateWaveform(
-    audioBuffer: Buffer,
-    waveformOptions?: object,
-  ) {
-    const options = {
-      width: 8000,
-      height: 1000,
-      frames: 8000,
-      maxLineWidth: 10,
-      backgroundColor: '#00000000',
-      lineColor: '#000000',
-      ...waveformOptions,
-    };
-
-    const wavData = wav.decode(audioBuffer),
-      samplesPerFrame = Math.floor(
-        wavData['channelData'][0].length / options.width,
-      );
-
-    const averageLoudnessArray = [];
-    let highestLoudness = 0;
-    for (let i = 0; i < options.width; i++) {
-      const frame = wavData['channelData'][0].slice(
-          i * samplesPerFrame,
-          (i + 1) * samplesPerFrame,
-        ),
-        averageLoudness =
-          frame.reduce((sum: number, sample: number) => sum + sample, 0) /
-          frame.length;
-
-      if (averageLoudness > highestLoudness) highestLoudness = averageLoudness;
-      averageLoudnessArray.push(averageLoudness);
-    }
-
-    const canvas = createCanvas(options.width, options.height),
-      context = canvas.getContext('2d');
-
-    context.fillStyle = options.backgroundColor;
-    context.fillRect(0, 0, options.width, options.height);
-
-    context.strokeStyle = options.lineColor;
-    context.beginPath();
-    for (let i = 0; i < options.frames; i++) {
-      const x = i,
-        y =
-          options.height / 2 -
-          averageLoudnessArray[i] *
-            (1 - highestLoudness + 1) *
-            (options.height / 2);
-      context.lineWidth =
-        options.maxLineWidth -
-        (averageLoudnessArray[i + 1] + 0.5) * (options.maxLineWidth / 2);
-      if (!i) context.moveTo(x, y);
-      else context.lineTo(x, y);
-    }
-    context.stroke();
-
-    return canvas.toBuffer('image/png');
+  private async generateWaveform(audioFile: string, waveformFile: string) {
+    return await this.audiowaveformService.generateWaveform(
+      audioFile,
+      waveformFile,
+    );
   }
 
   private isWaveBuffer(buffer: Buffer) {
@@ -140,19 +88,16 @@ export class FileService {
       waveAudioFilePath = FileService.getAudioFilePath(waveId, 'wav'),
       waveformPath = FileService.getWaveformFilePath(waveId);
 
-    let addedWaveform = false;
-    if (!existsSync(waveformPath)) {
-      writeFileSync(
-        FileService.getWaveformFilePath(waveId),
-        await this.generateWaveform(buffer),
-      );
-      addedWaveform = true;
-    }
-
     let addedWaveAudio = false;
     if (!existsSync(waveAudioFilePath)) {
       writeFileSync(waveAudioFilePath, buffer);
       addedWaveAudio = true;
+    }
+
+    let addedWaveform = false;
+    if (!existsSync(waveformPath)) {
+      await this.generateWaveform(waveAudioFilePath, waveformPath);
+      addedWaveform = true;
     }
 
     return {

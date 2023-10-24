@@ -1,9 +1,9 @@
 # API: `/project/version/file`
 
 ---
-## get waveform image
+## get waveform data
 
-### Request `GET /project/version/file/waveformImage/<32-byte-id>`
+### Request `GET /project/version/file/waveformData/<32-byte-id>`
 
 #### Body
 
