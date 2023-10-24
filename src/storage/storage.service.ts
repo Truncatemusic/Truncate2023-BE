@@ -6,7 +6,7 @@ import { join } from 'path';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class StorageService {
-  private static URL_LIFETIME = 60 * 60 * 1e3; // 1h
+  static URL_LIFETIME = 60 * 60 * 1e3; // 1h
 
   private readonly storage: Storage;
 
@@ -40,6 +40,15 @@ export class StorageService {
   }
 
   async getFileTmpURL(bucketName: string, fileName: string) {
+    await this.storage.bucket(bucketName).setCorsConfiguration([
+      {
+        origin: [env.CORS_ORIGIN],
+        responseHeader: ['Content-Type'],
+        method: ['GET'],
+        maxAgeSeconds: StorageService.URL_LIFETIME / 1e3,
+      },
+    ]);
+
     const [url] = await this.storage
       .bucket(bucketName)
       .file(fileName)

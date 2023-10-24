@@ -27,6 +27,35 @@ _empty or file stream_
 _empty or audio file stream_
 
 ---
+## get audio url
+
+### Request `GET /project/version/file/audio/url/<type-like-wav...>/<32-byte-id>`
+
+#### Body
+
+`session` _cookie required_
+
+### Responses
+
+#### resource not found
+
+```json
+{
+  "success": false,
+  "reason": "RESOURCE_NOT_FOUND"
+}
+```
+
+#### success
+
+```json
+{
+  "success": true,
+  "url": "<url to the audio resource>"
+}
+```
+
+---
 ## upload audio file
 
 ### Request `POST /project/version/file/audio/upload/<project-id>/<version-number>`

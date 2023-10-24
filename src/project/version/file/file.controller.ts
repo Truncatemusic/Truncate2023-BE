@@ -73,6 +73,30 @@ export class FileController {
     );
   }
 
+  @Get('audio/url/:type/:id')
+  async getAudioURL(
+    @Req() request: Request,
+    @Param('type') type: string,
+    @Param('id') id: string,
+  ) {
+    const userId = await this.authService.getUserId(request);
+    if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
+
+    const { role, file } = await this.service.getUserFileAndRole(id, userId);
+    if (!role) return AuthService.INVALID_SESSION_RESPONSE;
+    if (!file) return { success: false, reason: 'RESOURCE_NOT_FOUND' };
+
+    return {
+      success: true,
+      url: await this.storageService.getFileTmpURL(
+        ProjectService.getBucketName(
+          await this.service.getProjectIdByFileId(file.id),
+        ),
+        FileService.getAudioFileName(file.id, type || file.type),
+      ),
+    };
+  }
+
   @Get('audio/:type/:id')
   async getAudio(
     @Req() request: Request,
@@ -92,7 +116,7 @@ export class FileController {
         ProjectService.getBucketName(
           await this.service.getProjectIdByFileId(file.id),
         ),
-        FileService.getAudioFileName(file.id, file.type),
+        FileService.getAudioFileName(file.id, type || file.type),
       ),
     );
   }
