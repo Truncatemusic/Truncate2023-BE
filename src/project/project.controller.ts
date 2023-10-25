@@ -84,4 +84,17 @@ export class ProjectController {
       body.role,
     );
   }
+
+  @Get('users')
+  async getUsers(@Req() request: Request, @Query('id') id: number) {
+    id = parseInt(String(id));
+
+    if (!(await this.service.getUserRoleBySession(id, request)))
+      return AuthService.INVALID_SESSION_RESPONSE;
+
+    return {
+      success: true,
+      users: this.service.getProjectUsersFill(id),
+    };
+  }
 }

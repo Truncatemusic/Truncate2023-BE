@@ -212,3 +212,32 @@
   "action": "UPDATED"
 }
 ```
+
+---
+## get project users
+
+### Request `GET /project/users?id=<project_id>`
+
+`session` _cookie required_
+
+### Responses
+
+#### project users
+
+```json
+{
+  "success": true,
+  "users": [
+    {
+      "id": "<project-user id>",
+      "role": "<project-user role>",
+      "user": {
+        "email": "<user email>",
+        "username": "<user username>",
+        "firstname": "<user firstname>",
+        "lastname": "<user lastname>"
+      }
+    }
+  ]
+}
+```
