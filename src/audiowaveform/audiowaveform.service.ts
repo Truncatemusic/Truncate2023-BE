@@ -15,7 +15,7 @@ export class AudiowaveformService {
   }
 
   install(
-    distribution: 'debian' | 'ubuntu' = 'debian',
+    distribution: 'debian' | 'ubuntu' | 'macosx' = 'debian',
     ignoreInstalled: boolean = false,
   ) {
     return new Promise<{

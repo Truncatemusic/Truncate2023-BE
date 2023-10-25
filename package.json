@@ -8,6 +8,7 @@
   "scripts": {
     "install:audiowaveform:ubuntu": "add-apt-repository ppa:chris-needham/ppa && apt-get update && apt-get install audiowaveform",
     "install:audiowaveform:debian": "apt-get update && cd package && apt-get install -fy && dpkg -i audiowaveform_1.9.1-1-11_amd64.deb && apt-get -f install -y",
+    "install:audiowaveform:macosx": "brew tap bbc/audiowaveform && brew install audiowaveform",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

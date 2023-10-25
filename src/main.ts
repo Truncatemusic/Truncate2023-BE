@@ -23,7 +23,7 @@ async function bootstrap() {
     await audioWaveformService.install();
   if (!wasInstalled && !installedSuccessfully) {
     logger.error(
-      "audiowaveform need to be installed! Install using: 'sudo npm run install:audiowaveform:<debian|ubuntu>'",
+      "audiowaveform need to be installed! Install using: 'sudo npm run install:audiowaveform:<debian|ubuntu|macosx>'",
     );
     process.exit(1);
   }
