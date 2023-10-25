@@ -1,4 +1,4 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable, Scope, HttpStatus } from '@nestjs/common';
 import { Storage } from '@google-cloud/storage';
 import { env } from 'process';
 import { Response } from 'express';
@@ -59,11 +59,13 @@ export class StorageService {
     return url;
   }
 
-  pipeFile(response: Response, bucketName: string, fileName: string) {
-    this.storage
-      .bucket(bucketName)
-      .file(fileName)
-      .createReadStream()
-      .pipe(response);
+  async pipeFile(response: Response, bucketName: string, fileName: string) {
+    try {
+      const [file] = await this.storage.bucket(bucketName).file(fileName).get();
+      if (!file) response.status(HttpStatus.NOT_FOUND).send();
+      else file.createReadStream().pipe(response);
+    } catch (e) {
+      response.status(HttpStatus.NOT_FOUND).send();
+    }
   }
 }

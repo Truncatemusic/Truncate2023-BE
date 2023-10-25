@@ -51,8 +51,8 @@ export class FileController {
     return { success: true, id: waveId };
   }
 
-  @Get('waveformImage/:id')
-  async getWaveformImage(
+  @Get('waveformData/:id')
+  async getwaveformData(
     @Req() request: Request,
     @Res() response: Response,
     @Param('id') id: string,
@@ -64,7 +64,7 @@ export class FileController {
     if (!role) return response.status(HttpStatus.UNAUTHORIZED).send();
     if (!file) return response.status(HttpStatus.NOT_FOUND).send();
 
-    this.storageService.pipeFile(
+    await this.storageService.pipeFile(
       response,
       ProjectService.getBucketName(
         await this.service.getProjectIdByFileId(file.id),
