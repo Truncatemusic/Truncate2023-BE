@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { exec, ExecException } from 'child_process';
 
 /**
@@ -20,6 +20,10 @@ export class AudiowaveformService {
     return new Promise<boolean>(async (resolve) =>
       resolve(!!(await this.version)),
     );
+  }
+
+  async printVersion(logger: Logger = new Logger(AudiowaveformService.name)) {
+    logger.log(await this.version);
   }
 
   install(

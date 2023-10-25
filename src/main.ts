@@ -27,7 +27,7 @@ async function bootstrap() {
     );
     return process.exit(1);
   }
-  logger.log(await audioWaveformService.version);
+  await audioWaveformService.printVersion();
 
   config();
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
