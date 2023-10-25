@@ -94,7 +94,7 @@ export class ProjectController {
 
     return {
       success: true,
-      users: this.service.getProjectUsersFill(id),
+      users: await this.service.getProjectUsersFill(id),
     };
   }
 }
