@@ -8,9 +8,17 @@ import { exec, ExecException } from 'child_process';
 
 @Injectable()
 export class AudiowaveformService {
+  get version() {
+    return new Promise<string | null>((resolve) =>
+      exec('audiowaveform -v', (error, stdout) =>
+        resolve(error ? null : stdout.trim()),
+      ),
+    );
+  }
+
   get installed() {
-    return new Promise<boolean>((resolve) =>
-      exec('audiowaveform -v', (error) => resolve(!error)),
+    return new Promise<boolean>(async (resolve) =>
+      resolve(!!(await this.version)),
     );
   }
 

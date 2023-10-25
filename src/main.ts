@@ -25,8 +25,9 @@ async function bootstrap() {
     logger.error(
       "audiowaveform need to be installed! Install using: 'sudo npm run install:audiowaveform:<debian|ubuntu|macosx>'",
     );
-    process.exit(1);
+    return process.exit(1);
   }
+  logger.log(await audioWaveformService.version);
 
   config();
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
