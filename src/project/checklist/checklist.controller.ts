@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Patch, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, Patch, Req, Query } from '@nestjs/common';
 import { ChecklistService } from './checklist.service';
 import { AuthService } from '../../auth/auth.service';
 import { ProjectService } from '../project.service';
@@ -16,17 +16,18 @@ export class ChecklistController {
   @Get('entries')
   async getEntries(
     @Req() request: Request,
-    @Body() body: { projectId: number; versionNumber: number },
+    @Query('projectId') projectId: number,
+    @Query('versionNumber') versionNumber: number,
   ) {
     const userRole = await this.projectService.getUserRoleBySession(
-      parseInt(String(body.projectId)),
+      parseInt(String(projectId)),
       request,
     );
     if (!userRole) return AuthService.INVALID_SESSION_RESPONSE;
 
     const versionId = await this.versionService.getVersionId(
-      body.projectId,
-      body.versionNumber,
+      projectId,
+      versionNumber,
     );
 
     return versionId

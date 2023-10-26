@@ -49,18 +49,9 @@
 ---
 ## get all project checklist entries
 
-### Request `GET /project/checklist/entries`
-
-#### Body
+### Request `GET /project/checklist/entries?projectId=<project_id>&versionNumber=<version_number>`
 
 `session` _cookie required_
-
-```json
-{
-  "projectId": "<id of the project to get the checklist entries from>",
-  "versionNumber": "<version number of the project to get the checklist entries from>"
-}
-```
 
 ### Responses
 
