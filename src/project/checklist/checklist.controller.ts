@@ -16,8 +16,8 @@ export class ChecklistController {
   @Get('entries')
   async getEntries(
     @Req() request: Request,
-    @Query('projectId') projectId: number,
-    @Query('versionNumber') versionNumber: number,
+    @Query('projectId') projectId: string,
+    @Query('versionNumber') versionNumber: string,
   ) {
     const userRole = await this.projectService.getUserRoleBySession(
       parseInt(String(projectId)),
@@ -26,8 +26,8 @@ export class ChecklistController {
     if (!userRole) return AuthService.INVALID_SESSION_RESPONSE;
 
     const versionId = await this.versionService.getVersionId(
-      projectId,
-      versionNumber,
+      parseInt(String(projectId)),
+      parseInt(String(versionNumber)),
     );
 
     return versionId
