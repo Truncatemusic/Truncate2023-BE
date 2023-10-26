@@ -30,7 +30,10 @@ export class ChecklistController {
     );
 
     return versionId
-      ? await this.checklistService.getEntries(versionId)
+      ? {
+          success: true,
+          entries: await this.checklistService.getEntries(versionId),
+        }
       : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }
 

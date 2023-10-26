@@ -76,15 +76,18 @@
 #### entries
 
 ```json
-[
-  {
-    "id": "<entry id>",
-    "user_id": "<author user id>",
-    "timestamp": "<entry created timestamp>",
-    "text": "<entry text>",
-    "checkedVersionNumber": "<versionNumber the entry got checked | null if not checked>"
-  }
-]
+{
+  "success": true,
+  "entries": [
+    {
+      "id": "<entry id>",
+      "user_id": "<author user id>",
+      "timestamp": "<entry created timestamp>",
+      "text": "<entry text>",
+      "checkedVersionNumber": "<versionNumber the entry got checked | null if not checked>"
+    }
+  ]
+}
 ```
 
 ---
