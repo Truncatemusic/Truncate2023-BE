@@ -3,5 +3,6 @@ Cookie: session={{session}}
 Content-Type: application/json
 
 {
-  "projectId": "{{projectId}}"
+  "projectId": "{{projectId}}",
+  "versionNumber": "{{versionNumber}}"
 }
