@@ -29,6 +29,8 @@ CREATE TABLE IF NOT EXISTS tprojectuser (
     FOREIGN KEY (project_id) REFERENCES tproject(id)
 );
 
+ALTER TABLE tprojectuser ADD IF NOT EXISTS role CHAR(1) NOT NULL;
+
 CREATE TABLE IF NOT EXISTS tprojectversion (
     id            INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     project_id    INT UNSIGNED,
@@ -50,7 +52,7 @@ CREATE TABLE IF NOT EXISTS tprojectversionfile (
     FOREIGN KEY (projectversion_id) REFERENCES tprojectversion(id)
 );
 
-ALTER TABLE tprojectuser ADD role CHAR(1) NOT NULL;
+ALTER TABLE tprojectversionfile DROP COLUMN IF EXISTS duration;
 
 CREATE TABLE IF NOT EXISTS tprojectchecklist (
     id                       INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -65,9 +67,7 @@ CREATE TABLE IF NOT EXISTS tprojectchecklist (
     FOREIGN KEY (checkedProjectversion_id) REFERENCES tprojectversion(id)
 );
 
-ALTER TABLE tprojectversionfile DROP COLUMN IF EXISTS duration;
-
-ALTER TABLE tuser ADD blocked BOOLEAN DEFAULT TRUE;
+ALTER TABLE tuser ADD IF NOT EXISTS blocked BOOLEAN DEFAULT TRUE;
 UPDATE tuser SET blocked=0 WHERE blocked IS NULL;
 ALTER TABLE tuser MODIFY blocked BOOLEAN NOT NULL;
 
