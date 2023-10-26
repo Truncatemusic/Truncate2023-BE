@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Patch, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, Patch, Req, Query } from '@nestjs/common';
 import { ChecklistService } from './checklist.service';
 import { AuthService } from '../../auth/auth.service';
 import { ProjectService } from '../project.service';
@@ -16,23 +16,32 @@ export class ChecklistController {
   @Get('entries')
   async getEntries(
     @Req() request: Request,
-    @Body() body: { projectId: number },
+    @Query('projectId') projectId: string,
+    @Query('versionNumber') versionNumber: string,
   ) {
     const userRole = await this.projectService.getUserRoleBySession(
-      parseInt(String(body.projectId)),
+      parseInt(String(projectId)),
       request,
     );
     if (!userRole) return AuthService.INVALID_SESSION_RESPONSE;
 
-    return await this.checklistService.getEntries(
-      parseInt(String(body.projectId)),
+    const versionId = await this.versionService.getVersionId(
+      parseInt(String(projectId)),
+      parseInt(String(versionNumber)),
     );
+
+    return versionId
+      ? {
+          success: true,
+          entries: await this.checklistService.getEntries(versionId),
+        }
+      : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }
 
   @Post('entry/add')
   async addEntry(
     @Req() request: Request,
-    @Body() body: { projectId: number; text: string },
+    @Body() body: { projectId: number; versionNumber: number; text: string },
   ) {
     const userRole = await this.projectService.getUserRoleBySession(
       parseInt(String(body.projectId)),
@@ -44,11 +53,14 @@ export class ChecklistController {
     const userId = await this.authService.getUserId(request);
     if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
 
-    return await this.checklistService.addEntry(
-      parseInt(String(body.projectId)),
-      userId,
-      body.text,
+    const versionId = await this.versionService.getVersionId(
+      body.projectId,
+      body.versionNumber,
     );
+
+    return versionId
+      ? await this.checklistService.addEntry(versionId, userId, body.text)
+      : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }
 
   @Patch('entry/check')
@@ -67,11 +79,12 @@ export class ChecklistController {
       parseInt(String(body.projectId)),
       parseInt(String(body.versionNumber)),
     );
-    if (!versionId)
-      return { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
-    return await this.checklistService.checkEntry(
-      parseInt(String(body.entryId)),
-      versionId,
-    );
+
+    return versionId
+      ? await this.checklistService.checkEntry(
+          parseInt(String(body.entryId)),
+          versionId,
+        )
+      : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }
 }

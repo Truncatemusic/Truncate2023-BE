@@ -104,11 +104,13 @@ export class ProjectService {
 
   async deleteProject(id: number) {
     try {
-      await this.prisma.tprojectchecklist.deleteMany({
-        where: {
-          project_id: id,
-        },
-      });
+      for (const version of await this.versionService.getVersions(id))
+        await this.prisma.tprojectchecklist.deleteMany({
+          where: {
+            projectversionId: version.id,
+          },
+        });
+
       await this.prisma.tprojectversionfile.deleteMany({
         where: {
           tprojectversion: {
@@ -116,14 +118,17 @@ export class ProjectService {
           },
         },
       });
+
       await this.prisma.tprojectversion.deleteMany({
         where: {
           project_id: id,
         },
       });
+
       await this.prisma.tprojectuser.deleteMany({
         where: { project_id: id },
       });
+
       await this.prisma.tproject.delete({
         where: { id },
       });

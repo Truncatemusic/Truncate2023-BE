@@ -12,11 +12,21 @@
 ```json
 {
   "projectId": "<id of the project to add new checklist entry>",
+  "versionNumber": "<version number of the project to add new checklist entry>",
   "text": "<checklist entry text>"
 }
 ```
 
 ### Responses
+
+#### invalid project or version
+
+```json
+{
+  "success": false,
+  "reason": "INVALID_PROJECT_OR_VERSION"
+}
+```
 
 #### unknown error
 
@@ -24,15 +34,6 @@
 {
   "success": false,
   "reason": "UNKNOWN"
-}
-```
-
-#### invalid project id
-
-```json
-{
-  "success": false,
-  "reason": "INVALID_PROJECT"
 }
 ```
 
@@ -48,32 +49,36 @@
 ---
 ## get all project checklist entries
 
-### Request `GET /project/checklist/entries`
-
-#### Body
+### Request `GET /project/checklist/entries?projectId=<project_id>&versionNumber=<version_number>`
 
 `session` _cookie required_
 
+### Responses
+
+#### invalid project or version
+
 ```json
 {
-  "projectId": "<id of the project to get the checklist entries from>"
+  "success": false,
+  "reason": "INVALID_PROJECT_OR_VERSION"
 }
 ```
-
-### Responses
 
 #### entries
 
 ```json
-[
-  {
-    "id": "<entry id>",
-    "user_id": "<author user id>",
-    "timestamp": "<entry created timestamp>",
-    "text": "<entry text>",
-    "checkedVersionNumber": "<versionNumber the entry got checked | null if not checked>"
-  }
-]
+{
+  "success": true,
+  "entries": [
+    {
+      "id": "<entry id>",
+      "user_id": "<author user id>",
+      "timestamp": "<entry created timestamp>",
+      "text": "<entry text>",
+      "checkedVersionNumber": "<versionNumber the entry got checked | null if not checked>"
+    }
+  ]
+}
 ```
 
 ---
@@ -94,6 +99,15 @@
 ```
 
 ### Responses
+
+#### invalid project or version
+
+```json
+{
+  "success": false,
+  "reason": "INVALID_PROJECT_OR_VERSION"
+}
+```
 
 #### unknown error
 

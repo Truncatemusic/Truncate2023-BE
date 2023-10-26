@@ -4,5 +4,6 @@ Content-Type: application/json
 
 {
   "projectId": "{{projectId}}",
+  "versionNumber": "{{versionNumber}}",
   "text": "{{projectChecklistEntryText}}"
 }
