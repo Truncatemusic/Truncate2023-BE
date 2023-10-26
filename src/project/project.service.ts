@@ -194,4 +194,37 @@ export class ProjectService {
       return { success: false, reason: 'UNKNOWN' };
     }
   }
+
+  async getProjectUsers(projectId: number) {
+    return this.prisma.tprojectuser.findMany({
+      where: {
+        project_id: projectId,
+      },
+      select: {
+        id: true,
+        user_id: true,
+        role: true,
+      },
+    });
+  }
+
+  async getProjectUsersFill(projectId: number) {
+    const users = [];
+    for (const { id, user_id, role } of await this.getProjectUsers(projectId)) {
+      const { success, email, username, firstname, lastname } =
+        await this.userService.getInfo(user_id);
+      if (success)
+        users.push({
+          id,
+          role,
+          user: {
+            email,
+            username,
+            firstname,
+            lastname,
+          },
+        });
+    }
+    return users;
+  }
 }
