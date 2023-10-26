@@ -12,11 +12,21 @@
 ```json
 {
   "projectId": "<id of the project to add new checklist entry>",
+  "versionNumber": "<version number of the project to add new checklist entry>",
   "text": "<checklist entry text>"
 }
 ```
 
 ### Responses
+
+#### invalid project or version
+
+```json
+{
+  "success": false,
+  "reason": "INVALID_PROJECT_OR_VERSION"
+}
+```
 
 #### unknown error
 
@@ -24,15 +34,6 @@
 {
   "success": false,
   "reason": "UNKNOWN"
-}
-```
-
-#### invalid project id
-
-```json
-{
-  "success": false,
-  "reason": "INVALID_PROJECT"
 }
 ```
 
@@ -56,11 +57,21 @@
 
 ```json
 {
-  "projectId": "<id of the project to get the checklist entries from>"
+  "projectId": "<id of the project to get the checklist entries from>",
+  "versionNumber": "<version number of the project to get the checklist entries from>"
 }
 ```
 
 ### Responses
+
+#### invalid project or version
+
+```json
+{
+  "success": false,
+  "reason": "INVALID_PROJECT_OR_VERSION"
+}
+```
 
 #### entries
 
@@ -94,6 +105,15 @@
 ```
 
 ### Responses
+
+#### invalid project or version
+
+```json
+{
+  "success": false,
+  "reason": "INVALID_PROJECT_OR_VERSION"
+}
+```
 
 #### unknown error
 

@@ -56,14 +56,14 @@ ALTER TABLE tprojectversionfile DROP COLUMN IF EXISTS duration;
 
 CREATE TABLE IF NOT EXISTS tprojectchecklist (
     id                       INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    project_id               INT UNSIGNED,
+    projectversionId         INT UNSIGNED,
     user_id                  INT UNSIGNED,
     timestamp                TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     text                     VARCHAR(255) NOT NULL,
     checkedProjectversion_id INT UNSIGNED DEFAULT NULL,
 
-    FOREIGN KEY (project_id)               REFERENCES tproject(id),
     FOREIGN KEY (user_id)                  REFERENCES tuser(id),
+    FOREIGN KEY (projectversionId)         REFERENCES tprojectversion(id),
     FOREIGN KEY (checkedProjectversion_id) REFERENCES tprojectversion(id)
 );
 
