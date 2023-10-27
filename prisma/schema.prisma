@@ -21,6 +21,7 @@ model tprojectchecklist {
   timestamp                                                                   DateTime?        @default(now()) @db.Timestamp(0)
   text                                                                        String           @db.VarChar(255)
   checkedProjectversion_id                                                    Int?             @db.UnsignedInt
+  rejected                                                                    Boolean?
   tuser                                                                       tuser?           @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_1")
   tprojectversion_tprojectchecklist_projectversionIdTotprojectversion         tprojectversion? @relation("tprojectchecklist_projectversionIdTotprojectversion", fields: [projectversionId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_2")
   tprojectversion_tprojectchecklist_checkedProjectversion_idTotprojectversion tprojectversion? @relation("tprojectchecklist_checkedProjectversion_idTotprojectversion", fields: [checkedProjectversion_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_3")

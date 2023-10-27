@@ -67,6 +67,8 @@ CREATE TABLE IF NOT EXISTS tprojectchecklist (
     FOREIGN KEY (checkedProjectversion_id) REFERENCES tprojectversion(id)
 );
 
+ALTER TABLE tprojectchecklist ADD COLUMN IF NOT EXISTS rejected BOOLEAN;
+
 ALTER TABLE tuser ADD IF NOT EXISTS blocked BOOLEAN DEFAULT TRUE;
 UPDATE tuser SET blocked=0 WHERE blocked IS NULL;
 ALTER TABLE tuser MODIFY blocked BOOLEAN NOT NULL;

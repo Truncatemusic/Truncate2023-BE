@@ -75,7 +75,8 @@
       "user_id": "<author user id>",
       "timestamp": "<entry created timestamp>",
       "text": "<entry text>",
-      "checkedVersionNumber": "<versionNumber the entry got checked | null if not checked>"
+      "checkedVersionNumber": "<versionNumber the entry got checked | null if not checked>",
+      "rejected": "<rejected status>"
     }
   ]
 }
@@ -94,7 +95,8 @@
 {
   "projectId": "<project id>",
   "versionNumber": "<project version number>",
-  "entryId": "<id of the entry to check>"
+  "entryId": "<id of the entry to check>",
+  "rejected": "<entry rejected status boolean>"
 }
 ```
 
