@@ -56,6 +56,7 @@ export class ChecklistService {
               )
             )?.versionNumber || null
           : null,
+        rejected: entries[i].rejected,
       });
     }
     return entriesOut;
