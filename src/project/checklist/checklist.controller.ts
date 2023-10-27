@@ -18,6 +18,7 @@ export class ChecklistController {
     @Req() request: Request,
     @Query('projectId') projectId: string,
     @Query('versionNumber') versionNumber: string,
+    @Query('includeOlder') includeOlder?: string,
   ) {
     const userRole = await this.projectService.getUserRoleBySession(
       parseInt(String(projectId)),
@@ -33,7 +34,10 @@ export class ChecklistController {
     return versionId
       ? {
           success: true,
-          entries: await this.checklistService.getEntries(versionId),
+          entries: await this.checklistService.getEntries(
+            versionId,
+            includeOlder === '1',
+          ),
         }
       : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }
@@ -68,16 +72,19 @@ export class ChecklistController {
     @Req() request: Request,
     @Body() body: { projectId: number; versionNumber: number; entryId: number },
   ) {
+    const projectId = parseInt(String(body.projectId));
+    const versionNumber = parseInt(String(body.versionNumber));
+
     const userRole = await this.projectService.getUserRoleBySession(
-      parseInt(String(body.projectId)),
+      projectId,
       request,
     );
     if (userRole !== 'O' && userRole !== 'A')
       return AuthService.INVALID_SESSION_RESPONSE;
 
     const versionId = await this.versionService.getVersionId(
-      parseInt(String(body.projectId)),
-      parseInt(String(body.versionNumber)),
+      projectId,
+      versionNumber,
     );
 
     return versionId
@@ -85,6 +92,37 @@ export class ChecklistController {
           parseInt(String(body.entryId)),
           versionId,
         )
+      : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
+  }
+
+  @Patch('entry/uncheck')
+  async uncheckEntry(
+    @Req() request: Request,
+    @Body() body: { projectId: number; versionNumber: number; entryId: number },
+  ) {
+    const projectId = parseInt(String(body.projectId));
+    const versionNumber = parseInt(String(body.versionNumber));
+
+    const userRole = await this.projectService.getUserRoleBySession(
+      projectId,
+      request,
+    );
+    if (userRole !== 'O' && userRole !== 'A')
+      return AuthService.INVALID_SESSION_RESPONSE;
+
+    const lastVersion = (await this.versionService.getLastVersion(
+      projectId,
+    )) as { versionNumber: number };
+    if (versionNumber !== lastVersion?.versionNumber)
+      return { success: false, reason: 'OLD_PROJECT_VERSION' };
+
+    const versionId = await this.versionService.getVersionId(
+      projectId,
+      versionNumber,
+    );
+
+    return versionId
+      ? await this.checklistService.uncheckEntry(parseInt(String(body.entryId)))
       : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }
 }

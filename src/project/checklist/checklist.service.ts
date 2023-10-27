@@ -24,10 +24,12 @@ export class ChecklistService {
     }
   }
 
-  async getEntries(projectversionId: number) {
+  async getEntries(projectversionId: number, includeOlder: boolean = false) {
     const entries = await this.prisma.tprojectchecklist.findMany({
       where: {
-        projectversionId: projectversionId,
+        projectversionId: includeOlder
+          ? { lte: projectversionId }
+          : projectversionId,
       },
       select: {
         id: true,
@@ -37,7 +39,9 @@ export class ChecklistService {
         checkedProjectversion_id: true,
       },
     });
+
     const entriesOut = [];
+    // using for-loop instead of 'Array.map', because 'versionService.getVersionNumber' is async
     for (const i in entries) {
       entriesOut.push({
         id: entries[i].id,
