@@ -87,4 +87,35 @@ export class ChecklistController {
         )
       : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }
+
+  @Patch('entry/uncheck')
+  async uncheckEntry(
+    @Req() request: Request,
+    @Body() body: { projectId: number; versionNumber: number; entryId: number },
+  ) {
+    const projectId = parseInt(String(body.projectId));
+    const versionNumber = parseInt(String(body.versionNumber));
+
+    const userRole = await this.projectService.getUserRoleBySession(
+      projectId,
+      request,
+    );
+    if (userRole !== 'O' && userRole !== 'A')
+      return AuthService.INVALID_SESSION_RESPONSE;
+
+    const lastVersion = (await this.versionService.getLastVersion(
+      projectId,
+    )) as { versionNumber: number };
+    if (versionNumber !== lastVersion?.versionNumber)
+      return { success: false, reason: 'OLD_PROJECT_VERSION' };
+
+    const versionId = await this.versionService.getVersionId(
+      projectId,
+      versionNumber,
+    );
+
+    return versionId
+      ? await this.checklistService.uncheckEntry(parseInt(String(body.entryId)))
+      : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
+  }
 }
