@@ -70,7 +70,13 @@ export class ChecklistController {
   @Patch('entry/check')
   async checkEntry(
     @Req() request: Request,
-    @Body() body: { projectId: number; versionNumber: number; entryId: number },
+    @Body()
+    body: {
+      projectId: number;
+      versionNumber: number;
+      entryId: number;
+      rejected: boolean;
+    },
   ) {
     const projectId = parseInt(String(body.projectId));
     const versionNumber = parseInt(String(body.versionNumber));
@@ -91,6 +97,7 @@ export class ChecklistController {
       ? await this.checklistService.checkEntry(
           parseInt(String(body.entryId)),
           versionId,
+          !!body.rejected,
         )
       : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }

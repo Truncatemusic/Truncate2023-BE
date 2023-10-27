@@ -37,6 +37,7 @@ export class ChecklistService {
         timestamp: true,
         text: true,
         checkedProjectversion_id: true,
+        rejected: true,
       },
     });
 
@@ -60,11 +61,18 @@ export class ChecklistService {
     return entriesOut;
   }
 
-  async checkEntry(entryId: number, versionId: number) {
+  async checkEntry(
+    entryId: number,
+    versionId: number,
+    rejected: boolean = false,
+  ) {
     try {
       await this.prisma.tprojectchecklist.update({
         where: { id: entryId },
-        data: { checkedProjectversion_id: versionId },
+        data: {
+          checkedProjectversion_id: versionId,
+          rejected,
+        },
       });
       return { success: true };
     } catch (_) {
@@ -76,7 +84,10 @@ export class ChecklistService {
     try {
       await this.prisma.tprojectchecklist.update({
         where: { id: entryId },
-        data: { checkedProjectversion_id: null },
+        data: {
+          checkedProjectversion_id: null,
+          rejected: null,
+        },
       });
       return { success: true };
     } catch (_) {
