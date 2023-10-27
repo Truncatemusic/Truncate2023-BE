@@ -18,6 +18,7 @@ export class ChecklistController {
     @Req() request: Request,
     @Query('projectId') projectId: string,
     @Query('versionNumber') versionNumber: string,
+    @Query('includeOlder') includeOlder?: string,
   ) {
     const userRole = await this.projectService.getUserRoleBySession(
       parseInt(String(projectId)),
@@ -33,7 +34,10 @@ export class ChecklistController {
     return versionId
       ? {
           success: true,
-          entries: await this.checklistService.getEntries(versionId),
+          entries: await this.checklistService.getEntries(
+            versionId,
+            includeOlder === '1',
+          ),
         }
       : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }

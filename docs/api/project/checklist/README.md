@@ -49,7 +49,7 @@
 ---
 ## get all project checklist entries
 
-### Request `GET /project/checklist/entries?projectId=<project_id>&versionNumber=<version_number>`
+### Request `GET /project/checklist/entries?projectId=<project_id>&versionNumber=<version_number>&includeOlder=<include_entries_under_version_number>`
 
 `session` _cookie required_
 
