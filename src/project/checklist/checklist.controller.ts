@@ -68,16 +68,19 @@ export class ChecklistController {
     @Req() request: Request,
     @Body() body: { projectId: number; versionNumber: number; entryId: number },
   ) {
+    const projectId = parseInt(String(body.projectId));
+    const versionNumber = parseInt(String(body.versionNumber));
+
     const userRole = await this.projectService.getUserRoleBySession(
-      parseInt(String(body.projectId)),
+      projectId,
       request,
     );
     if (userRole !== 'O' && userRole !== 'A')
       return AuthService.INVALID_SESSION_RESPONSE;
 
     const versionId = await this.versionService.getVersionId(
-      parseInt(String(body.projectId)),
-      parseInt(String(body.versionNumber)),
+      projectId,
+      versionNumber,
     );
 
     return versionId
