@@ -89,12 +89,19 @@ export class ProjectController {
   async getUsers(@Req() request: Request, @Query('id') id: number) {
     id = parseInt(String(id));
 
-    if (!(await this.service.getUserRoleBySession(id, request)))
+    const userId = await this.authService.getUserId(request);
+    if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
+
+    if (!(await this.service.getUserRole(id, userId)))
       return AuthService.INVALID_SESSION_RESPONSE;
 
     return {
       success: true,
-      users: await this.service.getProjectUsersFill(id),
+      users: (await this.service.getProjectUsersFill(id)).map((user) => {
+        user.user.isSelf = user.user.id === userId;
+        delete user.user.id;
+        return user;
+      }),
     };
   }
 }
