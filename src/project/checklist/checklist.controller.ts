@@ -18,6 +18,7 @@ export class ChecklistController {
     @Req() request: Request,
     @Query('projectId') projectId: string,
     @Query('versionNumber') versionNumber: string,
+    @Query('checked') checked?: string,
     @Query('includeOlder') includeOlder?: string,
   ) {
     const userRole = await this.projectService.getUserRoleBySession(
@@ -36,6 +37,7 @@ export class ChecklistController {
           success: true,
           entries: await this.checklistService.getEntries(
             versionId,
+            checked === '1' ? true : checked === '0' ? false : undefined,
             includeOlder === '1',
           ),
         }
@@ -64,6 +66,44 @@ export class ChecklistController {
 
     return versionId
       ? await this.checklistService.addEntry(versionId, userId, body.text)
+      : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
+  }
+
+  @Patch('entry/rename')
+  async renameEntry(
+    @Req() request: Request,
+    @Body()
+    body: {
+      projectId: number;
+      versionNumber: number;
+      entryId: number;
+      text: string;
+    },
+  ) {
+    const projectId = parseInt(String(body.projectId));
+    const versionNumber = parseInt(String(body.versionNumber));
+    const entryId = parseInt(String(body.entryId));
+
+    const userRole = await this.projectService.getUserRoleBySession(
+      projectId,
+      request,
+    );
+    if (userRole !== 'O' && userRole !== 'A')
+      return AuthService.INVALID_SESSION_RESPONSE;
+
+    const lastVersion = (await this.versionService.getLastVersion(
+      projectId,
+    )) as { versionNumber: number };
+    if (versionNumber !== lastVersion?.versionNumber)
+      return { success: false, reason: 'OLD_PROJECT_VERSION' };
+
+    const versionId = await this.versionService.getVersionId(
+      projectId,
+      versionNumber,
+    );
+
+    return versionId
+      ? await this.checklistService.renameEntry(entryId, body.text)
       : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }
 

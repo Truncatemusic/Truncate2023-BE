@@ -49,7 +49,7 @@
 ---
 ## get all project checklist entries
 
-### Request `GET /project/checklist/entries?projectId=<project_id>&versionNumber=<version_number>&includeOlder=<include_entries_under_version_number>`
+### Request `GET /project/checklist/entries?projectId=<project_id>&versionNumber=<version_number>&checked=<only_checked_or_unchecked_entries>&includeOlder=<include_entries_under_version_number>`
 
 `session` _cookie required_
 
@@ -79,6 +79,61 @@
       "rejected": "<rejected status>"
     }
   ]
+}
+```
+
+---
+## rename project checklist entry
+
+### Request `PATCH /project/checklist/entry/rename`
+
+#### Body
+
+`session` _cookie required_
+
+```json
+{
+  "projectId": "<project id>",
+  "versionNumber": "<project version number>",
+  "entryId": "<id of the entry to check>",
+  "text": "<new text>"
+}
+```
+
+### Responses
+
+#### project version too old
+
+```json
+{
+  "success": false,
+  "reason": "OLD_PROJECT_VERSION"
+}
+```
+
+#### invalid project or version
+
+```json
+{
+  "success": false,
+  "reason": "INVALID_PROJECT_OR_VERSION"
+}
+```
+
+#### unknown error
+
+```json
+{
+  "success": false,
+  "reason": "UNKNOWN"
+}
+```
+
+#### successfully renamed entry
+
+```json
+{
+  "success": true
 }
 ```
 
