@@ -18,6 +18,7 @@ export class ChecklistController {
     @Req() request: Request,
     @Query('projectId') projectId: string,
     @Query('versionNumber') versionNumber: string,
+    @Query('checked') checked?: string,
     @Query('includeOlder') includeOlder?: string,
   ) {
     const userRole = await this.projectService.getUserRoleBySession(
@@ -36,6 +37,7 @@ export class ChecklistController {
           success: true,
           entries: await this.checklistService.getEntries(
             versionId,
+            checked === '1' ? true : checked === '0' ? false : undefined,
             includeOlder === '1',
           ),
         }

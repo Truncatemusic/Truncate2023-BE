@@ -24,12 +24,27 @@ export class ChecklistService {
     }
   }
 
-  async getEntries(projectversionId: number, includeOlder: boolean = false) {
+  async getEntries(
+    projectversionId: number,
+    checked: boolean | undefined = undefined,
+    includeOlder: boolean = false,
+  ) {
     const entries = await this.prisma.tprojectchecklist.findMany({
       where: {
         projectversionId: includeOlder
           ? { lte: projectversionId }
           : projectversionId,
+        ...(checked !== undefined
+          ? {
+              checkedProjectversion_id: checked
+                ? {
+                    not: {
+                      equals: null,
+                    },
+                  }
+                : null,
+            }
+          : {}),
       },
       select: {
         id: true,
