@@ -64,6 +64,23 @@ export class VersionService {
     });
   }
 
+  async getVersionsWithOlder(projectversionId: number) {
+    const projectVersion = await this.prisma.tprojectversion.findFirst({
+      where: { id: projectversionId },
+    });
+    return this.prisma.tprojectversion.findMany({
+      where: {
+        project_id: projectVersion.project_id,
+        versionNumber: {
+          lte: projectVersion.versionNumber,
+        },
+      },
+      orderBy: {
+        versionNumber: 'asc',
+      },
+    });
+  }
+
   async getLastVersion(projectId: number) {
     const lastVersionId = await this.getLastVersionId(projectId);
     if (!lastVersionId) return false;

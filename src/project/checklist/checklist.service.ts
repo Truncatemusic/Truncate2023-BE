@@ -31,20 +31,15 @@ export class ChecklistService {
   ) {
     const entries = await this.prisma.tprojectchecklist.findMany({
       where: {
-        projectversionId: includeOlder
-          ? { lte: projectversionId }
-          : projectversionId,
-        ...(checked !== undefined
-          ? {
-              checkedProjectversion_id: checked
-                ? {
-                    not: {
-                      equals: null,
-                    },
-                  }
-                : null,
-            }
-          : {}),
+        OR: (includeOlder
+          ? await this.versionService.getVersionsWithOlder(projectversionId)
+          : [{ id: projectversionId }]
+        ).map((projectVersion: { id: number }) => ({
+          ...(checked === true ? {} : { projectversionId: projectVersion.id }),
+          ...(checked !== undefined
+            ? { checkedProjectversion_id: checked ? projectVersion.id : null }
+            : {}),
+        })),
       },
       select: {
         id: true,

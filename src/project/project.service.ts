@@ -223,6 +223,7 @@ export class ProjectService {
           id,
           role,
           user: {
+            id: user_id,
             email,
             username,
             firstname,
