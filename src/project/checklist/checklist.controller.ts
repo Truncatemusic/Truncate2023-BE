@@ -69,6 +69,44 @@ export class ChecklistController {
       : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }
 
+  @Patch('entry/rename')
+  async renameEntry(
+    @Req() request: Request,
+    @Body()
+    body: {
+      projectId: number;
+      versionNumber: number;
+      entryId: number;
+      text: string;
+    },
+  ) {
+    const projectId = parseInt(String(body.projectId));
+    const versionNumber = parseInt(String(body.versionNumber));
+    const entryId = parseInt(String(body.entryId));
+
+    const userRole = await this.projectService.getUserRoleBySession(
+      projectId,
+      request,
+    );
+    if (userRole !== 'O' && userRole !== 'A')
+      return AuthService.INVALID_SESSION_RESPONSE;
+
+    const lastVersion = (await this.versionService.getLastVersion(
+      projectId,
+    )) as { versionNumber: number };
+    if (versionNumber !== lastVersion?.versionNumber)
+      return { success: false, reason: 'OLD_PROJECT_VERSION' };
+
+    const versionId = await this.versionService.getVersionId(
+      projectId,
+      versionNumber,
+    );
+
+    return versionId
+      ? await this.checklistService.renameEntry(entryId, body.text)
+      : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
+  }
+
   @Patch('entry/check')
   async checkEntry(
     @Req() request: Request,

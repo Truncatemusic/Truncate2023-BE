@@ -83,6 +83,61 @@
 ```
 
 ---
+## rename project checklist entry
+
+### Request `PATCH /project/checklist/entry/rename`
+
+#### Body
+
+`session` _cookie required_
+
+```json
+{
+  "projectId": "<project id>",
+  "versionNumber": "<project version number>",
+  "entryId": "<id of the entry to check>",
+  "text": "<new text>"
+}
+```
+
+### Responses
+
+#### project version too old
+
+```json
+{
+  "success": false,
+  "reason": "OLD_PROJECT_VERSION"
+}
+```
+
+#### invalid project or version
+
+```json
+{
+  "success": false,
+  "reason": "INVALID_PROJECT_OR_VERSION"
+}
+```
+
+#### unknown error
+
+```json
+{
+  "success": false,
+  "reason": "UNKNOWN"
+}
+```
+
+#### successfully renamed entry
+
+```json
+{
+  "success": true
+}
+```
+
+---
 ## check project checklist entry
 
 ### Request `PATCH /project/checklist/entry/check`

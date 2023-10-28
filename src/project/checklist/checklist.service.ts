@@ -77,6 +77,18 @@ export class ChecklistService {
     return entriesOut;
   }
 
+  async renameEntry(entryId: number, text: string) {
+    try {
+      await this.prisma.tprojectchecklist.update({
+        where: { id: entryId },
+        data: { text },
+      });
+      return { success: true };
+    } catch (_) {
+      return { success: false, reason: 'UNKNOWN' };
+    }
+  }
+
   async checkEntry(
     entryId: number,
     versionId: number,
