@@ -70,6 +70,26 @@
 ```
 
 ---
+## search users
+
+### Request `GET /user/search?query=<search_query>`
+
+`session` _cookie required_
+
+### Response
+
+```json
+[
+  {
+    "user_id": "<user id>",
+    "username": "<username>",
+    "firstname": "<first name>",
+    "lastname": "<last name>"
+  }
+]
+```
+
+---
 ## get users projects
 
 ### Request `GET /user/projects`

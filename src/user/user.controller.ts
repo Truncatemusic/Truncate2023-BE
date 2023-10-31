@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -35,6 +35,11 @@ export class UserController {
     return userId
       ? await this.service.getInfo(userId)
       : AuthService.INVALID_SESSION_RESPONSE;
+  }
+
+  @Get('search')
+  async findUsers(@Req() request: Request, @Query('query') query: string) {
+    return await this.service.search(query);
   }
 
   @Get('projects')
