@@ -127,7 +127,7 @@ export class UserService {
         },
       })
     ).map(({ id, username, firstname, lastname }) => ({
-      user_id: id,
+      id,
       username,
       firstname,
       lastname,

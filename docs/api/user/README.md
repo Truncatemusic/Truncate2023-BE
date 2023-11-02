@@ -81,7 +81,7 @@
 ```json
 [
   {
-    "user_id": "<user id>",
+    "id": "<user id>",
     "username": "<username>",
     "firstname": "<first name>",
     "lastname": "<last name>"
