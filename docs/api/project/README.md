@@ -191,7 +191,7 @@
 ---
 ## add user to a project / update user role
 
-### Request `POST /project/addUser`
+### Request `POST /project/user/add`
 
 #### Body
 

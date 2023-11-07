@@ -1,4 +1,4 @@
-POST http://{{host}}:{{port}}/project/addUser
+POST http://{{host}}:{{port}}/project/user/add
 Cookie: session={{session}}
 Content-Type: application/json
 

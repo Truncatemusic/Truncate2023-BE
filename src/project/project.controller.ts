@@ -72,7 +72,7 @@ export class ProjectController {
     return await this.service.deleteProject(parseInt(String(body.id)));
   }
 
-  @Post('addUser')
+  @Post('user/add')
   async addUser(
     @Req() request: Request,
     @Body() body: { id: number; user_id: number; role: string },
