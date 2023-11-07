@@ -9,6 +9,14 @@ export class ProjectController {
     private readonly authService: AuthService,
   ) {}
 
+  @Get('all')
+  async getProjects(@Req() request: Request) {
+    const userId = await this.authService.getUserId(request);
+    return userId
+      ? await this.service.getProjects(userId)
+      : AuthService.INVALID_SESSION_RESPONSE;
+  }
+
   @Get('info')
   async getInfo(@Req() request: Request, @Query('id') id: number) {
     id = parseInt(String(id));

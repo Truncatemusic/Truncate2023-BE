@@ -36,12 +36,4 @@ export class UserController {
       ? await this.service.getInfo(userId)
       : AuthService.INVALID_SESSION_RESPONSE;
   }
-
-  @Get('projects')
-  async getProjects(@Req() request: Request) {
-    const userId = await this.authService.getUserId(request);
-    return userId
-      ? await this.service.getProjects(userId)
-      : AuthService.INVALID_SESSION_RESPONSE;
-  }
 }

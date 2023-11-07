@@ -114,40 +114,4 @@ export class UserService {
       lastname,
     };
   }
-
-  async getProjects(userId: number) {
-    const projectResults = await this.prisma.tproject.findMany({
-      where: {
-        tprojectuser: {
-          some: {
-            user_id: userId,
-          },
-        },
-      },
-    });
-
-    const projects = [];
-    for (const project of projectResults) {
-      const version = await this.versionService.getLastVersion(project.id);
-      if (!version) continue;
-
-      projects.push({
-        id: project.id,
-        name: project.name,
-        lastVersion: {
-          versionNumber: version.versionNumber,
-          timestamp: version.timestamp,
-          songBPM: version.songBPM,
-          songKey: version.songKey,
-          files: (await this.versionService.getFiles(version.id)).map(
-            (file) => ({
-              id: file.id,
-              type: file.type,
-            }),
-          ),
-        },
-      });
-    }
-    return projects;
-  }
 }
