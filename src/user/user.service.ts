@@ -114,4 +114,23 @@ export class UserService {
       lastname,
     };
   }
+
+  async search(query: string) {
+    return (
+        await this.prisma.tuser.findMany({
+          where: {
+            OR: [
+              { username: { contains: query } },
+              { firstname: { contains: query } },
+              { lastname: { contains: query } },
+            ],
+          },
+        })
+    ).map(({ id, username, firstname, lastname }) => ({
+      id,
+      username,
+      firstname,
+      lastname,
+    }));
+  }
 }
