@@ -1,14 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { VersionService } from '../project/version/version.service';
 
 @Injectable()
 export class UserService {
-  constructor(
-    private readonly prisma: PrismaClient,
-    private readonly versionService: VersionService,
-  ) {}
+  constructor(private readonly prisma: PrismaClient) {}
 
   private async hashPassword(password: string): Promise<string> {
     return (await bcrypt.hash(password, 10)).toString();
@@ -117,15 +113,15 @@ export class UserService {
 
   async search(query: string) {
     return (
-        await this.prisma.tuser.findMany({
-          where: {
-            OR: [
-              { username: { contains: query } },
-              { firstname: { contains: query } },
-              { lastname: { contains: query } },
-            ],
-          },
-        })
+      await this.prisma.tuser.findMany({
+        where: {
+          OR: [
+            { username: { contains: query } },
+            { firstname: { contains: query } },
+            { lastname: { contains: query } },
+          ],
+        },
+      })
     ).map(({ id, username, firstname, lastname }) => ({
       id,
       username,
