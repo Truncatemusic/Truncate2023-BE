@@ -107,7 +107,7 @@ export class ProjectController {
       success: true,
       users: (await this.service.getProjectUsersFill(id)).map((user) => {
         user.user.isSelf = user.user.id === userId;
-        delete user.user.id;
+        //delete user.user.id;
         return user;
       }),
     };

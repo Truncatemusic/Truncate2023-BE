@@ -263,6 +263,7 @@
       "role": "<project-user role>",
       "user": {
         "isSelf": "<is this user the one who made the request?>",
+        "id": "<user id>",
         "email": "<user email>",
         "username": "<user username>",
         "firstname": "<user firstname>",
