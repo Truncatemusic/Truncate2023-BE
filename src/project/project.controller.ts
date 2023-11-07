@@ -93,6 +93,23 @@ export class ProjectController {
     );
   }
 
+  @Post('user/remove')
+  async removeUser(
+    @Req() request: Request,
+    @Body() body: { id: number; user_id: number },
+  ) {
+    const userRole = await this.service.getUserRoleBySession(
+      parseInt(String(body.id)),
+      request,
+    );
+    if (userRole !== 'O') return AuthService.INVALID_SESSION_RESPONSE;
+
+    return await this.service.removeUserFromProject(
+      parseInt(String(body.id)),
+      parseInt(String(body.user_id)),
+    );
+  }
+
   @Get('users')
   async getUsers(@Req() request: Request, @Query('id') id: number) {
     id = parseInt(String(id));

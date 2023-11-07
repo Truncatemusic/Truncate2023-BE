@@ -236,6 +236,20 @@ export class ProjectService {
     }
   }
 
+  async removeUserFromProject(projectId: number, userId: number) {
+    if (!(await this.userService.userExists(userId)))
+      return { success: false, reason: 'USER_DOES_NOT_EXIST' };
+
+    await this.prisma.tprojectuser.deleteMany({
+      where: {
+        project_id: projectId,
+        user_id: userId,
+      },
+    });
+
+    return { success: true };
+  }
+
   async getProjectUsers(projectId: number) {
     return this.prisma.tprojectuser.findMany({
       where: {

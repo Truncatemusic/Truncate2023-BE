@@ -244,6 +244,41 @@
 ```
 
 ---
+## remove user from a project
+
+### Request `POST /project/user/remove`
+
+#### Body
+
+`session` _cookie required_
+
+```json
+{
+  "id": "<id of the project>",
+  "user_id": "<id if the user to add>"
+}
+```
+
+### Responses
+
+#### user does not exist
+
+```json
+{
+  "success": false,
+  "reason": "USER_DOES_NOT_EXIST"
+}
+```
+
+#### successfully removed user
+
+```json
+{
+  "success": true
+}
+```
+
+---
 ## get project users
 
 ### Request `GET /project/users?id=<project_id>`
