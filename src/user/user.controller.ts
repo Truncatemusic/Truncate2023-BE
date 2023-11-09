@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -40,5 +40,16 @@ export class UserController {
   @Get('search')
   async findUsers(@Req() request: Request, @Query('query') query: string) {
     return await this.service.search(query);
+  }
+
+  @Patch('public')
+  async setUserPublicStatus(
+    @Req() request: Request,
+    @Body() body: { public: boolean },
+  ) {
+    const userId = await this.authService.getUserId(request);
+    if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
+
+    await this.service.setPublicStatus(userId, body.public);
   }
 }
