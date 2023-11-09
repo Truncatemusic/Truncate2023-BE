@@ -30,11 +30,17 @@ export class UserController {
   }
 
   @Get('info')
-  async getInfo(@Req() request: Request) {
+  async getInfo(@Req() request: Request, @Body() body: { userId?: number }) {
     const userId = await this.authService.getUserId(request);
-    return userId
-      ? await this.service.getInfo(userId)
-      : AuthService.INVALID_SESSION_RESPONSE;
+    if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
+
+    if (body.userId)
+      return body.userId === userId ||
+        (await this.service.isUserVisibleForUser(userId, body.userId))
+        ? await this.service.getInfo(body.userId)
+        : { success: false, reason: 'USER_NOT_VISIBLE' };
+
+    return await this.service.getInfo(userId);
   }
 
   @Get('search')

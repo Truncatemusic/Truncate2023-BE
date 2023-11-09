@@ -104,6 +104,7 @@ export class UserService {
     const result = await this.prisma.tuser.findFirst({
       where: { id: userId },
       select: {
+        id: true,
         email: true,
         username: true,
         firstname: true,
@@ -114,6 +115,7 @@ export class UserService {
     });
     return {
       success: true,
+      id: result.id,
       email: result.email,
       username: result.username,
       firstname: result.firstname,
@@ -121,6 +123,17 @@ export class UserService {
       blocked: result.blocked,
       public: result.public,
     };
+  }
+
+  async isUserVisibleForUser(
+    userId: number,
+    otherUserId: number,
+  ): Promise<boolean> {
+    return (
+      (await this.isUserPublic(otherUserId)) ||
+      (await this.isUserFollowing(userId, otherUserId)) ||
+      false
+    );
   }
 
   async isUserPublic(userId: number): Promise<boolean> {

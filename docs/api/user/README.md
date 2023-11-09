@@ -54,6 +54,8 @@
 
 ### Request `PATCH /user/public`
 
+`session` _cookie required_
+
 #### Body
 ```json
 {
@@ -73,6 +75,7 @@
 ```json
 {
   "success": true,
+  "id": "<user id>",
   "email": "<email address>",
   "username": "<username>",
   "password": "<password>",
@@ -82,6 +85,33 @@
   "public": "<is user public>"
 }
 ```
+
+---
+## get others user information
+
+### Request `GET /user/info`
+
+`session` _cookie required_
+
+### Body
+```json
+{
+  "userId": "<id of the user to get information about>"
+}
+```
+
+### Responses
+
+#### user not visible
+```json
+{
+  "success": false,
+  "reason": "USER_NOT_VISIBLE"
+}
+```
+
+#### get user data
+_equal to 'get user information' response_
 
 ---
 ## search users
