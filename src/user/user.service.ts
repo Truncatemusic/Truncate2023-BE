@@ -136,21 +136,28 @@ export class UserService {
     )?.public;
   }
 
-  async search(query: string) {
-    return (
-      await this.prisma.tuser.findMany({
-        where: {
-          AND: {
-            OR: [
-              { username: { contains: query } },
-              { firstname: { contains: query } },
-              { lastname: { contains: query } },
-            ],
-            public: true,
-          },
+  async search(query: string, userId?: number) {
+    const users = await this.prisma.tuser.findMany({
+      where: {
+        AND: {
+          OR: [
+            { username: { contains: query } },
+            { firstname: { contains: query } },
+            { lastname: { contains: query } },
+          ],
         },
-      })
-    ).map(({ id, username, firstname, lastname }) => ({
+      },
+    });
+
+    if (userId)
+      for (const i in users)
+        if (
+          !users[i].public &&
+          !(await this.isUserFollowing(userId, users[i].id))
+        )
+          users.splice(parseInt(i), 1);
+
+    return users.map(({ id, username, firstname, lastname }) => ({
       id,
       username,
       firstname,

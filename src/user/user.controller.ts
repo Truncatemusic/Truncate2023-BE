@@ -39,7 +39,8 @@ export class UserController {
 
   @Get('search')
   async findUsers(@Req() request: Request, @Query('query') query: string) {
-    return await this.service.search(query);
+    const userId = await this.authService.getUserId(request);
+    return await this.service.search(query, userId || undefined);
   }
 
   @Patch('public')
