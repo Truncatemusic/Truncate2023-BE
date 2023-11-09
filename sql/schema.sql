@@ -102,3 +102,12 @@ CREATE TABLE IF NOT EXISTS tuserresetpassword (
 
     FOREIGN KEY (user_id) REFERENCES tuser(id)
 );
+
+CREATE TABLE IF NOT EXISTS tuserfollow (
+    id            INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    user_id       INT UNSIGNED,
+    followUser_id INT UNSIGNED,
+
+    FOREIGN KEY (user_id)       REFERENCES tuser(id),
+    FOREIGN KEY (followUser_id) REFERENCES tuser(id)
+)

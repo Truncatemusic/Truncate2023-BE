@@ -54,6 +54,8 @@
 
 ### Request `PATCH /user/public`
 
+`session` _cookie required_
+
 #### Body
 ```json
 {
@@ -62,7 +64,7 @@
 ```
 
 ---
-## get user information
+## get own user information
 
 ### Request `GET /user/info`
 
@@ -73,13 +75,54 @@
 ```json
 {
   "success": true,
+  "isSelf": true,
+  "id": "<user id>",
   "email": "<email address>",
   "username": "<username>",
-  "password": "<password>",
   "firstname": "<first name>",
   "lastname": "<last name>",
   "blocked": "<is user blocked>",
   "public": "<is user public>"
+}
+```
+
+---
+## get others user information
+
+### Request `GET /user/info`
+
+`session` _cookie required_
+
+### Body
+```json
+{
+  "userId": "<id of the user to get information about>"
+}
+```
+
+### Responses
+
+#### user not visible
+```json
+{
+  "success": false,
+  "reason": "USER_NOT_VISIBLE"
+}
+```
+
+#### get user data
+```json
+{
+  "success": true,
+  "isSelf": false,
+  "id": "<user id>",
+  "email": "<email address>",
+  "username": "<username>",
+  "firstname": "<first name>",
+  "lastname": "<last name>",
+  "blocked": "<is user blocked>",
+  "public": "<is user public>",
+  "isFollowing": "<am i following this user>"
 }
 ```
 
@@ -101,4 +144,76 @@
     "lastname": "<last name>"
   }
 ]
+```
+
+---
+## follow a user
+
+### Request `POST /user/follow`
+
+`session` _cookie required_
+
+#### Body
+
+```json
+{
+  "followUserId": "<user id to follow>"
+}
+```
+
+### Responses
+
+#### already following
+```json
+{
+  "success": true,
+  "reason": "ALREADY_FOLLOWING"
+}
+```
+
+#### user is not public
+```json
+{
+  "success": false,
+  "reason": "USER_NOT_PUBLIC"
+}
+```
+
+#### followed successfully
+```json
+{
+  "success": true
+}
+```
+
+---
+## unfollow a user
+
+### Request `POST /user/unfollow`
+
+`session` _cookie required_
+
+#### Body
+
+```json
+{
+  "unfollowUserId": "<user id to unfollow>"
+}
+```
+
+### Responses
+
+#### already unfollowed
+```json
+{
+  "success": true,
+  "reason": "ALREADY_UNFOLLOWED"
+}
+```
+
+#### unfollowed successfully
+```json
+{
+  "success": true
+}
 ```

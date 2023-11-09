@@ -30,16 +30,33 @@ export class UserController {
   }
 
   @Get('info')
-  async getInfo(@Req() request: Request) {
+  async getInfo(@Req() request: Request, @Body() body: { userId?: number }) {
     const userId = await this.authService.getUserId(request);
-    return userId
-      ? await this.service.getInfo(userId)
-      : AuthService.INVALID_SESSION_RESPONSE;
+    if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
+
+    if (body.userId && body.userId !== userId) {
+      const isFollowing = await this.service.isUserFollowing(
+        userId,
+        body.userId,
+      );
+
+      if (!isFollowing && !(await this.service.isUserPublic(body.userId)))
+        return { success: false, reason: 'USER_NOT_VISIBLE' };
+
+      return {
+        ...(await this.service.getInfo(body.userId)),
+        isSelf: false,
+        isFollowing,
+      };
+    }
+
+    return { ...(await this.service.getInfo(userId)), isSelf: true };
   }
 
   @Get('search')
   async findUsers(@Req() request: Request, @Query('query') query: string) {
-    return await this.service.search(query);
+    const userId = await this.authService.getUserId(request);
+    return await this.service.search(query, userId || undefined);
   }
 
   @Patch('public')
@@ -51,5 +68,38 @@ export class UserController {
     if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
 
     await this.service.setPublicStatus(userId, body.public);
+  }
+
+  @Post('follow')
+  async followUser(
+    @Req() request: Request,
+    @Body() body: { followUserId: number },
+  ) {
+    const userId = await this.authService.getUserId(request);
+    if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
+
+    if (await this.service.isUserFollowing(userId, body.followUserId))
+      return { success: true, reason: 'ALREADY_FOLLOWING' };
+
+    if (!(await this.service.isUserPublic(body.followUserId)))
+      return { success: false, reason: 'USER_NOT_PUBLIC' };
+
+    await this.service.follow(userId, body.followUserId);
+    return { success: true };
+  }
+
+  @Post('unfollow')
+  async unfollowUser(
+    @Req() request: Request,
+    @Body() body: { unfollowUserId: number },
+  ) {
+    const userId = await this.authService.getUserId(request);
+    if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
+
+    if (!(await this.service.isUserFollowing(userId, body.unfollowUserId)))
+      return { success: true, reason: 'ALREADY_UNFOLLOWED' };
+
+    await this.service.unfollow(userId, body.unfollowUserId);
+    return { success: true };
   }
 }

@@ -77,18 +77,20 @@ model tsession {
 }
 
 model tuser {
-  id                 Int                  @id @default(autoincrement()) @db.UnsignedInt
-  email              String               @db.VarChar(255)
-  password           String               @db.VarChar(255)
-  username           String               @db.VarChar(255)
-  firstname          String?              @db.VarChar(255)
-  lastname           String?              @db.VarChar(255)
-  blocked            Boolean
-  public             Boolean
-  tprojectchecklist  tprojectchecklist[]
-  tprojectuser       tprojectuser[]
-  tsession           tsession[]
-  tuserresetpassword tuserresetpassword[]
+  id                                           Int                  @id @default(autoincrement()) @db.UnsignedInt
+  email                                        String               @db.VarChar(255)
+  password                                     String               @db.VarChar(255)
+  username                                     String               @db.VarChar(255)
+  firstname                                    String?              @db.VarChar(255)
+  lastname                                     String?              @db.VarChar(255)
+  blocked                                      Boolean
+  public                                       Boolean
+  tprojectchecklist                            tprojectchecklist[]
+  tprojectuser                                 tprojectuser[]
+  tsession                                     tsession[]
+  tuserfollow_tuserfollow_user_idTotuser       tuserfollow[]        @relation("tuserfollow_user_idTotuser")
+  tuserfollow_tuserfollow_followUser_idTotuser tuserfollow[]        @relation("tuserfollow_followUser_idTotuser")
+  tuserresetpassword                           tuserresetpassword[]
 }
 
 model tusernotification {
@@ -117,5 +119,16 @@ model tuserresetpassword {
   timestamp DateTime? @default(now()) @db.Timestamp(0)
   tuser     tuser?    @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tuserresetpassword_ibfk_1")
 
+  @@index([user_id], map: "user_id")
+}
+
+model tuserfollow {
+  id                                     Int    @id @default(autoincrement()) @db.UnsignedInt
+  user_id                                Int?   @db.UnsignedInt
+  followUser_id                          Int?   @db.UnsignedInt
+  tuser_tuserfollow_user_idTotuser       tuser? @relation("tuserfollow_user_idTotuser", fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tuserfollow_ibfk_1")
+  tuser_tuserfollow_followUser_idTotuser tuser? @relation("tuserfollow_followUser_idTotuser", fields: [followUser_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tuserfollow_ibfk_2")
+
+  @@index([followUser_id], map: "followUser_id")
   @@index([user_id], map: "user_id")
 }

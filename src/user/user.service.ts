@@ -104,6 +104,7 @@ export class UserService {
     const result = await this.prisma.tuser.findFirst({
       where: { id: userId },
       select: {
+        id: true,
         email: true,
         username: true,
         firstname: true,
@@ -114,6 +115,7 @@ export class UserService {
     });
     return {
       success: true,
+      id: result.id,
       email: result.email,
       username: result.username,
       firstname: result.firstname,
@@ -123,25 +125,74 @@ export class UserService {
     };
   }
 
-  async search(query: string) {
-    return (
-      await this.prisma.tuser.findMany({
+  async isUserPublic(userId: number): Promise<boolean> {
+    return !!(
+      await this.prisma.tuser.findUnique({
         where: {
-          AND: {
-            OR: [
-              { username: { contains: query } },
-              { firstname: { contains: query } },
-              { lastname: { contains: query } },
-            ],
-            public: true,
-          },
+          id: userId,
+        },
+        select: {
+          public: true,
         },
       })
-    ).map(({ id, username, firstname, lastname }) => ({
+    )?.public;
+  }
+
+  async search(query: string, userId?: number) {
+    const users = await this.prisma.tuser.findMany({
+      where: {
+        AND: {
+          OR: [
+            { username: { contains: query } },
+            { firstname: { contains: query } },
+            { lastname: { contains: query } },
+          ],
+        },
+      },
+    });
+
+    if (userId)
+      for (const i in users)
+        if (
+          !users[i].public &&
+          !(await this.isUserFollowing(userId, users[i].id))
+        )
+          users.splice(parseInt(i), 1);
+
+    return users.map(({ id, username, firstname, lastname }) => ({
       id,
       username,
       firstname,
       lastname,
     }));
+  }
+
+  async follow(userId: number, followUserId: number) {
+    await this.prisma.tuserfollow.create({
+      data: {
+        user_id: userId,
+        followUser_id: followUserId,
+      },
+    });
+  }
+
+  async unfollow(userId: number, followUserId: number) {
+    await this.prisma.tuserfollow.deleteMany({
+      where: {
+        user_id: userId,
+        followUser_id: followUserId,
+      },
+    });
+  }
+
+  async isUserFollowing(userId: number, otherUserId: number): Promise<boolean> {
+    return !!(
+      await this.prisma.tuserfollow.findFirst({
+        where: {
+          user_id: userId,
+          followUser_id: otherUserId,
+        },
+      })
+    )?.id;
   }
 }
