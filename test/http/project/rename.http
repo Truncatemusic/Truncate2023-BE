@@ -1,8 +1,0 @@
-PATCH http://{{host}}:{{port}}/project/rename
-Cookie: session={{session}}
-Content-Type: application/json
-
-{
-    "id": "{{projectId}}",
-    "name": "{{projectNameNew}}"
-}

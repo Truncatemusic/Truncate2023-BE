@@ -1,2 +1,0 @@
-PATCH http://{{host}}:{{port}}/auth/updateSession
-Cookie: session={{session}}

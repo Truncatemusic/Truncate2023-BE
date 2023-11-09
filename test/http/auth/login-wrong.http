@@ -1,7 +1,0 @@
-POST http://{{host}}:{{port}}/auth/login
-Content-Type: application/json
-
-{
-    "login": "{{username}}",
-    "password": "{{wrongPassword}}"
-}

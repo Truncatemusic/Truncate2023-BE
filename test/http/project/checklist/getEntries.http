@@ -1,8 +1,0 @@
-GET http://{{host}}:{{port}}/project/checklist/entries
-Cookie: session={{session}}
-Content-Type: application/json
-
-{
-  "projectId": "{{projectId}}",
-  "versionNumber": "{{versionNumber}}"
-}

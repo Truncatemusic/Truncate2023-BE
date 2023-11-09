@@ -1,9 +1,0 @@
-PATCH http://{{host}}:{{port}}/project/version/info
-Cookie: session={{session}}
-Content-Type: application/json
-
-{
-    "projectId": "{{projectId}}",
-    "versionNumber": "{{versionNumber}}",
-    "songKey": "{{newProjectSongKey}}"
-}

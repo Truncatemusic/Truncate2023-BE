@@ -1,2 +1,0 @@
-GET http://{{host}}:{{port}}/user/search?query={{userSearchQuery}}
-Cookie: session={{session}}

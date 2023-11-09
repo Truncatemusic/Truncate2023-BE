@@ -1,7 +1,0 @@
-POST http://{{host}}:{{port}}/project/delete
-Cookie: session={{session}}
-Content-Type: application/json
-
-{
-    "id": "{{projectId}}"
-}

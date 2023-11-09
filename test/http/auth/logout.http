@@ -1,2 +1,0 @@
-POST http://{{host}}:{{port}}/auth/logout
-Cookie: session={{session}}

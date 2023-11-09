@@ -1,8 +1,0 @@
-POST http://{{host}}:{{port}}/project/user/remove
-Cookie: session={{session}}
-Content-Type: application/json
-
-{
-    "id": "{{projectId}}",
-    "user_id": "{{newProjectUserId}}"
-}

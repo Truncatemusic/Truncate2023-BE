@@ -1,7 +1,0 @@
-POST http://{{host}}:{{port}}/notification/unread
-Cookie: session={{session}}
-Content-Type: application/json
-
-{
-  "notificationId": "{{userNotificationId}}"
-}

@@ -1,9 +1,0 @@
-POST http://{{host}}:{{port}}/project/create
-Cookie: session={{session}}
-Content-Type: application/json
-
-{
-    "name": "{{projectName}}",
-    "songBPM": "{{projectSongBPM}}",
-    "songKey": "{{projectSongKey}}"
-}

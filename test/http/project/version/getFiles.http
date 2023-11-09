@@ -1,2 +1,0 @@
-GET http://{{host}}:{{port}}/project/version/files?id={{projectId}}&version={{versionNumber}}
-Cookie: session={{session}}
