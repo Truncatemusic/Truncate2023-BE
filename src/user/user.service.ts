@@ -93,6 +93,13 @@ export class UserService {
     }
   }
 
+  async setPublicStatus(userId: number, isPublic: boolean) {
+    await this.prisma.tuser.update({
+      where: { id: userId },
+      data: { public: isPublic },
+    });
+  }
+
   async getInfo(userId: number) {
     const result = await this.prisma.tuser.findFirst({
       where: { id: userId },

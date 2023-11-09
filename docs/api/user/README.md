@@ -50,6 +50,18 @@
 ```
 
 ---
+## update users public status
+
+### Request `PATCH /user/public`
+
+#### Body
+```json
+{
+  "public": "<public status as boolean>"
+}
+```
+
+---
 ## get user information
 
 ### Request `GET /user/info`
@@ -87,36 +99,6 @@
     "username": "<username>",
     "firstname": "<first name>",
     "lastname": "<last name>"
-  }
-]
-```
-
----
-## get users projects
-
-### Request `GET /user/projects`
-
-`session` _cookie required_
-
-### Response
-
-```json
-[
-  {
-    "id": "<project id>",
-    "name": "<project name>",
-    "lastVersion": {
-      "versionNumber": "<version number>",
-      "timestamp": "<version-created timestamp>",
-      "songBPM": "<song bpm | null>",
-      "songKey": "<song key | null>",
-      "files": [
-        {
-          "id": "<128-byte file id>",
-          "type": "<file type - like wav, mp3,...>"
-        }
-      ]
-    }
   }
 ]
 ```
