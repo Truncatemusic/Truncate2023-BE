@@ -43,10 +43,14 @@ export class UserController {
       if (!isFollowing && !(await this.service.isUserPublic(body.userId)))
         return { success: false, reason: 'USER_NOT_VISIBLE' };
 
-      return { isFollowing, ...(await this.service.getInfo(body.userId)) };
+      return {
+        ...(await this.service.getInfo(body.userId)),
+        isSelf: false,
+        isFollowing,
+      };
     }
 
-    return await this.service.getInfo(userId);
+    return { ...(await this.service.getInfo(userId)), isSelf: true };
   }
 
   @Get('search')

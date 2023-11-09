@@ -64,7 +64,7 @@
 ```
 
 ---
-## get user information
+## get own user information
 
 ### Request `GET /user/info`
 
@@ -75,6 +75,7 @@
 ```json
 {
   "success": true,
+  "isSelf": true,
   "id": "<user id>",
   "email": "<email address>",
   "username": "<username>",
@@ -113,6 +114,7 @@
 ```json
 {
   "success": true,
+  "isSelf": false,
   "id": "<user id>",
   "email": "<email address>",
   "username": "<username>",
