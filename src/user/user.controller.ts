@@ -34,11 +34,17 @@ export class UserController {
     const userId = await this.authService.getUserId(request);
     if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
 
-    if (body.userId)
-      return body.userId === userId ||
-        (await this.service.isUserVisibleForUser(userId, body.userId))
-        ? await this.service.getInfo(body.userId)
-        : { success: false, reason: 'USER_NOT_VISIBLE' };
+    if (body.userId && body.userId !== userId) {
+      const isFollowing = await this.service.isUserFollowing(
+        userId,
+        body.userId,
+      );
+
+      if (!isFollowing && !(await this.service.isUserPublic(body.userId)))
+        return { success: false, reason: 'USER_NOT_VISIBLE' };
+
+      return { isFollowing, ...(await this.service.getInfo(body.userId)) };
+    }
 
     return await this.service.getInfo(userId);
   }

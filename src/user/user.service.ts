@@ -125,17 +125,6 @@ export class UserService {
     };
   }
 
-  async isUserVisibleForUser(
-    userId: number,
-    otherUserId: number,
-  ): Promise<boolean> {
-    return (
-      (await this.isUserPublic(otherUserId)) ||
-      (await this.isUserFollowing(userId, otherUserId)) ||
-      false
-    );
-  }
-
   async isUserPublic(userId: number): Promise<boolean> {
     return !!(
       await this.prisma.tuser.findUnique({

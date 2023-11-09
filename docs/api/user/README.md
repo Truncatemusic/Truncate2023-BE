@@ -78,7 +78,6 @@
   "id": "<user id>",
   "email": "<email address>",
   "username": "<username>",
-  "password": "<password>",
   "firstname": "<first name>",
   "lastname": "<last name>",
   "blocked": "<is user blocked>",
@@ -111,7 +110,19 @@
 ```
 
 #### get user data
-_equal to 'get user information' response_
+```json
+{
+  "success": true,
+  "id": "<user id>",
+  "email": "<email address>",
+  "username": "<username>",
+  "firstname": "<first name>",
+  "lastname": "<last name>",
+  "blocked": "<is user blocked>",
+  "public": "<is user public>",
+  "isFollowing": "<am i following this user>"
+}
+```
 
 ---
 ## search users
