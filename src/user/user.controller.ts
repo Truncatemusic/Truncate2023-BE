@@ -52,4 +52,37 @@ export class UserController {
 
     await this.service.setPublicStatus(userId, body.public);
   }
+
+  @Post('follow')
+  async followUser(
+    @Req() request: Request,
+    @Body() body: { followUserId: number },
+  ) {
+    const userId = await this.authService.getUserId(request);
+    if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
+
+    if (await this.service.isUserFollowing(userId, body.followUserId))
+      return { success: true, reason: 'ALREADY_FOLLOWING' };
+
+    if (!(await this.service.isUserPublic(body.followUserId)))
+      return { success: false, reason: 'USER_NOT_PUBLIC' };
+
+    await this.service.follow(userId, body.followUserId);
+    return { success: true };
+  }
+
+  @Post('unfollow')
+  async unfollowUser(
+    @Req() request: Request,
+    @Body() body: { unfollowUserId: number },
+  ) {
+    const userId = await this.authService.getUserId(request);
+    if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
+
+    if (!(await this.service.isUserFollowing(userId, body.unfollowUserId)))
+      return { success: true, reason: 'ALREADY_UNFOLLOWED' };
+
+    await this.service.unfollow(userId, body.unfollowUserId);
+    return { success: true };
+  }
 }

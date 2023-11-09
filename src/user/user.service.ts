@@ -123,6 +123,19 @@ export class UserService {
     };
   }
 
+  async isUserPublic(userId: number): Promise<boolean> {
+    return !!(
+      await this.prisma.tuser.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          public: true,
+        },
+      })
+    )?.public;
+  }
+
   async search(query: string) {
     return (
       await this.prisma.tuser.findMany({
@@ -143,5 +156,34 @@ export class UserService {
       firstname,
       lastname,
     }));
+  }
+
+  async follow(userId: number, followUserId: number) {
+    await this.prisma.tuserfollow.create({
+      data: {
+        user_id: userId,
+        followUser_id: followUserId,
+      },
+    });
+  }
+
+  async unfollow(userId: number, followUserId: number) {
+    await this.prisma.tuserfollow.deleteMany({
+      where: {
+        user_id: userId,
+        followUser_id: followUserId,
+      },
+    });
+  }
+
+  async isUserFollowing(userId: number, otherUserId: number): Promise<boolean> {
+    return !!(
+      await this.prisma.tuserfollow.findFirst({
+        where: {
+          user_id: userId,
+          followUser_id: otherUserId,
+        },
+      })
+    )?.id;
   }
 }

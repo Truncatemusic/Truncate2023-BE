@@ -102,3 +102,75 @@
   }
 ]
 ```
+
+---
+## follow a user
+
+### Request `POST /user/follow`
+
+`session` _cookie required_
+
+#### Body
+
+```json
+{
+  "followUserId": "<user id to follow>"
+}
+```
+
+### Responses
+
+#### already following
+```json
+{
+  "success": true,
+  "reason": "ALREADY_FOLLOWING"
+}
+```
+
+#### user is not public
+```json
+{
+  "success": false,
+  "reason": "USER_NOT_PUBLIC"
+}
+```
+
+#### followed successfully
+```json
+{
+  "success": true
+}
+```
+
+---
+## unfollow a user
+
+### Request `POST /user/unfollow`
+
+`session` _cookie required_
+
+#### Body
+
+```json
+{
+  "unfollowUserId": "<user id to unfollow>"
+}
+```
+
+### Responses
+
+#### already unfollowed
+```json
+{
+  "success": true,
+  "reason": "ALREADY_UNFOLLOWED"
+}
+```
+
+#### unfollowed successfully
+```json
+{
+  "success": true
+}
+```
