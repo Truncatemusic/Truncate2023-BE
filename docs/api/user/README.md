@@ -89,16 +89,9 @@
 ---
 ## get others user information
 
-### Request `GET /user/info`
+### Request `GET /user/info?id=<user_id>`
 
 `session` _cookie required_
-
-### Body
-```json
-{
-  "userId": "<id of the user to get information about>"
-}
-```
 
 ### Responses
 

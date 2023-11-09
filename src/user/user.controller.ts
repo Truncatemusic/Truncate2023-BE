@@ -30,21 +30,20 @@ export class UserController {
   }
 
   @Get('info')
-  async getInfo(@Req() request: Request, @Body() body: { userId?: number }) {
+  async getInfo(@Req() request: Request, @Query('id') id?: string) {
     const userId = await this.authService.getUserId(request);
     if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
 
-    if (body.userId && body.userId !== userId) {
-      const isFollowing = await this.service.isUserFollowing(
-        userId,
-        body.userId,
-      );
+    const queryId = Number.isInteger(id) ? parseInt(id) : undefined;
 
-      if (!isFollowing && !(await this.service.isUserPublic(body.userId)))
+    if (queryId && queryId !== userId) {
+      const isFollowing = await this.service.isUserFollowing(userId, queryId);
+
+      if (!isFollowing && !(await this.service.isUserPublic(queryId)))
         return { success: false, reason: 'USER_NOT_VISIBLE' };
 
       return {
-        ...(await this.service.getInfo(body.userId)),
+        ...(await this.service.getInfo(queryId)),
         isSelf: false,
         isFollowing,
       };
