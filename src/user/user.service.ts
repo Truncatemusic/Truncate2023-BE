@@ -49,6 +49,7 @@ export class UserService {
         firstname: firstname,
         lastname: lastname,
         blocked: true,
+        public: true,
       },
     });
 
@@ -58,12 +59,13 @@ export class UserService {
     return { success: true };
   }
 
-  async getUserByEmail(email: string) {
-    const result = await this.prisma.tuser.findFirst({
-      where: { email },
-      select: { id: true },
-    });
-    return result?.id || null;
+  async getUserByEmail(email: string): Promise<number | undefined> {
+    return (
+      await this.prisma.tuser.findFirst({
+        where: { email },
+        select: { id: true },
+      })
+    )?.id;
   }
 
   async userExists(userId: number) {
@@ -92,22 +94,25 @@ export class UserService {
   }
 
   async getInfo(userId: number) {
-    const { email, username, firstname, lastname } =
-      await this.prisma.tuser.findFirst({
-        where: { id: userId },
-        select: {
-          email: true,
-          username: true,
-          firstname: true,
-          lastname: true,
-        },
-      });
+    const result = await this.prisma.tuser.findFirst({
+      where: { id: userId },
+      select: {
+        email: true,
+        username: true,
+        firstname: true,
+        lastname: true,
+        blocked: true,
+        public: true,
+      },
+    });
     return {
       success: true,
-      email,
-      username,
-      firstname,
-      lastname,
+      email: result.email,
+      username: result.username,
+      firstname: result.firstname,
+      lastname: result.lastname,
+      blocked: result.blocked,
+      public: result.public,
     };
   }
 
@@ -115,11 +120,14 @@ export class UserService {
     return (
       await this.prisma.tuser.findMany({
         where: {
-          OR: [
-            { username: { contains: query } },
-            { firstname: { contains: query } },
-            { lastname: { contains: query } },
-          ],
+          AND: {
+            OR: [
+              { username: { contains: query } },
+              { firstname: { contains: query } },
+              { lastname: { contains: query } },
+            ],
+            public: true,
+          },
         },
       })
     ).map(({ id, username, firstname, lastname }) => ({

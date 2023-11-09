@@ -65,7 +65,9 @@
   "username": "<username>",
   "password": "<password>",
   "firstname": "<first name>",
-  "lastname": "<last name>"
+  "lastname": "<last name>",
+  "blocked": "<is user blocked>",
+  "public": "<is user public>"
 }
 ```
 
