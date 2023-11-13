@@ -105,15 +105,16 @@ export class ProjectService {
         songBPM,
         songKey,
       );
+
       await this.addUserToProject(project.id, userId, 'O');
+
+      await this.storageService.createBucket(
+        ProjectService.getBucketName(project.id),
+      );
     } catch (error) {
       console.error(error);
       return { success: false, reason: 'UNKNOWN' };
     }
-
-    await this.storageService.createBucket(
-      ProjectService.getBucketName(project.id),
-    );
 
     return {
       success: true,
