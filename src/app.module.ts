@@ -25,6 +25,7 @@ import { TranslationService } from './translation/translation.service';
 import { ResetPasswordController } from './reset-password/reset-password.controller';
 import { ResetPasswordService } from './reset-password/reset-password.service';
 import { AudiowaveformService } from './audiowaveform/audiowaveform.service';
+import { AudioFileService } from './project/version/file/audio/audio-file.service';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { AudiowaveformService } from './audiowaveform/audiowaveform.service';
     ResetPasswordService,
     StorageService,
     AudiowaveformService,
+    AudioFileService,
   ],
 })
 export class AppModule {}
