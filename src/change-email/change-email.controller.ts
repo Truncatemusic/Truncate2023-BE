@@ -16,7 +16,7 @@ export class ChangeEmailController {
   @Patch()
   async changeEmail(@Body() { key }: { key: string }) {
     const result = await this.changeEmailService.evaluateResetKey(key);
-    if (!result.user_id) return { success: false, reason: 'INVALID_KEY' };
+    if (!result) return { success: false, reason: 'INVALID_KEY' };
 
     if (
       !(await this.userService.updateInfo(result.user_id, {
