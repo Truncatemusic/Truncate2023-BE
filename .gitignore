@@ -133,5 +133,8 @@ dist
 template/mail/css/*.css
 template/mail/css/*.map
 
+# tmp foles
+/tmp/*
+
 # (google) key files
 /*.key.json
