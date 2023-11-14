@@ -64,6 +64,7 @@ export class VersionController {
 
     return (await this.service.getFiles(versionId)).map((file) => ({
       id: file.id,
+      hash: file.hash,
       type: file.type,
     }));
   }

@@ -52,15 +52,13 @@ CREATE TABLE IF NOT EXISTS tprojectversion (
 );
 
 CREATE TABLE IF NOT EXISTS tprojectversionfile (
-    id                CHAR(128),
+    id                INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    hash              CHAR(128),
     projectversion_id INT UNSIGNED,
     type              CHAR(3),
 
-    PRIMARY KEY (projectversion_id, id, type),
     FOREIGN KEY (projectversion_id) REFERENCES tprojectversion(id)
 );
-
-ALTER TABLE tprojectversionfile DROP COLUMN IF EXISTS duration;
 
 CREATE TABLE IF NOT EXISTS tprojectchecklist (
     id                       INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
