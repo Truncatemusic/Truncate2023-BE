@@ -1,4 +1,4 @@
-import { Body, Controller, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Patch, Post, Req } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { ResetPasswordService } from './reset-password.service';
 import { AuthService } from '../auth/auth.service';
@@ -17,9 +17,19 @@ export class ResetPasswordController {
   ) {}
 
   @Post()
-  async requestPasswordReset(@Body() body: { email: string }) {
-    const user_id = await this.userService.getUserByEmail(body.email);
-    if (!user_id) return { success: false, reason: 'USER_DOES_NOT_EXIST' };
+  async requestPasswordReset(
+    @Req() request: Request,
+    @Body() body: { email?: string },
+  ) {
+    let user_id: number | false;
+
+    if (body.email) {
+      user_id = await this.userService.getUserByEmail(body.email);
+      if (!user_id) return { success: false, reason: 'USER_DOES_NOT_EXIST' };
+    } else {
+      user_id = await this.authService.getUserId(request);
+      if (!user_id) return AuthService.INVALID_SESSION_RESPONSE;
+    }
 
     const resetKey = await this.resetPasswordService.addResetKey(
       user_id,
