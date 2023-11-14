@@ -26,6 +26,8 @@ import { ResetPasswordController } from './reset-password/reset-password.control
 import { ResetPasswordService } from './reset-password/reset-password.service';
 import { AudiowaveformService } from './audiowaveform/audiowaveform.service';
 import { AudioFileService } from './project/version/file/audio/audio-file.service';
+import { ChangeEmailController } from './change-email/change-email.controller';
+import { ChangeEmailService } from './change-email/change-email.service';
 
 @Module({
   imports: [
@@ -55,6 +57,7 @@ import { AudioFileService } from './project/version/file/audio/audio-file.servic
     ChecklistController,
     NotificationController,
     ResetPasswordController,
+    ChangeEmailController,
   ],
   providers: [
     AppService,
@@ -72,6 +75,7 @@ import { AudioFileService } from './project/version/file/audio/audio-file.servic
     StorageService,
     AudiowaveformService,
     AudioFileService,
+    ChangeEmailService,
   ],
 })
 export class AppModule {}

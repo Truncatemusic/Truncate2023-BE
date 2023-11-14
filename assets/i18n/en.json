@@ -8,6 +8,15 @@
       "resetPasswordSuccess": {
         "subject": "Your Truncate password was reset",
         "text": "Hey!<br><br>Your Truncate account password was reset on <b>%datetime%</b>."
+      },
+
+      "changeEmail": {
+        "subject": "Change your Truncate Email Address",
+        "text": "Hey!<br><br>You requested to change your email address to <b>%newEmail%</b>.<br>You can confirm the email change with the following link:<br><br><a href=\"%link%\">%link%</a>"
+      },
+      "changeEmailSuccess": {
+        "subject": "Your Truncate Email was changed",
+        "text": "Hey!<br><br>Your Truncate account email address was changed to <b>%newEmail%</b> on <b>%datetime%</b>."
       }
     }
   }

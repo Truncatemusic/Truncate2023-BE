@@ -103,6 +103,15 @@ CREATE TABLE IF NOT EXISTS tuserresetpassword (
     FOREIGN KEY (user_id) REFERENCES tuser(id)
 );
 
+CREATE TABLE IF NOT EXISTS tuserchangeemail (
+    resetKey  CHAR(32) PRIMARY KEY,
+    user_id   INT UNSIGNED,
+    email     VARCHAR(255) NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES tuser(id)
+);
+
 CREATE TABLE IF NOT EXISTS tuserfollow (
     id            INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     user_id       INT UNSIGNED,

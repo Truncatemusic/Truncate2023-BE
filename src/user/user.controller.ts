@@ -1,12 +1,19 @@
 import { Body, Controller, Get, Patch, Post, Query, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthService } from '../auth/auth.service';
+import { env } from 'process';
+import { MailService } from '../mail/mail.service';
+import { TranslationService } from '../translation/translation.service';
+import { ChangeEmailService } from '../change-email/change-email.service';
 
 @Controller('user')
 export class UserController {
   constructor(
     private readonly service: UserService,
     private readonly authService: AuthService,
+    private readonly mailService: MailService,
+    private readonly translationService: TranslationService,
+    private readonly changeEmailService: ChangeEmailService,
   ) {}
 
   @Post('register')
@@ -66,14 +73,42 @@ export class UserController {
     const userId = await this.authService.getUserId(request);
     if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
 
-    // TODO: send mail to reset email address
-
     await this.service.updateInfo(userId, {
       firstname: body.firstname,
       lastname: body.lastname,
       username: body.username,
-      //email: body.email,
     });
+
+    if (body.email) {
+      const resetKey = await this.changeEmailService.addResetKey(
+        userId,
+        body.email,
+      );
+
+      const emailResult = await this.mailService.sendMail(
+        body.email,
+        this.translationService.getTranslation(
+          'en',
+          'template.mail.changeEmail.subject',
+        ),
+        'change-email',
+        {
+          text: this.translationService.getTranslation(
+            'en',
+            'template.mail.changeEmail.text',
+            {
+              newEmail: body.email,
+              link: env.WEB_HOST + '/change-email?k=' + resetKey,
+            },
+          ),
+        },
+      );
+
+      if (!emailResult.success) {
+        console.error(emailResult.error);
+        return { success: false, reason: 'UNKNOWN' };
+      }
+    }
 
     return { success: true };
   }

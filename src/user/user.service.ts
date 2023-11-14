@@ -134,15 +134,20 @@ export class UserService {
       email?: string;
     },
   ) {
-    await this.prisma.tuser.update({
-      where: { id: userId },
-      data: {
-        ...(data.firstname ? { firstname: data.firstname } : {}),
-        ...(data.lastname ? { lastname: data.lastname } : {}),
-        ...(data.username ? { username: data.username } : {}),
-        ...(data.email ? { email: data.email } : {}),
-      },
-    });
+    try {
+      await this.prisma.tuser.update({
+        where: { id: userId },
+        data: {
+          ...(data.firstname ? { firstname: data.firstname } : {}),
+          ...(data.lastname ? { lastname: data.lastname } : {}),
+          ...(data.username ? { username: data.username } : {}),
+          ...(data.email ? { email: data.email } : {}),
+        },
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   async isUserPublic(userId: number): Promise<boolean> {
