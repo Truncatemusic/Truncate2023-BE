@@ -16,12 +16,14 @@ import { VersionService } from '../version.service';
 import { StorageService } from '../../../storage/storage.service';
 import { Response } from 'express';
 import { ProjectService } from '../../project.service';
+import { AudioFileService } from './audio/audio-file.service';
 
 @Controller('project/version/file')
 export class FileController {
   constructor(
     private readonly service: FileService,
     private readonly authService: AuthService,
+    private readonly audioFileService: AudioFileService,
     private readonly storageService: StorageService,
     private readonly versionService: VersionService,
   ) {}
@@ -47,7 +49,10 @@ export class FileController {
     if (!file.mimetype.includes('audio/wav'))
       return { success: false, reason: 'INVALID_FILE_TYPE' };
 
-    const { waveId } = await this.service.addAudioFile(versionId, file.buffer);
+    const { waveId } = await this.audioFileService.addAudioFile(
+      versionId,
+      file.buffer,
+    );
     return { success: true, id: waveId };
   }
 
@@ -69,7 +74,7 @@ export class FileController {
       ProjectService.getBucketName(
         await this.service.getProjectIdByFileId(file.id),
       ),
-      FileService.getWaveformFileName(file.id),
+      AudioFileService.getWaveformFileName(file.id),
     );
   }
 
@@ -92,7 +97,7 @@ export class FileController {
         ProjectService.getBucketName(
           await this.service.getProjectIdByFileId(file.id),
         ),
-        FileService.getAudioFileName(file.id, type || file.type),
+        FileService.getFileName(file.id, type || file.type),
       ),
     };
   }
@@ -116,7 +121,7 @@ export class FileController {
         ProjectService.getBucketName(
           await this.service.getProjectIdByFileId(file.id),
         ),
-        FileService.getAudioFileName(file.id, type || file.type),
+        FileService.getFileName(file.id, type || file.type),
       ),
     );
   }
