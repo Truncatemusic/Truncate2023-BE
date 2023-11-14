@@ -21,14 +21,16 @@ export class ResetPasswordController {
     @Req() request: Request,
     @Body() body: { email?: string },
   ) {
-    let user_id: number | false;
+    let user_id: number | false,
+      email = body.email;
 
-    if (body.email) {
-      user_id = await this.userService.getUserByEmail(body.email);
+    if (email) {
+      user_id = await this.userService.getUserByEmail(email);
       if (!user_id) return { success: false, reason: 'USER_DOES_NOT_EXIST' };
     } else {
       user_id = await this.authService.getUserId(request);
       if (!user_id) return AuthService.INVALID_SESSION_RESPONSE;
+      email = (await this.userService.getInfo(user_id)).email;
     }
 
     const resetKey = await this.resetPasswordService.addResetKey(
@@ -36,8 +38,13 @@ export class ResetPasswordController {
       false,
     );
 
+    if (!resetKey) {
+      console.error('empty resetKey');
+      return { success: false, reason: 'UNKNOWN' };
+    }
+
     const emailResult = await this.mailService.sendMail(
-      body.email,
+      email,
       this.translationService.getTranslation(
         'en',
         'template.mail.resetPassword.subject',
@@ -59,7 +66,7 @@ export class ResetPasswordController {
       return { success: false, reason: 'UNKNOWN' };
     }
 
-    return resetKey ? { success: true } : { success: false, reason: 'UNKNOWN' };
+    return { success: true };
   }
 
   @Post('evaluate')
