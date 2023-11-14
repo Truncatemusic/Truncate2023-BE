@@ -125,6 +125,26 @@ export class UserService {
     };
   }
 
+  async updateInfo(
+    userId: number,
+    data: {
+      firstname?: string;
+      lastname?: string;
+      username?: string;
+      email?: string;
+    },
+  ) {
+    await this.prisma.tuser.update({
+      where: { id: userId },
+      data: {
+        ...(data.firstname ? { firstname: data.firstname } : {}),
+        ...(data.lastname ? { lastname: data.lastname } : {}),
+        ...(data.username ? { username: data.username } : {}),
+        ...(data.email ? { email: data.email } : {}),
+      },
+    });
+  }
+
   async isUserPublic(userId: number): Promise<boolean> {
     return !!(
       await this.prisma.tuser.findUnique({

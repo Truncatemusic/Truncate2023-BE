@@ -52,6 +52,32 @@ export class UserController {
     return { ...(await this.service.getInfo(userId)), isSelf: true };
   }
 
+  @Patch('info')
+  async updateInfo(
+    @Req() request: Request,
+    @Body()
+    body: {
+      firstname: string;
+      lastname: string;
+      username: string;
+      email: string;
+    },
+  ) {
+    const userId = await this.authService.getUserId(request);
+    if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
+
+    // TODO: send mail to reset email address
+
+    await this.service.updateInfo(userId, {
+      firstname: body.firstname,
+      lastname: body.lastname,
+      username: body.username,
+      //email: body.email,
+    });
+
+    return { success: true };
+  }
+
   @Get('search')
   async findUsers(@Req() request: Request, @Query('query') query: string) {
     const userId = await this.authService.getUserId(request);
