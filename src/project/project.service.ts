@@ -51,6 +51,7 @@ export class ProjectService {
           files: (await this.versionService.getFiles(version.id)).map(
             (file) => ({
               id: file.id,
+              hash: file.hash,
               type: file.type,
             }),
           ),

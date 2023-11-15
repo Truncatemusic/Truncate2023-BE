@@ -19,7 +19,7 @@ export class AudioFileService {
   private static FILE_TYPE_WAVEFORM = 'waveform.dat';
 
   static getWaveformFileName(waveId: string) {
-    return FileService.getFileName(waveId, this.FILE_TYPE_WAVEFORM);
+    return FileService.getFileNameByHash(waveId, this.FILE_TYPE_WAVEFORM);
   }
 
   constructor(
@@ -37,12 +37,12 @@ export class AudioFileService {
   }
 
   private async saveAudioFile(buffer: Buffer) {
-    let mp3Id = undefined;
+    let mp3Hash: string | undefined;
     if (!this.isWaveBuffer(buffer)) {
-      mp3Id = FileService.generateTmpFileId();
+      mp3Hash = FileService.generateRandomHash();
 
-      const mp3AudioFilePath = FileService.getFilePath(
-        mp3Id,
+      const mp3AudioFilePath = FileService.getFilePathByHash(
+        mp3Hash,
         AudioFileService.FILE_TYPE_MP3,
       );
       writeFileSync(mp3AudioFilePath, buffer);
@@ -51,20 +51,23 @@ export class AudioFileService {
       mkdirSync(mp3ToWaveOutDirPath);
 
       await new Mp32Wav(mp3AudioFilePath, mp3ToWaveOutDirPath).exec(undefined);
-      const mp3ToWaveAudioFilePath = join(mp3ToWaveOutDirPath, mp3Id + '.wav');
+      const mp3ToWaveAudioFilePath = join(
+        mp3ToWaveOutDirPath,
+        FileService.getFileNameByHash(mp3Hash, AudioFileService.FILE_TYPE_WAVE),
+      );
       buffer = readFileSync(mp3ToWaveAudioFilePath);
 
       unlinkSync(mp3ToWaveAudioFilePath);
       rmdirSync(mp3ToWaveOutDirPath);
     }
 
-    const waveId = FileService.generateTmpFileId(),
-      waveAudioFilePath = FileService.getFilePath(
-        waveId,
+    const waveHash = FileService.generateRandomHash(),
+      waveAudioFilePath = FileService.getFilePathByHash(
+        waveHash,
         AudioFileService.FILE_TYPE_WAVE,
       ),
-      waveformPath = FileService.getFilePath(
-        waveId,
+      waveformPath = FileService.getFilePathByHash(
+        waveHash,
         AudioFileService.FILE_TYPE_WAVEFORM,
       );
 
@@ -74,29 +77,29 @@ export class AudioFileService {
       waveformPath,
     );
 
-    return { waveId, mp3Id };
+    return { waveHash, mp3Hash };
   }
 
   async addAudioFile(versionId: number, buffer: Buffer) {
-    const { waveId, mp3Id } = await this.saveAudioFile(buffer);
+    const { waveHash, mp3Hash } = await this.saveAudioFile(buffer);
 
-    if (mp3Id)
+    if (mp3Hash)
       await this.fileService.addFile(
         versionId,
-        waveId,
+        waveHash,
         AudioFileService.FILE_TYPE_MP3,
       );
 
-    if (waveId) {
+    if (waveHash) {
       const { bucketName } = await this.fileService.addFile(
         versionId,
-        waveId,
+        waveHash,
         AudioFileService.FILE_TYPE_WAVE,
       );
 
       await this.fileService.addFile(
         versionId,
-        waveId,
+        waveHash,
         AudioFileService.FILE_TYPE_WAVEFORM,
         false,
         true,
@@ -104,6 +107,6 @@ export class AudioFileService {
       );
     }
 
-    return { waveId, mp3Id };
+    return { waveHash, mp3Hash };
   }
 }

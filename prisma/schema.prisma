@@ -58,15 +58,6 @@ model tprojectversion {
   @@unique([project_id, versionNumber], map: "project_id")
 }
 
-model tprojectversionfile {
-  id                String          @db.Char(128)
-  projectversion_id Int             @db.UnsignedInt
-  type              String          @db.Char(3)
-  tprojectversion   tprojectversion @relation(fields: [projectversion_id], references: [id], onUpdate: Restrict, map: "tprojectversionfile_ibfk_1")
-
-  @@id([projectversion_id, id, type])
-}
-
 model tsession {
   session   String    @id @db.Char(64)
   user_id   Int?      @db.UnsignedInt
@@ -131,4 +122,14 @@ model tuserfollow {
 
   @@index([followUser_id], map: "followUser_id")
   @@index([user_id], map: "user_id")
+}
+
+model tprojectversionfile {
+  id                Int              @id @default(autoincrement()) @db.UnsignedInt
+  hash              String?          @db.Char(128)
+  projectversion_id Int?             @db.UnsignedInt
+  type              String?          @db.Char(3)
+  tprojectversion   tprojectversion? @relation(fields: [projectversion_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversionfile_ibfk_1")
+
+  @@index([projectversion_id], map: "projectversion_id")
 }

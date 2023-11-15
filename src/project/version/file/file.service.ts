@@ -12,7 +12,7 @@ import { ProjectService } from '../../project.service';
 export class FileService {
   private static TMP_PATH = join(env.CWD || cwd(), 'tmp');
 
-  static generateTmpFileId() {
+  static generateRandomHash() {
     return createHash('sha512')
       .update(new Date().getTime() + '' + Math.random())
       .digest('hex')
@@ -20,15 +20,15 @@ export class FileService {
   }
 
   static generateTmpPath() {
-    return join(this.TMP_PATH, this.generateTmpFileId());
+    return join(this.TMP_PATH, this.generateRandomHash());
   }
 
-  static getFileName(id: string, type?: string) {
-    return type ? id + '.' + type : id;
+  static getFileNameByHash(hash: string, type?: string) {
+    return type ? hash + '.' + type : hash;
   }
 
-  static getFilePath(id: string, type?: string) {
-    return join(this.TMP_PATH, this.getFileName(id, type));
+  static getFilePathByHash(hash: string, type?: string) {
+    return join(this.TMP_PATH, this.getFileNameByHash(hash, type));
   }
 
   constructor(
@@ -36,32 +36,32 @@ export class FileService {
     private readonly storageService: StorageService,
   ) {}
 
-  private fileExists(id: string, type?: string) {
-    return existsSync(FileService.getFilePath(id, type));
+  private fileExistsByHash(hash: string, type?: string) {
+    return existsSync(FileService.getFilePathByHash(hash, type));
   }
 
-  private async upload(bucketName: string, id: string, type?: string) {
-    if (this.fileExists(id, type)) {
+  private async uploadByHash(bucketName: string, hash: string, type?: string) {
+    if (this.fileExistsByHash(hash, type)) {
       await this.storageService.uploadBuffer(
         bucketName,
-        FileService.getFileName(id, type),
-        readFileSync(FileService.getFilePath(id, type)),
+        FileService.getFileNameByHash(hash, type),
+        readFileSync(FileService.getFilePathByHash(hash, type)),
       );
       return true;
     }
     return false;
   }
 
-  clear(id: string, type?: string) {
-    if (this.fileExists(id, type))
-      unlinkSync(FileService.getFilePath(id, type));
+  clearByHash(hash: string, type?: string) {
+    if (this.fileExistsByHash(hash, type))
+      unlinkSync(FileService.getFilePathByHash(hash, type));
   }
 
-  async exists(versionId: number, id: string, type: string) {
+  async existsByHash(versionId: number, hash: string, type: string) {
     return !!(
       await this.prisma.tprojectversionfile.findFirst({
         where: {
-          id,
+          hash,
           type,
           projectversion_id: versionId,
         },
@@ -70,8 +70,8 @@ export class FileService {
     )?.projectversion_id;
   }
 
-  async getUserFileRole(
-    fileId: string,
+  async getUserFileRoleByFileHash(
+    hash: string,
     userId: number,
   ): Promise<ProjectUserRole | null> {
     return (
@@ -82,9 +82,7 @@ export class FileService {
               tprojectversion: {
                 some: {
                   tprojectversionfile: {
-                    some: {
-                      id: fileId,
-                    },
+                    some: { hash },
                   },
                 },
               },
@@ -97,21 +95,19 @@ export class FileService {
     );
   }
 
-  async getFile(fileId: string) {
+  async getFileByHash(hash: string) {
     const result = await this.prisma.tprojectversionfile.findFirst({
-      where: {
-        id: fileId,
-      },
+      where: { hash },
     });
     return result.id ? result : null;
   }
 
-  async getUserFileAndRole(fileId: string, userId: number) {
-    const userFileRole = await this.getUserFileRole(fileId, userId);
+  async getUserFileAndRoleByFileHash(hash: string, userId: number) {
+    const userFileRole = await this.getUserFileRoleByFileHash(hash, userId);
     return userFileRole
       ? {
           role: userFileRole,
-          file: await this.getFile(fileId),
+          file: await this.getFileByHash(hash),
         }
       : {
           role: null,
@@ -119,15 +115,13 @@ export class FileService {
         };
   }
 
-  async getProjectIdByFileId(fileId: string) {
+  async getProjectIdByFileHash(hash: string) {
     return (
       (
         await this.prisma.tprojectversion.findFirst({
           where: {
             tprojectversionfile: {
-              some: {
-                id: fileId,
-              },
+              some: { hash },
             },
           },
           select: { project_id: true },
@@ -137,29 +131,29 @@ export class FileService {
   }
 
   private async save(buffer: Buffer, type?: string) {
-    const id = FileService.generateTmpFileId();
-    writeFileSync(FileService.getFilePath(id, type), buffer);
-    return id;
+    const hash = FileService.generateRandomHash();
+    writeFileSync(FileService.getFilePathByHash(hash, type), buffer);
+    return hash;
   }
 
   async addFile(
     versionId: number,
-    bufferOrId: Buffer | string,
+    bufferOrHash: Buffer | string,
     type: string,
     addToDB: boolean = true,
     upload: boolean = true,
     bucketName?: string,
     clear: boolean = true,
   ) {
-    const id =
-      typeof bufferOrId === 'string'
-        ? bufferOrId
-        : await this.save(bufferOrId, type);
+    const hash =
+      typeof bufferOrHash === 'string'
+        ? bufferOrHash
+        : await this.save(bufferOrHash, type);
 
-    if (addToDB && !(await this.exists(versionId, id, type)))
+    if (addToDB && !(await this.existsByHash(versionId, hash, type)))
       await this.prisma.tprojectversionfile.create({
         data: {
-          id,
+          hash,
           type,
           projectversion_id: versionId,
         },
@@ -168,14 +162,14 @@ export class FileService {
     if (upload) {
       if (!bucketName)
         bucketName = ProjectService.getBucketName(
-          await this.getProjectIdByFileId(id),
+          await this.getProjectIdByFileHash(hash),
         );
 
-      await this.upload(bucketName, id, type);
+      await this.uploadByHash(bucketName, hash, type);
     }
 
-    if (clear) this.clear(id, type);
+    if (clear) this.clearByHash(hash, type);
 
-    return { id, bucketName };
+    return { hash, bucketName };
   }
 }

@@ -25,7 +25,8 @@ import { TranslationService } from './translation/translation.service';
 import { ResetPasswordController } from './reset-password/reset-password.controller';
 import { ResetPasswordService } from './reset-password/reset-password.service';
 import { AudiowaveformService } from './audiowaveform/audiowaveform.service';
-import { AudioFileService } from './project/version/file/audio/audio-file.service';
+import { AudioFileService } from './project/version/file/audio-file/audio-file.service';
+import { AudioFileController } from './project/version/file/audio-file/audio-file.controller';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { AudioFileService } from './project/version/file/audio/audio-file.servic
     ChecklistController,
     NotificationController,
     ResetPasswordController,
+    AudioFileController,
   ],
   providers: [
     AppService,
