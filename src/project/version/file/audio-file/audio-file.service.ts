@@ -22,6 +22,10 @@ export class AudioFileService {
     return FileService.getFileNameByHash(waveId, this.FILE_TYPE_WAVEFORM);
   }
 
+  static evaluateMimeType(file: Express.Multer.File): boolean {
+    return file.mimetype.includes('audio/wav');
+  }
+
   constructor(
     private readonly audiowaveformService: AudiowaveformService,
     private readonly fileService: FileService,
