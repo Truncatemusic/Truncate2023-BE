@@ -1,13 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as wav from 'node-wav';
 import * as Mp32Wav from 'mp3-to-wav';
-import {
-  readFileSync,
-  unlinkSync,
-  writeFileSync,
-  mkdirSync,
-  rmdirSync,
-} from 'fs';
+import { readFileSync, unlinkSync, mkdirSync, rmdirSync } from 'fs';
 import { join } from 'path';
 import { AudiowaveformService } from '../../../../audiowaveform/audiowaveform.service';
 import { FileService } from '../file.service';
@@ -40,21 +34,20 @@ export class AudioFileService {
     }
   }
 
-  private async saveAudioFile(buffer: Buffer) {
+  private async saveAudioFile(
+    buffer: Buffer,
+  ): Promise<{ waveHash: string; mp3Hash?: string }> {
     let mp3Hash: string | undefined;
     if (!this.isWaveBuffer(buffer)) {
-      mp3Hash = FileService.generateRandomHash();
-
-      const mp3AudioFilePath = FileService.getFilePathByHash(
-        mp3Hash,
-        AudioFileService.FILE_TYPE_MP3,
-      );
-      writeFileSync(mp3AudioFilePath, buffer);
+      mp3Hash = this.fileService.save(buffer, AudioFileService.FILE_TYPE_MP3);
 
       const mp3ToWaveOutDirPath = FileService.generateTmpPath();
       mkdirSync(mp3ToWaveOutDirPath);
 
-      await new Mp32Wav(mp3AudioFilePath, mp3ToWaveOutDirPath).exec(undefined);
+      await new Mp32Wav(
+        FileService.getFilePathByHash(mp3Hash),
+        mp3ToWaveOutDirPath,
+      ).exec(undefined);
       const mp3ToWaveAudioFilePath = join(
         mp3ToWaveOutDirPath,
         FileService.getFileNameByHash(mp3Hash, AudioFileService.FILE_TYPE_WAVE),
@@ -65,7 +58,10 @@ export class AudioFileService {
       rmdirSync(mp3ToWaveOutDirPath);
     }
 
-    const waveHash = FileService.generateRandomHash(),
+    const waveHash = this.fileService.save(
+        buffer,
+        AudioFileService.FILE_TYPE_WAVE,
+      ),
       waveAudioFilePath = FileService.getFilePathByHash(
         waveHash,
         AudioFileService.FILE_TYPE_WAVE,
@@ -75,7 +71,6 @@ export class AudioFileService {
         AudioFileService.FILE_TYPE_WAVEFORM,
       );
 
-    writeFileSync(waveAudioFilePath, buffer);
     await this.audiowaveformService.generateWaveform(
       waveAudioFilePath,
       waveformPath,
@@ -84,7 +79,14 @@ export class AudioFileService {
     return { waveHash, mp3Hash };
   }
 
-  async addAudioFile(versionId: number, file: Express.Multer.File) {
+  async addAudioFile(
+    versionId: number,
+    file: Express.Multer.File,
+  ): Promise<{
+    file: Express.Multer.File;
+    waveHash: string;
+    mp3Hash?: string;
+  }> {
     const { waveHash, mp3Hash } = await this.saveAudioFile(file.buffer);
 
     if (mp3Hash)
@@ -111,6 +113,6 @@ export class AudioFileService {
       );
     }
 
-    return { waveHash, mp3Hash };
+    return { file, waveHash, mp3Hash };
   }
 }
