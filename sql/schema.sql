@@ -67,6 +67,25 @@ CREATE TABLE IF NOT EXISTS tprojectversionfile (
     FOREIGN KEY (projectversion_id) REFERENCES tprojectversion(id)
 );
 
+CREATE TABLE IF NOT EXISTS tprojectversionstemsgroup (
+    id                INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    projectversion_id INT UNSIGNED,
+    name              VARCHAR(255) DEFAULT NULL,
+
+    FOREIGN KEY (projectversion_id) REFERENCES tprojectversion(id)
+);
+
+CREATE TABLE IF NOT EXISTS tprojectversionstems (
+    id                         INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    projectversionfile_id      INT UNSIGNED,
+    projectversionstemgroup_id INT UNSIGNED,
+    name                       VARCHAR(255),
+    type                       CHAR(3),
+
+    FOREIGN KEY (projectversionfile_id)      REFERENCES tprojectversionfile(id),
+    FOREIGN KEY (projectversionstemgroup_id) REFERENCES tprojectversionstemsgroup(id)
+);
+
 CREATE TABLE IF NOT EXISTS tusernotification (
     id                     INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     user_id                INT UNSIGNED,

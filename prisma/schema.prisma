@@ -44,16 +44,17 @@ model tprojectuser {
 }
 
 model tprojectversion {
-  id                                                                            Int                   @id @default(autoincrement()) @db.UnsignedInt
-  project_id                                                                    Int?                  @db.UnsignedInt
-  versionNumber                                                                 Int                   @db.UnsignedInt
-  timestamp                                                                     DateTime?             @default(now()) @db.Timestamp(0)
-  songBPM                                                                       Int?                  @db.UnsignedSmallInt
-  songKey                                                                       String?               @db.VarChar(10)
-  tprojectchecklist_tprojectchecklist_projectversionIdTotprojectversion         tprojectchecklist[]   @relation("tprojectchecklist_projectversionIdTotprojectversion")
-  tprojectchecklist_tprojectchecklist_checkedProjectversion_idTotprojectversion tprojectchecklist[]   @relation("tprojectchecklist_checkedProjectversion_idTotprojectversion")
-  tproject                                                                      tproject?             @relation(fields: [project_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversion_ibfk_1")
+  id                                                                            Int                         @id @default(autoincrement()) @db.UnsignedInt
+  project_id                                                                    Int?                        @db.UnsignedInt
+  versionNumber                                                                 Int                         @db.UnsignedInt
+  timestamp                                                                     DateTime?                   @default(now()) @db.Timestamp(0)
+  songBPM                                                                       Int?                        @db.UnsignedSmallInt
+  songKey                                                                       String?                     @db.VarChar(10)
+  tprojectchecklist_tprojectchecklist_projectversionIdTotprojectversion         tprojectchecklist[]         @relation("tprojectchecklist_projectversionIdTotprojectversion")
+  tprojectchecklist_tprojectchecklist_checkedProjectversion_idTotprojectversion tprojectchecklist[]         @relation("tprojectchecklist_checkedProjectversion_idTotprojectversion")
+  tproject                                                                      tproject?                   @relation(fields: [project_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversion_ibfk_1")
   tprojectversionfile                                                           tprojectversionfile[]
+  tprojectversionstemsgroup                                                     tprojectversionstemsgroup[]
 
   @@unique([project_id, versionNumber], map: "project_id")
 }
@@ -125,11 +126,35 @@ model tuserfollow {
 }
 
 model tprojectversionfile {
-  id                Int              @id @default(autoincrement()) @db.UnsignedInt
-  hash              String?          @db.Char(128)
-  projectversion_id Int?             @db.UnsignedInt
-  type              String?          @db.Char(3)
-  tprojectversion   tprojectversion? @relation(fields: [projectversion_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversionfile_ibfk_1")
+  id                   Int                    @id @default(autoincrement()) @db.UnsignedInt
+  hash                 String?                @db.Char(128)
+  projectversion_id    Int?                   @db.UnsignedInt
+  type                 String?                @db.Char(3)
+  tprojectversion      tprojectversion?       @relation(fields: [projectversion_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversionfile_ibfk_1")
+  tprojectversionstems tprojectversionstems[]
+
+  @@index([projectversion_id], map: "projectversion_id")
+}
+
+model tprojectversionstems {
+  id                         Int                        @id @default(autoincrement()) @db.UnsignedInt
+  projectversionfile_id      Int?                       @db.UnsignedInt
+  projectversionstemgroup_id Int?                       @db.UnsignedInt
+  name                       String?                    @db.VarChar(255)
+  type                       String?                    @db.Char(3)
+  tprojectversionfile        tprojectversionfile?       @relation(fields: [projectversionfile_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversionstems_ibfk_1")
+  tprojectversionstemsgroup  tprojectversionstemsgroup? @relation(fields: [projectversionstemgroup_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversionstems_ibfk_2")
+
+  @@index([projectversionfile_id], map: "projectversionfile_id")
+  @@index([projectversionstemgroup_id], map: "projectversionstemgroup_id")
+}
+
+model tprojectversionstemsgroup {
+  id                   Int                    @id @default(autoincrement()) @db.UnsignedInt
+  projectversion_id    Int?                   @db.UnsignedInt
+  name                 String?                @db.VarChar(255)
+  tprojectversionstems tprojectversionstems[]
+  tprojectversion      tprojectversion?       @relation(fields: [projectversion_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversionstemsgroup_ibfk_1")
 
   @@index([projectversion_id], map: "projectversion_id")
 }

@@ -27,6 +27,8 @@ import { ResetPasswordService } from './reset-password/reset-password.service';
 import { AudiowaveformService } from './audiowaveform/audiowaveform.service';
 import { AudioFileService } from './project/version/file/audio-file/audio-file.service';
 import { AudioFileController } from './project/version/file/audio-file/audio-file.controller';
+import { StemsService } from './project/version/file/stems/stems.service';
+import { StemsController } from './project/version/file/stems/stems.controller';
 
 @Module({
   imports: [
@@ -57,6 +59,7 @@ import { AudioFileController } from './project/version/file/audio-file/audio-fil
     NotificationController,
     ResetPasswordController,
     AudioFileController,
+    StemsController,
   ],
   providers: [
     AppService,
@@ -74,6 +77,7 @@ import { AudioFileController } from './project/version/file/audio-file/audio-fil
     StorageService,
     AudiowaveformService,
     AudioFileService,
+    StemsService,
   ],
 })
 export class AppModule {}
