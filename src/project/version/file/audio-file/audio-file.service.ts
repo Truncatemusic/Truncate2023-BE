@@ -84,8 +84,8 @@ export class AudioFileService {
     return { waveHash, mp3Hash };
   }
 
-  async addAudioFile(versionId: number, buffer: Buffer) {
-    const { waveHash, mp3Hash } = await this.saveAudioFile(buffer);
+  async addAudioFile(versionId: number, file: Express.Multer.File) {
+    const { waveHash, mp3Hash } = await this.saveAudioFile(file.buffer);
 
     if (mp3Hash)
       await this.fileService.addFile(

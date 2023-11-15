@@ -49,10 +49,7 @@ export class AudioFileController {
     if (!AudioFileService.evaluateMimeType(file))
       return { success: false, reason: 'INVALID_FILE_TYPE' };
 
-    const { waveHash } = await this.service.addAudioFile(
-      versionId,
-      file.buffer,
-    );
+    const { waveHash } = await this.service.addAudioFile(versionId, file);
     return { success: true, id: waveHash };
   }
 
