@@ -95,6 +95,16 @@ export class StemsService {
     return stemsGroup || (await this.createDefaultGroup(versionId));
   }
 
+  async getStems(versionId: number) {
+    return this.prisma.tprojectversionstems.findMany({
+      where: {
+        tprojectversionfile: {
+          projectversion_id: versionId,
+        },
+      },
+    });
+  }
+
   private async insertStem(
     fileId: number,
     groupId: number,
