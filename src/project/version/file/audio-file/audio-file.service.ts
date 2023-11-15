@@ -59,21 +59,16 @@ export class AudioFileService {
     }
 
     const waveHash = this.fileService.save(
-        buffer,
-        AudioFileService.FILE_TYPE_WAVE,
-      ),
-      waveAudioFilePath = FileService.getFilePathByHash(
-        waveHash,
-        AudioFileService.FILE_TYPE_WAVE,
-      ),
-      waveformPath = FileService.getFilePathByHash(
-        waveHash,
-        AudioFileService.FILE_TYPE_WAVEFORM,
-      );
+      buffer,
+      AudioFileService.FILE_TYPE_WAVE,
+    );
 
     await this.audiowaveformService.generateWaveform(
-      waveAudioFilePath,
-      waveformPath,
+      FileService.getFilePathByHash(waveHash, AudioFileService.FILE_TYPE_WAVE),
+      FileService.getFilePathByHash(
+        waveHash,
+        AudioFileService.FILE_TYPE_WAVEFORM,
+      ),
     );
 
     return { waveHash, mp3Hash };
