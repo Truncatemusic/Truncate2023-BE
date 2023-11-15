@@ -17,27 +17,6 @@ export class StemsService {
     private readonly fileService: FileService,
   ) {}
 
-  addStemsParallel(versionId: number, files: Express.Multer.File[]) {
-    return new Promise<
-      (
-        | {
-            success: true;
-            stem: object;
-            hash: string;
-            file: Express.Multer.File;
-          }
-        | { success: false; reason: string }
-      )[]
-    >((resolve) => {
-      const results = [];
-      for (const file of files)
-        this.addStem(versionId, file).then((result) => {
-          results.push(result);
-          if (results.length === files.length) resolve(results);
-        });
-    });
-  }
-
   async addStem(
     versionId: number,
     file: Express.Multer.File,

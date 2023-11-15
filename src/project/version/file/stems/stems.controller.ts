@@ -5,7 +5,7 @@ import {
   Post,
   Query,
   Req,
-  UploadedFiles,
+  UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -53,9 +53,9 @@ export class StemsController {
 
   @Post('upload/:projectId/:versionNumber')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadStems(
+  async uploadStem(
     @Req() request: Request,
-    @UploadedFiles() files: Express.Multer.File[],
+    @UploadedFile() file: Express.Multer.File,
     @Param('projectId') projectId: number,
     @Param('versionNumber') versionNumber: number,
   ) {
@@ -69,7 +69,7 @@ export class StemsController {
     if (!versionId)
       return { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
 
-    await this.service.addStemsParallel(versionId, files);
+    await this.service.addStem(versionId, file);
     return { success: true };
   }
 }
