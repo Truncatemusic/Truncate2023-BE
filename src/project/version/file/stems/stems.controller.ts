@@ -69,7 +69,7 @@ export class StemsController {
     if (!versionId)
       return { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
 
-    await this.service.addStem(versionId, file);
+    this.service.addStem(versionId, file).then();
     return { success: true };
   }
 }
