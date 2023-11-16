@@ -32,6 +32,18 @@ CREATE TABLE IF NOT EXISTS tprojectuser (
     FOREIGN KEY (project_id) REFERENCES tproject(id)
 );
 
+CREATE TABLE IF NOT EXISTS tprojectversion (
+    id            INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    project_id    INT UNSIGNED,
+    versionNumber INT UNSIGNED NOT NULL,
+    timestamp     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    songBPM       SMALLINT UNSIGNED,
+    songKey       VARCHAR(10),
+
+    FOREIGN KEY (project_id) REFERENCES tproject(id),
+    UNIQUE (project_id, versionNumber)
+);
+
 CREATE TABLE IF NOT EXISTS tprojectchecklist (
     id                       INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     projectversionId         INT UNSIGNED,
@@ -44,18 +56,6 @@ CREATE TABLE IF NOT EXISTS tprojectchecklist (
     FOREIGN KEY (user_id)                  REFERENCES tuser(id),
     FOREIGN KEY (projectversionId)         REFERENCES tprojectversion(id),
     FOREIGN KEY (checkedProjectversion_id) REFERENCES tprojectversion(id)
-);
-
-CREATE TABLE IF NOT EXISTS tprojectversion (
-    id            INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    project_id    INT UNSIGNED,
-    versionNumber INT UNSIGNED NOT NULL,
-    timestamp     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    songBPM       SMALLINT UNSIGNED,
-    songKey       VARCHAR(10),
-
-    FOREIGN KEY (project_id) REFERENCES tproject(id),
-    UNIQUE (project_id, versionNumber)
 );
 
 CREATE TABLE IF NOT EXISTS tprojectversionfile (
@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS tprojectversionstems (
     projectversionstemgroup_id INT UNSIGNED,
     name                       VARCHAR(255),
     type                       CHAR(3),
+    processing                 BOOLEAN,
 
     FOREIGN KEY (projectversionfile_id)      REFERENCES tprojectversionfile(id),
     FOREIGN KEY (projectversionstemgroup_id) REFERENCES tprojectversionstemsgroup(id)
