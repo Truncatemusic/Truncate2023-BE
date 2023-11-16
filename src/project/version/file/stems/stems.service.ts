@@ -39,7 +39,7 @@ export class StemsService {
     const stem = await this.insertStem(
       fileEntry.id,
       stemGroup.id,
-      file.filename,
+      file.filename || file.originalname,
       StemsService.typeFromFile(file),
     );
     if (!stem) return { success: false, reason: 'STEM_COULD_NOT_BE_INSERTED' };
