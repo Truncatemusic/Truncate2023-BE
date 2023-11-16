@@ -81,7 +81,6 @@ CREATE TABLE IF NOT EXISTS tprojectversionstems (
     projectversionstemgroup_id INT UNSIGNED,
     name                       VARCHAR(255),
     type                       CHAR(3),
-    processing                 BOOLEAN,
 
     FOREIGN KEY (projectversionfile_id)      REFERENCES tprojectversionfile(id),
     FOREIGN KEY (projectversionstemgroup_id) REFERENCES tprojectversionstemsgroup(id)

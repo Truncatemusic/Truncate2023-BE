@@ -1,15 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { FileService } from '../file.service';
+import { lookup } from 'mime-types';
 
 @Injectable()
 export class StemsService {
   private static FILE_TYPE_STEM = 'stm';
 
-  private static typeFromFile(file: Express.Multer.File) {
-    if (file.mimetype.includes('audio/wav')) return 'wav';
-    if (file.mimetype.includes('audio/aiff')) return 'aif';
-    if (file.mimetype.includes('audio/mp3')) return 'mp3';
+  static typeFromFileName(filename: string): string | undefined {
+    const mimetype = lookup(filename);
+    if (mimetype) {
+      if (mimetype.includes('audio/wav')) return 'wav';
+      if (mimetype.includes('audio/aiff')) return 'aif';
+      if (mimetype.includes('audio/mp3')) return 'mp3';
+    }
   }
 
   constructor(
@@ -19,19 +23,29 @@ export class StemsService {
 
   async addStem(
     versionId: number,
-    file: Express.Multer.File,
+    fileName: string,
   ): Promise<
-    | { success: true; stem: object; hash: string; file: Express.Multer.File }
+    | {
+        success: true;
+        stem: {
+          id: number;
+          projectversionfile_id: number;
+          projectversionstemgroup_id: number;
+          name: string;
+          type: string;
+        };
+        hash: string;
+      }
     | { success: false; reason: string }
   > {
     const stemGroup = await this.getCreateDefaultGroup(versionId);
 
-    // TODO: add pseudo stem entry and set processing to true!
-
     const { hash } = await this.fileService.addFile(
       versionId,
-      file.buffer,
+      null,
       StemsService.FILE_TYPE_STEM,
+      true,
+      false,
     );
 
     const fileEntry = await this.fileService.getFileByHash(hash);
@@ -41,12 +55,12 @@ export class StemsService {
     const stem = await this.insertStem(
       fileEntry.id,
       stemGroup.id,
-      file.filename || file.originalname,
-      StemsService.typeFromFile(file),
+      fileName,
+      StemsService.typeFromFileName(fileName),
     );
     if (!stem) return { success: false, reason: 'STEM_COULD_NOT_BE_INSERTED' };
 
-    return { success: true, stem, hash, file };
+    return { success: true, stem, hash };
   }
 
   async getDefaultGroupByVersionId(versionId: number) {
@@ -91,7 +105,6 @@ export class StemsService {
     groupId: number,
     name: string,
     type: string,
-    processing: boolean = false,
   ) {
     return this.prisma.tprojectversionstems.create({
       data: {
@@ -99,15 +112,7 @@ export class StemsService {
         projectversionstemgroup_id: groupId,
         name,
         type,
-        processing,
       },
-    });
-  }
-
-  protected async setStemProcessing(id: number, processing: boolean) {
-    return this.prisma.tprojectversionstems.update({
-      where: { id },
-      data: { processing },
     });
   }
 }

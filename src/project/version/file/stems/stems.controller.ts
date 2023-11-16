@@ -1,18 +1,10 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Post,
-  Query,
-  Req,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, Get, Query, Req } from '@nestjs/common';
 import { AuthService } from '../../../../auth/auth.service';
 import { StemsService } from './stems.service';
 import { VersionService } from '../../version.service';
 import { ProjectService } from '../../../project.service';
+import { StorageService } from '../../../../storage/storage.service';
+import { FileService } from '../file.service';
 
 @Controller('project/version/file/stems')
 export class StemsController {
@@ -21,6 +13,8 @@ export class StemsController {
     private readonly authService: AuthService,
     private readonly projectService: ProjectService,
     private readonly versionService: VersionService,
+    private readonly fileService: FileService,
+    private readonly storageService: StorageService,
   ) {}
 
   @Get()
@@ -46,18 +40,17 @@ export class StemsController {
     return {
       success: true,
       stems: (await this.service.getStems(versionId)).map(
-        ({ id, name, type, processing }) => ({ id, name, type, processing }),
+        ({ id, name, type }) => ({ id, name, type }),
       ),
     };
   }
 
-  @Post('upload/:projectId/:versionNumber')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadStem(
+  @Get('uploadURL')
+  async getUploadURL(
     @Req() request: Request,
-    @UploadedFile() file: Express.Multer.File,
-    @Param('projectId') projectId: number,
-    @Param('versionNumber') versionNumber: number,
+    @Query('projectId') projectId?: string,
+    @Query('versionNumber') versionNumber?: string,
+    @Query('fileName') fileName?: string,
   ) {
     if (!(await this.authService.validateSession(request)))
       return AuthService.INVALID_SESSION_RESPONSE;
@@ -69,7 +62,20 @@ export class StemsController {
     if (!versionId)
       return { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
 
-    this.service.addStem(versionId, file).then();
-    return { success: true };
+    const stemResult = await this.service.addStem(versionId, fileName);
+    if (!stemResult.success) return { success: false, reason: 'UNKNOWN' };
+
+    return {
+      success: true,
+      url: await this.storageService.getFileTmpUploadURL(
+        ProjectService.getBucketName(
+          await this.fileService.getProjectIdByFileHash(stemResult.hash),
+        ),
+        FileService.getFileNameByHash(
+          stemResult.hash,
+          StemsService.typeFromFileName(fileName),
+        ),
+      ),
+    };
   }
 }
