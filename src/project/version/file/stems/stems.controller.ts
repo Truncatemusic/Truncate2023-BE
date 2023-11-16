@@ -46,7 +46,7 @@ export class StemsController {
     return {
       success: true,
       stems: (await this.service.getStems(versionId)).map(
-        ({ id, name, type, processing }) => ({ id, name, type, processing }),
+        ({ id, name, type }) => ({ id, name, type }),
       ),
     };
   }

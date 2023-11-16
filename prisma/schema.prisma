@@ -112,7 +112,6 @@ model tprojectversionstems {
   projectversionstemgroup_id Int?                       @db.UnsignedInt
   name                       String?                    @db.VarChar(255)
   type                       String?                    @db.Char(3)
-  processing                 Boolean?
   tprojectversionfile        tprojectversionfile?       @relation(fields: [projectversionfile_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversionstems_ibfk_1")
   tprojectversionstemsgroup  tprojectversionstemsgroup? @relation(fields: [projectversionstemgroup_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectversionstems_ibfk_2")
 

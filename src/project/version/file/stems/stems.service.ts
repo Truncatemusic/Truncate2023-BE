@@ -26,8 +26,6 @@ export class StemsService {
   > {
     const stemGroup = await this.getCreateDefaultGroup(versionId);
 
-    // TODO: add pseudo stem entry and set processing to true!
-
     const { hash } = await this.fileService.addFile(
       versionId,
       file.buffer,
@@ -91,7 +89,6 @@ export class StemsService {
     groupId: number,
     name: string,
     type: string,
-    processing: boolean = false,
   ) {
     return this.prisma.tprojectversionstems.create({
       data: {
@@ -99,15 +96,7 @@ export class StemsService {
         projectversionstemgroup_id: groupId,
         name,
         type,
-        processing,
       },
-    });
-  }
-
-  protected async setStemProcessing(id: number, processing: boolean) {
-    return this.prisma.tprojectversionstems.update({
-      where: { id },
-      data: { processing },
     });
   }
 }
