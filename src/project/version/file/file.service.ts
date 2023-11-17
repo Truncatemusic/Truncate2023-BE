@@ -130,7 +130,7 @@ export class FileService {
     );
   }
 
-  private async save(buffer: Buffer, type?: string) {
+  save(buffer: Buffer, type?: string): string {
     const hash = FileService.generateRandomHash();
     writeFileSync(FileService.getFilePathByHash(hash, type), buffer);
     return hash;
@@ -138,7 +138,7 @@ export class FileService {
 
   async addFile(
     versionId: number,
-    bufferOrHash: Buffer | string,
+    bufferOrHash: Buffer | string | null,
     type: string,
     addToDB: boolean = true,
     upload: boolean = true,
@@ -148,7 +148,9 @@ export class FileService {
     const hash =
       typeof bufferOrHash === 'string'
         ? bufferOrHash
-        : await this.save(bufferOrHash, type);
+        : bufferOrHash
+        ? this.save(bufferOrHash, type)
+        : FileService.generateRandomHash();
 
     if (addToDB && !(await this.existsByHash(versionId, hash, type)))
       await this.prisma.tprojectversionfile.create({

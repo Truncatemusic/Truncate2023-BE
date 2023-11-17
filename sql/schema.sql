@@ -4,16 +4,10 @@ CREATE TABLE IF NOT EXISTS tuser (
     password  VARCHAR(255) NOT NULL,
     username  VARCHAR(255) NOT NULL,
     firstname VARCHAR(255),
-    lastname  VARCHAR(255)
+    lastname  VARCHAR(255),
+    public    BOOLEAN NOT NULL DEFAULT TRUE,
+    blocked   BOOLEAN NOT NULL DEFAULT TRUE
 );
-
-ALTER TABLE tuser ADD IF NOT EXISTS blocked BOOLEAN DEFAULT TRUE;
-UPDATE tuser SET blocked=FALSE WHERE blocked IS NULL;
-ALTER TABLE tuser MODIFY blocked BOOLEAN NOT NULL;
-
-ALTER TABLE tuser ADD IF NOT EXISTS public BOOLEAN DEFAULT TRUE;
-UPDATE tuser SET public=TRUE WHERE public IS NULL;
-ALTER TABLE tuser MODIFY public BOOLEAN NOT NULL;
 
 CREATE TABLE IF NOT EXISTS tsession (
     session   CHAR(64) PRIMARY KEY,
@@ -32,12 +26,11 @@ CREATE TABLE IF NOT EXISTS tprojectuser (
     id         INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     user_id    INT UNSIGNED,
     project_id INT UNSIGNED,
+    role       CHAR(1) NOT NULL,
 
     FOREIGN KEY (user_id)    REFERENCES tuser(id),
     FOREIGN KEY (project_id) REFERENCES tproject(id)
 );
-
-ALTER TABLE tprojectuser ADD IF NOT EXISTS role CHAR(1) NOT NULL;
 
 CREATE TABLE IF NOT EXISTS tprojectversion (
     id            INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -51,6 +44,20 @@ CREATE TABLE IF NOT EXISTS tprojectversion (
     UNIQUE (project_id, versionNumber)
 );
 
+CREATE TABLE IF NOT EXISTS tprojectchecklist (
+    id                       INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    projectversionId         INT UNSIGNED,
+    user_id                  INT UNSIGNED,
+    timestamp                TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    text                     VARCHAR(255) NOT NULL,
+    checkedProjectversion_id INT UNSIGNED DEFAULT NULL,
+    rejected                 BOOLEAN,
+
+    FOREIGN KEY (user_id)                  REFERENCES tuser(id),
+    FOREIGN KEY (projectversionId)         REFERENCES tprojectversion(id),
+    FOREIGN KEY (checkedProjectversion_id) REFERENCES tprojectversion(id)
+);
+
 CREATE TABLE IF NOT EXISTS tprojectversionfile (
     id                INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     hash              CHAR(128),
@@ -60,20 +67,24 @@ CREATE TABLE IF NOT EXISTS tprojectversionfile (
     FOREIGN KEY (projectversion_id) REFERENCES tprojectversion(id)
 );
 
-CREATE TABLE IF NOT EXISTS tprojectchecklist (
-    id                       INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    projectversionId         INT UNSIGNED,
-    user_id                  INT UNSIGNED,
-    timestamp                TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    text                     VARCHAR(255) NOT NULL,
-    checkedProjectversion_id INT UNSIGNED DEFAULT NULL,
+CREATE TABLE IF NOT EXISTS tprojectversionstemsgroup (
+    id                INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    projectversion_id INT UNSIGNED,
+    name              VARCHAR(255) DEFAULT NULL,
 
-    FOREIGN KEY (user_id)                  REFERENCES tuser(id),
-    FOREIGN KEY (projectversionId)         REFERENCES tprojectversion(id),
-    FOREIGN KEY (checkedProjectversion_id) REFERENCES tprojectversion(id)
+    FOREIGN KEY (projectversion_id) REFERENCES tprojectversion(id)
 );
 
-ALTER TABLE tprojectchecklist ADD COLUMN IF NOT EXISTS rejected BOOLEAN;
+CREATE TABLE IF NOT EXISTS tprojectversionstems (
+    id                         INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    projectversionfile_id      INT UNSIGNED,
+    projectversionstemgroup_id INT UNSIGNED,
+    name                       VARCHAR(255),
+    type                       CHAR(3),
+
+    FOREIGN KEY (projectversionfile_id)      REFERENCES tprojectversionfile(id),
+    FOREIGN KEY (projectversionstemgroup_id) REFERENCES tprojectversionstemsgroup(id)
+);
 
 CREATE TABLE IF NOT EXISTS tusernotification (
     id                     INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,

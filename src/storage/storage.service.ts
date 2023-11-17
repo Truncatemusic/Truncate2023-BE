@@ -10,6 +10,14 @@ export class StorageService {
 
   private readonly storage: Storage;
 
+  private get expirationDate(): number {
+    return Date.now() + StorageService.URL_LIFETIME;
+  }
+
+  private get maxAgeSeconds(): number {
+    return StorageService.URL_LIFETIME / 1e3;
+  }
+
   constructor() {
     this.storage = new Storage({
       keyFilename: env.CWD
@@ -40,22 +48,30 @@ export class StorageService {
   }
 
   async getFileTmpURL(bucketName: string, fileName: string) {
-    await this.storage.bucket(bucketName).setCorsConfiguration([
-      {
-        origin: [env.CORS_ORIGIN],
-        responseHeader: ['Content-Type'],
-        method: ['GET'],
-        maxAgeSeconds: StorageService.URL_LIFETIME / 1e3,
-      },
-    ]);
+    const bucket = this.storage.bucket(bucketName),
+      [metadata] = await bucket.getMetadata();
 
-    const [url] = await this.storage
-      .bucket(bucketName)
-      .file(fileName)
-      .getSignedUrl({
-        action: 'read',
-        expires: Date.now() + StorageService.URL_LIFETIME,
-      });
+    if (
+      !metadata.cors.some(
+        ({ origin, method, responseHeader }) =>
+          origin.includes(env.CORS_ORIGIN) &&
+          method.includes('GET') &&
+          responseHeader.includes('Content-Type'),
+      )
+    )
+      await bucket.setCorsConfiguration([
+        {
+          origin: [env.CORS_ORIGIN],
+          method: ['GET'],
+          responseHeader: ['Content-Type'],
+          maxAgeSeconds: this.maxAgeSeconds,
+        },
+      ]);
+
+    const [url] = await bucket.file(fileName).getSignedUrl({
+      action: 'read',
+      expires: this.expirationDate,
+    });
     return url;
   }
 
@@ -67,5 +83,39 @@ export class StorageService {
     } catch (e) {
       response.status(HttpStatus.NOT_FOUND).send();
     }
+  }
+
+  async getFileTmpUploadURL(
+    bucketName: string,
+    fileName: string,
+    contentType?: string,
+  ) {
+    const bucket = this.storage.bucket(bucketName),
+      [metadata] = await bucket.getMetadata();
+
+    if (
+      !metadata.cors.some(
+        ({ origin, method, responseHeader }) =>
+          origin.includes(env.CORS_ORIGIN) &&
+          method.includes('PUT') &&
+          responseHeader.includes('Content-Type'),
+      )
+    )
+      await bucket.setCorsConfiguration([
+        {
+          origin: [env.CORS_ORIGIN],
+          responseHeader: ['Content-Type'],
+          method: ['GET', 'PUT'],
+          maxAgeSeconds: this.maxAgeSeconds,
+        },
+      ]);
+
+    const [url] = await bucket.file(fileName).getSignedUrl({
+      version: 'v4',
+      action: 'write',
+      expires: this.expirationDate,
+      contentType,
+    });
+    return url;
   }
 }

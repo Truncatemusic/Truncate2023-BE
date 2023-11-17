@@ -21,9 +21,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 @Controller('project/version/file/audio')
 export class AudioFileController {
   constructor(
-    private readonly service: FileService,
+    private readonly service: AudioFileService,
+    private readonly fileService: FileService,
     private readonly authService: AuthService,
-    private readonly audioFileService: AudioFileService,
     private readonly storageService: StorageService,
     private readonly versionService: VersionService,
   ) {}
@@ -46,13 +46,10 @@ export class AudioFileController {
     if (!versionId)
       return { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
 
-    if (!file.mimetype.includes('audio/wav'))
+    if (!AudioFileService.evaluateMimeType(file))
       return { success: false, reason: 'INVALID_FILE_TYPE' };
 
-    const { waveHash } = await this.audioFileService.addAudioFile(
-      versionId,
-      file.buffer,
-    );
+    const { waveHash } = await this.service.addAudioFile(versionId, file);
     return { success: true, id: waveHash };
   }
 
@@ -65,7 +62,7 @@ export class AudioFileController {
     const userId = await this.authService.getUserId(request);
     if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
 
-    const { role, file } = await this.service.getUserFileAndRoleByFileHash(
+    const { role, file } = await this.fileService.getUserFileAndRoleByFileHash(
       hash,
       userId,
     );
@@ -76,7 +73,7 @@ export class AudioFileController {
       success: true,
       url: await this.storageService.getFileTmpURL(
         ProjectService.getBucketName(
-          await this.service.getProjectIdByFileHash(file.hash),
+          await this.fileService.getProjectIdByFileHash(file.hash),
         ),
         FileService.getFileNameByHash(file.hash, type || file.type),
       ),
@@ -122,7 +119,7 @@ export class AudioFileController {
     const userId = await this.authService.getUserId(request);
     if (!userId) return response.status(HttpStatus.UNAUTHORIZED).send();
 
-    const { role, file } = await this.service.getUserFileAndRoleByFileHash(
+    const { role, file } = await this.fileService.getUserFileAndRoleByFileHash(
       hash,
       userId,
     );
@@ -132,7 +129,7 @@ export class AudioFileController {
     await this.storageService.pipeFile(
       response,
       ProjectService.getBucketName(
-        await this.service.getProjectIdByFileHash(file.hash),
+        await this.fileService.getProjectIdByFileHash(file.hash),
       ),
       AudioFileService.getWaveformFileName(file.hash),
     );
