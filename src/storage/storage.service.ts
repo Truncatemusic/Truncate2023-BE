@@ -48,15 +48,25 @@ export class StorageService {
   }
 
   async getFileTmpURL(bucketName: string, fileName: string) {
-    const bucket = this.storage.bucket(bucketName);
-    await bucket.setCorsConfiguration([
-      {
-        origin: [env.CORS_ORIGIN],
-        responseHeader: ['Content-Type'],
-        method: ['GET'],
-        maxAgeSeconds: this.maxAgeSeconds,
-      },
-    ]);
+    const bucket = this.storage.bucket(bucketName),
+      [metadata] = await bucket.getMetadata();
+
+    if (
+      !metadata.cors.some(
+        ({ origin, method, responseHeader }) =>
+          origin.includes(env.CORS_ORIGIN) &&
+          method.includes('GET') &&
+          responseHeader.includes('Content-Type'),
+      )
+    )
+      await bucket.setCorsConfiguration([
+        {
+          origin: [env.CORS_ORIGIN],
+          method: ['GET'],
+          responseHeader: ['Content-Type'],
+          maxAgeSeconds: this.maxAgeSeconds,
+        },
+      ]);
 
     const [url] = await bucket.file(fileName).getSignedUrl({
       action: 'read',
@@ -80,15 +90,25 @@ export class StorageService {
     fileName: string,
     contentType?: string,
   ) {
-    const bucket = this.storage.bucket(bucketName);
-    await bucket.setCorsConfiguration([
-      {
-        origin: [env.CORS_ORIGIN],
-        responseHeader: ['Content-Type'],
-        method: ['GET', 'PUT'],
-        maxAgeSeconds: this.maxAgeSeconds,
-      },
-    ]);
+    const bucket = this.storage.bucket(bucketName),
+      [metadata] = await bucket.getMetadata();
+
+    if (
+      !metadata.cors.some(
+        ({ origin, method, responseHeader }) =>
+          origin.includes(env.CORS_ORIGIN) &&
+          method.includes('PUT') &&
+          responseHeader.includes('Content-Type'),
+      )
+    )
+      await bucket.setCorsConfiguration([
+        {
+          origin: [env.CORS_ORIGIN],
+          responseHeader: ['Content-Type'],
+          method: ['GET', 'PUT'],
+          maxAgeSeconds: this.maxAgeSeconds,
+        },
+      ]);
 
     const [url] = await bucket.file(fileName).getSignedUrl({
       version: 'v4',
