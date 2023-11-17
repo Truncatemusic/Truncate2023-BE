@@ -78,4 +78,24 @@ export class StemsController {
       ),
     };
   }
+
+  @Get('downloadURL')
+  async getDownloadURL(@Req() request: Request, @Query('id') stemId?: string) {
+    const stem = await this.service.getStem(parseInt(String(stemId)));
+    if (!stem) return { success: false, reason: 'INVALID_STEM_ID' };
+
+    const project = await this.service.getProjectByStemId(stem.id);
+    if (!(await this.projectService.getUserRoleBySession(project.id, request)))
+      return AuthService.INVALID_SESSION_RESPONSE;
+
+    const file = await this.service.getFileByStemId(stem.id);
+    return {
+      success: true,
+      name: stem.name,
+      url: await this.storageService.getFileTmpURL(
+        ProjectService.getBucketName(project.id),
+        FileService.getFileNameByHash(file.hash, stem.type),
+      ),
+    };
+  }
 }

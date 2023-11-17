@@ -100,6 +100,12 @@ export class StemsService {
     });
   }
 
+  async getStem(stemId: number) {
+    return this.prisma.tprojectversionstems.findUnique({
+      where: { id: stemId },
+    });
+  }
+
   private async insertStem(
     fileId: number,
     groupId: number,
@@ -112,6 +118,38 @@ export class StemsService {
         projectversionstemgroup_id: groupId,
         name,
         type,
+      },
+    });
+  }
+
+  async getFileByStemId(stemId: number) {
+    return this.prisma.tprojectversionfile.findFirst({
+      where: {
+        tprojectversionstems: {
+          some: {
+            id: stemId,
+          },
+        },
+      },
+    });
+  }
+
+  async getProjectByStemId(stemId: number) {
+    return this.prisma.tproject.findFirst({
+      where: {
+        tprojectversion: {
+          some: {
+            tprojectversionfile: {
+              some: {
+                tprojectversionstems: {
+                  some: {
+                    id: stemId,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
   }
