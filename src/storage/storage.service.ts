@@ -52,7 +52,7 @@ export class StorageService {
       [metadata] = await bucket.getMetadata();
 
     if (
-      !metadata.cors.some(
+      !metadata.cors?.some(
         ({ origin, method, responseHeader }) =>
           origin.includes(env.CORS_ORIGIN) &&
           method.includes('GET') &&
@@ -94,7 +94,7 @@ export class StorageService {
       [metadata] = await bucket.getMetadata();
 
     if (
-      !metadata.cors.some(
+      !metadata.cors?.some(
         ({ origin, method, responseHeader }) =>
           origin.includes(env.CORS_ORIGIN) &&
           method.includes('PUT') &&
