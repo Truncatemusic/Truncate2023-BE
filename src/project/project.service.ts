@@ -5,7 +5,8 @@ import { UserService } from '../user/user.service';
 import { AuthService } from '../auth/auth.service';
 import { StorageService } from '../storage/storage.service';
 import { env } from 'process';
-import { ProjectUserRole } from './project-user-role.type';
+
+export type ProjectUserRole = 'O' | 'A' | 'S';
 
 @Injectable()
 export class ProjectService {
