@@ -4,9 +4,8 @@ import { join } from 'path';
 import { PrismaClient } from '@prisma/client';
 import { env, cwd } from 'process';
 import { StorageService } from '../../../storage/storage.service';
-import { ProjectUserRole } from '../../project-user-role.type';
 import { createHash } from 'crypto';
-import { ProjectService } from '../../project.service';
+import { ProjectService, ProjectUserRole } from '../../project.service';
 
 @Injectable()
 export class FileService {
