@@ -141,7 +141,7 @@ export class FileService {
     bufferOrHash: Buffer | string | null,
     type: string,
     addToDB: boolean = true,
-    upload: boolean = true,
+    upload: boolean | 'dry' = true,
     bucketName?: string,
     clear: boolean = true,
   ) {
@@ -167,7 +167,7 @@ export class FileService {
           await this.getProjectIdByFileHash(hash),
         );
 
-      await this.uploadByHash(bucketName, hash, type);
+      if (upload !== 'dry') await this.uploadByHash(bucketName, hash, type);
     }
 
     if (clear) this.clearByHash(hash, type);

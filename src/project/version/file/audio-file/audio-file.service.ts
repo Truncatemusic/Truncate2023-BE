@@ -74,40 +74,68 @@ export class AudioFileService {
     return { waveHash, mp3Hash };
   }
 
-  async addAudioFile(
-    versionId: number,
-    file: Express.Multer.File,
-  ): Promise<{
-    file: Express.Multer.File;
-    waveHash: string;
-    mp3Hash?: string;
-  }> {
-    const { waveHash, mp3Hash } = await this.saveAudioFile(file.buffer);
+  addAudioFile(versionId: number, file: Express.Multer.File) {
+    return new Promise<{
+      file: Express.Multer.File;
+      waveHash: string;
+      mp3Hash?: string;
+    }>(async (resolve) => {
+      const { waveHash, mp3Hash } = await this.saveAudioFile(file.buffer);
 
-    if (mp3Hash)
-      await this.fileService.addFile(
-        versionId,
-        waveHash,
-        AudioFileService.FILE_TYPE_MP3,
-      );
+      let awaitingMp3: boolean = !!mp3Hash,
+        awaitingWav: boolean = !!waveHash,
+        awaitingWaveform: boolean = !!awaitingWav;
 
-    if (waveHash) {
-      const { bucketName } = await this.fileService.addFile(
-        versionId,
-        waveHash,
-        AudioFileService.FILE_TYPE_WAVE,
-      );
+      if (awaitingWav) {
+        const { bucketName } = await this.fileService.addFile(
+          versionId,
+          waveHash,
+          AudioFileService.FILE_TYPE_WAVE,
+          true,
+          'dry',
+          undefined,
+          false,
+        );
 
-      await this.fileService.addFile(
-        versionId,
-        waveHash,
-        AudioFileService.FILE_TYPE_WAVEFORM,
-        false,
-        true,
-        bucketName,
-      );
-    }
+        this.fileService
+          .addFile(
+            versionId,
+            waveHash,
+            AudioFileService.FILE_TYPE_WAVE,
+            false,
+            true,
+            bucketName,
+          )
+          .then(() => {
+            awaitingWav = false;
+            if (!awaitingMp3 && !awaitingWaveform)
+              resolve({ file, waveHash, mp3Hash });
+          });
 
-    return { file, waveHash, mp3Hash };
+        this.fileService
+          .addFile(
+            versionId,
+            waveHash,
+            AudioFileService.FILE_TYPE_WAVEFORM,
+            false,
+            true,
+            bucketName,
+          )
+          .then(() => {
+            awaitingWaveform = false;
+            if (!awaitingMp3 && !awaitingWav)
+              resolve({ file, waveHash, mp3Hash });
+          });
+      }
+
+      if (awaitingMp3)
+        this.fileService
+          .addFile(versionId, waveHash, AudioFileService.FILE_TYPE_MP3)
+          .then(() => {
+            awaitingMp3 = false;
+            if (!awaitingWav && !awaitingWaveform)
+              resolve({ file, waveHash, mp3Hash });
+          });
+    });
   }
 }

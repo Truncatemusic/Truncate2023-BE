@@ -1,5 +1,5 @@
 import { Injectable, Scope, HttpStatus } from '@nestjs/common';
-import { Storage } from '@google-cloud/storage';
+import { IdempotencyStrategy, Storage } from '@google-cloud/storage';
 import { env } from 'process';
 import { Response } from 'express';
 import { join } from 'path';
@@ -23,6 +23,14 @@ export class StorageService {
       keyFilename: env.CWD
         ? join(env.CWD, env.GOOGLE_STORAGE_KEYFILE)
         : env.GOOGLE_STORAGE_KEYFILE,
+      retryOptions: {
+        autoRetry: true,
+        idempotencyStrategy: IdempotencyStrategy.RetryAlways,
+        retryDelayMultiplier: 3,
+        maxRetryDelay: 60,
+        totalTimeout: 500,
+        maxRetries: 5,
+      },
     });
   }
 
