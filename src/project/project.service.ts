@@ -75,6 +75,7 @@ export class ProjectService {
             name: project.name,
             versions: (await this.versionService.getVersions(project.id)).map(
               (version) => ({
+                id: version.id,
                 versionNumber: version.versionNumber,
                 timestamp: version.timestamp,
                 songBPM: version.songBPM,
