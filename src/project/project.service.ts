@@ -72,6 +72,7 @@ export class ProjectService {
         ? { success: false, reason: 'UNKNOWN' }
         : {
             success: true,
+            id: project.id,
             name: project.name,
             versions: (await this.versionService.getVersions(project.id)).map(
               (version) => ({
