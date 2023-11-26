@@ -5,6 +5,19 @@ import { PrismaClient } from '@prisma/client';
 export class VersionService {
   constructor(private readonly prisma: PrismaClient) {}
 
+  async getProjectIdByVersionId(versionId: number) {
+    return (
+      await this.prisma.tproject.findFirst({
+        where: {
+          tprojectversion: {
+            some: { id: versionId },
+          },
+        },
+        select: { id: true },
+      })
+    )?.id;
+  }
+
   async addVersion(projectId: number, songBPM?: number, songKey?: string) {
     const lastVersion = await this.getLastVersionId(projectId);
     const version = await this.prisma.tprojectversion.create({
