@@ -1,12 +1,14 @@
 import { Body, Controller, Get, Patch, Post, Query, Req } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { AuthService } from '../auth/auth.service';
+import { VersionService } from './version/version.service';
 
 @Controller('project')
 export class ProjectController {
   constructor(
     private readonly service: ProjectService,
     private readonly authService: AuthService,
+    private readonly versionService: VersionService,
   ) {}
 
   @Get('all')
@@ -18,8 +20,14 @@ export class ProjectController {
   }
 
   @Get('info')
-  async getInfo(@Req() request: Request, @Query('id') id: number) {
-    id = parseInt(String(id));
+  async getInfo(
+    @Req() request: Request,
+    @Query('id') id: number,
+    @Query('versionId') versionId: number,
+  ) {
+    id = versionId
+      ? await this.versionService.getProjectIdByVersionId(+versionId)
+      : +id;
 
     const userRole = await this.service.getUserRoleBySession(id, request);
     if (!userRole) return AuthService.INVALID_SESSION_RESPONSE;
