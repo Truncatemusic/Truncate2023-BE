@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { UserService } from '../../user/user.service';
 import { VersionService } from '../version/version.service';
 
 @Injectable()
 export class ChecklistService {
   constructor(
     private readonly prisma: PrismaClient,
+    private readonly userService: UserService,
     private readonly versionService: VersionService,
   ) {}
 
@@ -56,7 +58,7 @@ export class ChecklistService {
     for (const i in entries) {
       entriesOut.push({
         id: entries[i].id,
-        user_id: entries[i].user_id,
+        user: await this.userService.getInfo(entries[i].user_id),
         timestamp: entries[i].timestamp,
         text: entries[i].text,
         checkedVersionNumber: entries[i].checkedProjectversion_id
