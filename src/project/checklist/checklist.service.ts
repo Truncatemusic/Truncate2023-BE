@@ -12,9 +12,7 @@ export class ChecklistService {
   async getProjectIdByEntryId(entryId: number) {
     return (
       await this.prisma.tproject.findFirst({
-        select: {
-          id: true,
-        },
+        select: { id: true },
         where: {
           tprojectversion: {
             some: {
@@ -176,6 +174,28 @@ export class ChecklistService {
     }
   }
 
+  async getProjectIdByMarkerId(markerId: number) {
+    return (
+      await this.prisma.tproject.findFirst({
+        select: { id: true },
+        where: {
+          tprojectversion: {
+            some: {
+              tprojectchecklist_tprojectchecklist_projectversionIdTotprojectversion:
+                {
+                  some: {
+                    tprojectchecklistmarker: {
+                      some: { id: markerId },
+                    },
+                  },
+                },
+            },
+          },
+        },
+      })
+    )?.id;
+  }
+
   async addMarker(
     entryId: number,
     userId: number,
@@ -194,6 +214,17 @@ export class ChecklistService {
         })
       ).id;
       return { success: true, id };
+    } catch (_) {
+      return { success: false, reason: 'UNKNOWN' };
+    }
+  }
+
+  async deleteMarker(markerId: number) {
+    try {
+      await this.prisma.tprojectchecklistmarker.delete({
+        where: { id: markerId },
+      });
+      return { success: true };
     } catch (_) {
       return { success: false, reason: 'UNKNOWN' };
     }

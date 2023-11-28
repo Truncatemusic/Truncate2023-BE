@@ -50,7 +50,7 @@ export class ChecklistController {
     @Body() body: { projectId: number; versionNumber: number; text: string },
   ) {
     const userRole = await this.projectService.getUserRoleBySession(
-      +body.projectId,
+      body.projectId,
       request,
     );
     if (userRole !== 'O' && userRole !== 'A')
@@ -106,7 +106,7 @@ export class ChecklistController {
     );
 
     return versionId
-      ? await this.service.renameEntry(+body.entryId, body.text)
+      ? await this.service.renameEntry(body.entryId, body.text)
       : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }
 
@@ -188,7 +188,7 @@ export class ChecklistController {
     );
 
     return versionId
-      ? await this.service.uncheckEntry(+body.entryId)
+      ? await this.service.uncheckEntry(body.entryId)
       : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }
 
@@ -218,5 +218,23 @@ export class ChecklistController {
       body.start,
       body.end,
     );
+  }
+
+  @Post('entry/marker/delete')
+  async deleteMarker(
+    @Req() request: Request,
+    @Body() body: { markerId: number },
+  ) {
+    const userId = await this.authService.getUserId(request);
+    if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
+
+    const projectId = await this.service.getProjectIdByMarkerId(body.markerId);
+    if (!projectId) return { success: false, reason: 'INVALID_MARKER_ID' };
+
+    const userRole = await this.projectService.getUserRole(projectId, userId);
+    if (userRole !== 'O' && userRole !== 'A')
+      return AuthService.INVALID_SESSION_RESPONSE;
+
+    return await this.service.deleteMarker(body.markerId);
   }
 }
