@@ -198,6 +198,7 @@ export class ChecklistController {
     @Body()
     body: {
       entryId: number;
+      color: string;
       start: number;
       end?: number;
     },
@@ -215,6 +216,7 @@ export class ChecklistController {
     return await this.service.addMarker(
       body.entryId,
       userId,
+      body.color,
       body.start,
       body.end,
     );

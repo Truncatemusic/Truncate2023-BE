@@ -165,6 +165,7 @@ model tprojectchecklistmarker {
   id                  Int                @id @default(autoincrement()) @db.UnsignedInt
   projectchecklist_id Int?               @db.UnsignedInt
   user_id             Int?               @db.UnsignedInt
+  color               String             @db.Char(6)
   start               Decimal            @db.Decimal(5, 1)
   end                 Decimal?           @db.Decimal(5, 1)
   tuser               tuser?             @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklistmarker_ibfk_1")

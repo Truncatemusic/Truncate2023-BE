@@ -199,6 +199,7 @@ export class ChecklistService {
   async addMarker(
     entryId: number,
     userId: number,
+    color: string,
     start: number,
     end?: number,
   ) {
@@ -208,6 +209,7 @@ export class ChecklistService {
           data: {
             projectchecklist_id: entryId,
             user_id: userId,
+            color,
             start,
             end,
           },

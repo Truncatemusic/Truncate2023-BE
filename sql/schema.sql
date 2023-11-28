@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS tprojectchecklistmarker (
     id                  INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     projectchecklist_id INT UNSIGNED,
     user_id             INT UNSIGNED,
+    color               CHAR(6) NOT NULL,
     start               DECIMAL(5,1) NOT NULL,
     end                 DECIMAL(5,1) DEFAULT NULL,
 
