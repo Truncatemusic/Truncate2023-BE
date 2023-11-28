@@ -58,6 +58,17 @@ CREATE TABLE IF NOT EXISTS tprojectchecklist (
     FOREIGN KEY (checkedProjectversion_id) REFERENCES tprojectversion(id)
 );
 
+CREATE TABLE IF NOT EXISTS tprojectchecklistmarker (
+    id                  INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    projectchecklist_id INT UNSIGNED,
+    user_id             INT UNSIGNED,
+    start               DECIMAL(5,1) NOT NULL,
+    end                 DECIMAL(5,1) DEFAULT NULL,
+
+    FOREIGN KEY (user_id)             REFERENCES tuser(id),
+    FOREIGN KEY (projectchecklist_id) REFERENCES tprojectchecklist(id)
+);
+
 CREATE TABLE IF NOT EXISTS tprojectversionfile (
     id                INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     hash              CHAR(128),

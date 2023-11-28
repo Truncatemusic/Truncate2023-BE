@@ -1,15 +1,47 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { UserService } from '../../user/user.service';
 import { VersionService } from '../version/version.service';
 
 @Injectable()
 export class ChecklistService {
   constructor(
     private readonly prisma: PrismaClient,
-    private readonly userService: UserService,
     private readonly versionService: VersionService,
   ) {}
+
+  async getProjectIdByEntryId(entryId: number) {
+    return (
+      await this.prisma.tproject.findFirst({
+        select: {
+          id: true,
+        },
+        where: {
+          tprojectversion: {
+            some: {
+              tprojectchecklist_tprojectchecklist_projectversionIdTotprojectversion:
+                {
+                  some: { id: entryId },
+                },
+            },
+          },
+        },
+      })
+    )?.id;
+  }
+
+  async getProjectVersionByEntryId(entryId: number) {
+    return this.prisma.tprojectversion.findFirst({
+      select: {
+        id: true,
+        versionNumber: true,
+      },
+      where: {
+        tprojectchecklist_tprojectchecklist_projectversionIdTotprojectversion: {
+          some: { id: entryId },
+        },
+      },
+    });
+  }
 
   async addEntry(projectversionId: number, userId: number, text: string) {
     try {
@@ -45,11 +77,28 @@ export class ChecklistService {
       },
       select: {
         id: true,
-        user_id: true,
         timestamp: true,
         text: true,
         checkedProjectversion_id: true,
         rejected: true,
+        tuser: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+        tprojectchecklistmarker: {
+          select: {
+            tuser: {
+              select: {
+                id: true,
+                username: true,
+              },
+            },
+            start: true,
+            end: true,
+          },
+        },
       },
     });
 
@@ -58,7 +107,7 @@ export class ChecklistService {
     for (const i in entries) {
       entriesOut.push({
         id: entries[i].id,
-        user: await this.userService.getInfo(entries[i].user_id),
+        user: entries[i].tuser,
         timestamp: entries[i].timestamp,
         text: entries[i].text,
         checkedVersionNumber: entries[i].checkedProjectversion_id
@@ -69,6 +118,13 @@ export class ChecklistService {
             )?.versionNumber || null
           : null,
         rejected: entries[i].rejected,
+        marker: entries[i].tprojectchecklistmarker.map(
+          ({ tuser, start, end }) => ({
+            user: tuser,
+            start: start.toNumber(),
+            end: end?.toNumber(),
+          }),
+        ),
       });
     }
     return entriesOut;
@@ -115,6 +171,29 @@ export class ChecklistService {
         },
       });
       return { success: true };
+    } catch (_) {
+      return { success: false, reason: 'UNKNOWN' };
+    }
+  }
+
+  async addMarker(
+    entryId: number,
+    userId: number,
+    start: number,
+    end?: number,
+  ) {
+    try {
+      const id = (
+        await this.prisma.tprojectchecklistmarker.create({
+          data: {
+            projectchecklist_id: entryId,
+            user_id: userId,
+            start,
+            end,
+          },
+        })
+      ).id;
+      return { success: true, id };
     } catch (_) {
       return { success: false, reason: 'UNKNOWN' };
     }
