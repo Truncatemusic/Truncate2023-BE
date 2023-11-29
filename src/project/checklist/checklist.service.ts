@@ -93,6 +93,7 @@ export class ChecklistService {
                 username: true,
               },
             },
+            color: true,
             start: true,
             end: true,
           },
@@ -117,8 +118,9 @@ export class ChecklistService {
           : null,
         rejected: entries[i].rejected,
         marker: entries[i].tprojectchecklistmarker.map(
-          ({ tuser, start, end }) => ({
+          ({ tuser, color, start, end }) => ({
             user: tuser,
+            color,
             start: start.toNumber(),
             end: end?.toNumber(),
           }),
