@@ -34,6 +34,11 @@ export class ProjectService {
           },
         },
       },
+      select: {
+        id: true,
+        name: true,
+        tprojectuser: { select: { role: true } },
+      },
     });
 
     const projects = [];
@@ -44,6 +49,7 @@ export class ProjectService {
       projects.push({
         id: project.id,
         name: project.name,
+        role: project.tprojectuser[0].role,
         lastVersion: {
           versionNumber: version.versionNumber,
           timestamp: version.timestamp,
