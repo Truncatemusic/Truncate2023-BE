@@ -71,12 +71,19 @@ export class AudioFileController {
 
     return {
       success: true,
-      url: await this.storageService.getFileTmpURL(
-        ProjectService.getBucketName(
-          await this.fileService.getProjectIdByFileHash(file.hash),
-        ),
-        FileService.getFileNameByHash(file.hash, type || file.type),
-      ),
+      url:
+        this.storageService.getLocalStorageURL(
+          ProjectService.getBucketName(
+            await this.fileService.getProjectIdByFileHash(file.hash),
+          ),
+          FileService.getFileNameByHash(file.hash, type || file.type),
+        ) ||
+        (await this.storageService.getFileTmpURL(
+          ProjectService.getBucketName(
+            await this.fileService.getProjectIdByFileHash(file.hash),
+          ),
+          FileService.getFileNameByHash(file.hash, type || file.type),
+        )),
     };
   }
 
@@ -126,12 +133,16 @@ export class AudioFileController {
     if (!role) return response.status(HttpStatus.UNAUTHORIZED).send();
     if (!file) return response.status(HttpStatus.NOT_FOUND).send();
 
-    await this.storageService.pipeFile(
-      response,
-      ProjectService.getBucketName(
+    const bucketName = ProjectService.getBucketName(
         await this.fileService.getProjectIdByFileHash(file.hash),
       ),
-      AudioFileService.getWaveformFileName(file.hash),
+      waveformFileName = AudioFileService.getWaveformFileName(file.hash);
+    const localStorageURL = this.storageService.getLocalStorageURL(
+      bucketName,
+      waveformFileName,
     );
+
+    if (localStorageURL) return response.send(localStorageURL);
+    await this.storageService.pipeFile(response, bucketName, waveformFileName);
   }
 }

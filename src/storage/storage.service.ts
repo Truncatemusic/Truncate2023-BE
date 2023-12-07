@@ -4,7 +4,9 @@ import { env } from 'process';
 import { Response } from 'express';
 import { join } from 'path';
 
-@Injectable({ scope: Scope.DEFAULT })
+@Injectable({
+  scope: Scope.DEFAULT,
+})
 export class StorageService {
   static URL_LIFETIME = 60 * 60 * 1e3; // 1h
 
@@ -53,6 +55,12 @@ export class StorageService {
       stream.once('finish', () => resolve({ success: true }));
       stream.end(buffer);
     });
+  }
+
+  getLocalStorageURL(bucketName: string, fileName: string): string | null {
+    return env.LOCAL_STORAGE
+      ? join(env.LOCAL_STORAGE, bucketName, fileName)
+      : null;
   }
 
   async getFileTmpURL(bucketName: string, fileName: string) {
