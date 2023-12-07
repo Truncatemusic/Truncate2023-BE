@@ -41,13 +41,26 @@ export class ChecklistService {
     });
   }
 
-  async addEntry(projectversionId: number, userId: number, text: string) {
+  async addEntry(
+    projectversionId: number,
+    userId: number,
+    text: string,
+    marker: { color: string; start: number; end?: number }[] = [],
+  ) {
     try {
       const entry = await this.prisma.tprojectchecklist.create({
         data: {
           projectversionId: projectversionId,
           user_id: userId,
           text: text,
+          tprojectchecklistmarker: {
+            createMany: {
+              data: marker.map((_marker) => ({
+                user_id: userId,
+                ..._marker,
+              })),
+            },
+          },
         },
       });
       return { success: true, id: entry.id };

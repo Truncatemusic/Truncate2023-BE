@@ -47,7 +47,13 @@ export class ChecklistController {
   @Post('entry/add')
   async addEntry(
     @Req() request: Request,
-    @Body() body: { projectId: number; versionNumber: number; text: string },
+    @Body()
+    body: {
+      projectId: number;
+      versionNumber: number;
+      text: string;
+      marker?: { color: string; start: number; end?: number }[];
+    },
   ) {
     const userRole = await this.projectService.getUserRoleBySession(
       body.projectId,
@@ -65,7 +71,12 @@ export class ChecklistController {
     );
 
     return versionId
-      ? await this.service.addEntry(versionId, userId, body.text)
+      ? await this.service.addEntry(
+          versionId,
+          userId,
+          body.text,
+          body.marker || [],
+        )
       : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }
 
