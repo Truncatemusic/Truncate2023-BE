@@ -57,7 +57,9 @@ export class ChecklistService {
             createMany: {
               data: marker.map((_marker) => ({
                 user_id: userId,
-                ..._marker,
+                color: _marker.color,
+                start: _marker.start,
+                end: _marker.end,
               })),
             },
           },
