@@ -102,6 +102,7 @@ export class ChecklistService {
         },
         tprojectchecklistmarker: {
           select: {
+            id: true,
             tuser: {
               select: {
                 id: true,
@@ -133,7 +134,8 @@ export class ChecklistService {
           : null,
         rejected: entries[i].rejected,
         marker: entries[i].tprojectchecklistmarker.map(
-          ({ tuser, color, start, end }) => ({
+          ({ id, tuser, color, start, end }) => ({
+            id,
             user: tuser,
             color,
             start: start.toNumber(),
@@ -238,10 +240,12 @@ export class ChecklistService {
     }
   }
 
-  async deleteMarker(markerId: number) {
+  async deleteMarker(markerIds: number[]) {
     try {
-      await this.prisma.tprojectchecklistmarker.delete({
-        where: { id: markerId },
+      await this.prisma.tprojectchecklistmarker.deleteMany({
+        where: {
+          OR: markerIds.map((id) => ({ id })),
+        },
       });
       return { success: true };
     } catch (_) {

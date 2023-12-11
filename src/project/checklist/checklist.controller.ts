@@ -236,7 +236,7 @@ export class ChecklistController {
   @Post('entry/marker/delete')
   async deleteMarker(
     @Req() request: Request,
-    @Body() body: { markerId: number },
+    @Body() body: { markerId?: number; markerIds?: number[] },
   ) {
     const userId = await this.authService.getUserId(request);
     if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
@@ -248,6 +248,8 @@ export class ChecklistController {
     if (userRole !== 'O' && userRole !== 'A')
       return AuthService.INVALID_SESSION_RESPONSE;
 
-    return await this.service.deleteMarker(body.markerId);
+    return await this.service.deleteMarker(
+      body.markerId ? [body.markerId] : body.markerIds,
+    );
   }
 }
