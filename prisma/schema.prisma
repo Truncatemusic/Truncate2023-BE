@@ -52,19 +52,20 @@ model tsession {
 }
 
 model tuser {
-  id                                           Int                  @id @default(autoincrement()) @db.UnsignedInt
-  email                                        String               @db.VarChar(255)
-  password                                     String               @db.VarChar(255)
-  username                                     String               @db.VarChar(255)
-  firstname                                    String?              @db.VarChar(255)
-  lastname                                     String?              @db.VarChar(255)
-  public                                       Boolean              @default(true)
-  blocked                                      Boolean              @default(true)
+  id                                           Int                       @id @default(autoincrement()) @db.UnsignedInt
+  email                                        String                    @db.VarChar(255)
+  password                                     String                    @db.VarChar(255)
+  username                                     String                    @db.VarChar(255)
+  firstname                                    String?                   @db.VarChar(255)
+  lastname                                     String?                   @db.VarChar(255)
+  public                                       Boolean                   @default(true)
+  blocked                                      Boolean                   @default(true)
   tprojectchecklist                            tprojectchecklist[]
+  tprojectchecklistmarker                      tprojectchecklistmarker[]
   tprojectuser                                 tprojectuser[]
   tsession                                     tsession[]
-  tuserfollow_tuserfollow_user_idTotuser       tuserfollow[]        @relation("tuserfollow_user_idTotuser")
-  tuserfollow_tuserfollow_followUser_idTotuser tuserfollow[]        @relation("tuserfollow_followUser_idTotuser")
+  tuserfollow_tuserfollow_user_idTotuser       tuserfollow[]             @relation("tuserfollow_user_idTotuser")
+  tuserfollow_tuserfollow_followUser_idTotuser tuserfollow[]             @relation("tuserfollow_followUser_idTotuser")
   tuserresetpassword                           tuserresetpassword[]
 }
 
@@ -90,16 +91,17 @@ model tprojectversionstemsgroup {
 }
 
 model tprojectchecklist {
-  id                                                                          Int              @id @default(autoincrement()) @db.UnsignedInt
-  projectversionId                                                            Int?             @db.UnsignedInt
-  user_id                                                                     Int?             @db.UnsignedInt
-  timestamp                                                                   DateTime?        @default(now()) @db.Timestamp(0)
-  text                                                                        String           @db.VarChar(255)
-  checkedProjectversion_id                                                    Int?             @db.UnsignedInt
+  id                                                                          Int                       @id @default(autoincrement()) @db.UnsignedInt
+  projectversionId                                                            Int?                      @db.UnsignedInt
+  user_id                                                                     Int?                      @db.UnsignedInt
+  timestamp                                                                   DateTime?                 @default(now()) @db.Timestamp(0)
+  text                                                                        String                    @db.VarChar(255)
+  checkedProjectversion_id                                                    Int?                      @db.UnsignedInt
   rejected                                                                    Boolean?
-  tuser                                                                       tuser?           @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_1")
-  tprojectversion_tprojectchecklist_projectversionIdTotprojectversion         tprojectversion? @relation("tprojectchecklist_projectversionIdTotprojectversion", fields: [projectversionId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_2")
-  tprojectversion_tprojectchecklist_checkedProjectversion_idTotprojectversion tprojectversion? @relation("tprojectchecklist_checkedProjectversion_idTotprojectversion", fields: [checkedProjectversion_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_3")
+  tuser                                                                       tuser?                    @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_1")
+  tprojectversion_tprojectchecklist_projectversionIdTotprojectversion         tprojectversion?          @relation("tprojectchecklist_projectversionIdTotprojectversion", fields: [projectversionId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_2")
+  tprojectversion_tprojectchecklist_checkedProjectversion_idTotprojectversion tprojectversion?          @relation("tprojectchecklist_checkedProjectversion_idTotprojectversion", fields: [checkedProjectversion_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklist_ibfk_3")
+  tprojectchecklistmarker                                                     tprojectchecklistmarker[]
 
   @@index([checkedProjectversion_id], map: "checkedProjectversion_id")
   @@index([projectversionId], map: "projectversionId")
@@ -156,5 +158,19 @@ model tuserresetpassword {
   timestamp DateTime? @default(now()) @db.Timestamp(0)
   tuser     tuser?    @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tuserresetpassword_ibfk_1")
 
+  @@index([user_id], map: "user_id")
+}
+
+model tprojectchecklistmarker {
+  id                  Int                @id @default(autoincrement()) @db.UnsignedInt
+  projectchecklist_id Int?               @db.UnsignedInt
+  user_id             Int?               @db.UnsignedInt
+  color               String             @db.Char(6)
+  start               Decimal            @db.Decimal(5, 1)
+  end                 Decimal?           @db.Decimal(5, 1)
+  tuser               tuser?             @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklistmarker_ibfk_1")
+  tprojectchecklist   tprojectchecklist? @relation(fields: [projectchecklist_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tprojectchecklistmarker_ibfk_2")
+
+  @@index([projectchecklist_id], map: "projectchecklist_id")
   @@index([user_id], map: "user_id")
 }
