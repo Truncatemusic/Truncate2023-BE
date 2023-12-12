@@ -17,7 +17,7 @@ export class AudioFileService {
   }
 
   static evaluateMimeType(file: Express.Multer.File): boolean {
-    return file.mimetype.includes('audio/wav');
+    return /^audio\/.*wav$/.test(file.mimetype);
   }
 
   constructor(
