@@ -133,15 +133,15 @@ export class ChecklistService {
             )?.versionNumber || null
           : null,
         rejected: entries[i].rejected,
-        marker: entries[i].tprojectchecklistmarker.map(
-          ({ id, tuser, color, start, end }) => ({
+        marker: entries[i].tprojectchecklistmarker
+          .map(({ id, tuser, color, start, end }) => ({
             id,
             user: tuser,
             color,
             start: start.toNumber(),
             end: end?.toNumber(),
-          }),
-        ),
+          }))
+          .sort((markerA, markerB) => markerA.start - markerB.start),
       });
     }
     return entriesOut;
