@@ -113,6 +113,9 @@ export class ChecklistService {
             start: true,
             end: true,
           },
+          orderBy: {
+            start: 'asc',
+          },
         },
       },
     });
