@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import * as wav from 'node-wav';
 import * as Mp32Wav from 'mp3-to-wav';
-import { readFileSync, unlinkSync, mkdirSync, rmdirSync } from 'fs';
+import {
+  readFileSync,
+  copyFileSync,
+  unlinkSync,
+  mkdirSync,
+  rmdirSync,
+} from 'fs';
 import { join } from 'path';
 import { AudiowaveformService } from '../../../../audiowaveform/audiowaveform.service';
 import { FileService } from '../file.service';
@@ -44,14 +50,24 @@ export class AudioFileService {
       const mp3ToWaveOutDirPath = FileService.generateTmpPath();
       mkdirSync(mp3ToWaveOutDirPath);
 
-      await new Mp32Wav(
-        FileService.getFilePathByHash(mp3Hash),
-        mp3ToWaveOutDirPath,
-      ).exec(undefined);
-      const mp3ToWaveAudioFilePath = join(
-        mp3ToWaveOutDirPath,
-        FileService.getFileNameByHash(mp3Hash, AudioFileService.FILE_TYPE_WAVE),
-      );
+      const mp3FilePath = FileService.getFilePathByHash(mp3Hash),
+        mp3ToWaveAudioFilePath = join(
+          mp3ToWaveOutDirPath,
+          FileService.getFileNameByHash(
+            mp3Hash,
+            AudioFileService.FILE_TYPE_WAVE,
+          ),
+        );
+      try {
+        await new Mp32Wav(mp3FilePath, mp3ToWaveOutDirPath).exec(undefined);
+      } catch (error) {
+        console.error(
+          `Error converting mp3 (${mp3FilePath}) to wav (> ${mp3ToWaveOutDirPath})`,
+          error,
+        );
+        // TODO: mp3 only gets copied?!
+        copyFileSync(mp3FilePath, mp3ToWaveAudioFilePath);
+      }
       buffer = readFileSync(mp3ToWaveAudioFilePath);
 
       unlinkSync(mp3ToWaveAudioFilePath);
