@@ -270,6 +270,24 @@ export class ChecklistController {
     );
   }
 
+  @Patch('entry/marker/color')
+  async setMarkerColor(
+    @Req() request: Request,
+    @Body() body: { markerId: number; color: string },
+  ) {
+    const userId = await this.authService.getUserId(request);
+    if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
+
+    const projectId = await this.service.getProjectIdByMarkerId(body.markerId);
+    if (!projectId) return { success: false, reason: 'INVALID_MARKER_ID' };
+
+    const userRole = await this.projectService.getUserRole(projectId, userId);
+    if (userRole !== 'O' && userRole !== 'A')
+      return AuthService.INVALID_SESSION_RESPONSE;
+
+    return await this.service.setMarkerColor(body.markerId, body.color);
+  }
+
   @Post('entry/marker/delete')
   async deleteMarker(
     @Req() request: Request,
@@ -278,7 +296,9 @@ export class ChecklistController {
     const userId = await this.authService.getUserId(request);
     if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
 
-    const projectId = await this.service.getProjectIdByMarkerId(body.markerId);
+    const projectId = await this.service.getProjectIdByMarkerId(
+      body.markerId || body.markerIds[0],
+    );
     if (!projectId) return { success: false, reason: 'INVALID_MARKER_ID' };
 
     const userRole = await this.projectService.getUserRole(projectId, userId);
