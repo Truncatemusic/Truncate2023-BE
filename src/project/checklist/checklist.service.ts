@@ -259,6 +259,21 @@ export class ChecklistService {
     }
   }
 
+  async setMarkerColor(markerId: number, color: string) {
+    if (color.length !== 6)
+      return { success: false, reason: 'INVALID_COLOR_VALUE' };
+
+    try {
+      await this.prisma.tprojectchecklistmarker.update({
+        where: { id: markerId },
+        data: { color },
+      });
+      return { success: true };
+    } catch (_) {
+      return { success: false, reason: 'UNKNOWN' };
+    }
+  }
+
   async deleteMarker(markerIds: number[]) {
     try {
       await this.prisma.tprojectchecklistmarker.deleteMany({
