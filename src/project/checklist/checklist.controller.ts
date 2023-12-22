@@ -121,6 +121,43 @@ export class ChecklistController {
       : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }
 
+  @Post('entry/delete')
+  async deleteEntry(
+    @Req() request: Request,
+    @Body() body: { entryId: number },
+  ) {
+    const projectId = await this.service.getProjectIdByEntryId(body.entryId);
+    if (!projectId) return { success: false, reason: 'INVALID_ENTRY_ID' };
+
+    const thisVersionResult = await this.service.getProjectVersionByEntryId(
+      body.entryId,
+    );
+    if (!thisVersionResult)
+      return { success: false, reason: 'INVALID_ENTRY_ID' };
+
+    const userRole = await this.projectService.getUserRoleBySession(
+      projectId,
+      request,
+    );
+    if (userRole !== 'O' && userRole !== 'A')
+      return AuthService.INVALID_SESSION_RESPONSE;
+
+    const lastVersion = (await this.versionService.getLastVersion(
+      projectId,
+    )) as { versionNumber: number };
+    if (thisVersionResult.versionNumber !== lastVersion?.versionNumber)
+      return { success: false, reason: 'OLD_PROJECT_VERSION' };
+
+    const versionId = await this.versionService.getVersionId(
+      projectId,
+      thisVersionResult.versionNumber,
+    );
+
+    return versionId
+      ? await this.service.deleteEntry(body.entryId)
+      : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
+  }
+
   @Patch('entry/check')
   async checkEntry(
     @Req() request: Request,

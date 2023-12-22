@@ -162,6 +162,22 @@ export class ChecklistService {
     }
   }
 
+  async deleteEntry(entryId: number) {
+    try {
+      await this.prisma.tprojectchecklistmarker.deleteMany({
+        where: {
+          tprojectchecklist: { id: entryId },
+        },
+      });
+      await this.prisma.tprojectchecklist.delete({
+        where: { id: entryId },
+      });
+      return { success: true };
+    } catch (_) {
+      return { success: false, reason: 'UNKNOWN' };
+    }
+  }
+
   async checkEntry(
     entryId: number,
     versionId: number,
