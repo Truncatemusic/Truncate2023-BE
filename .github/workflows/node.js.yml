@@ -50,4 +50,3 @@ jobs:
 
     - name: Start pm2 Application
       run: pm2 start npm --name "Truncate2023-BE" -- start
-
