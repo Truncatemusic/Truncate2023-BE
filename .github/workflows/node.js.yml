@@ -28,8 +28,8 @@ jobs:
         echo -n '${{ secrets.GOOGLE_CLOUD_STORAGE_KEY }}' > ./truncate-cloud-storage.key.json
         echo "" >> ./.env
         echo "GOOGLE_STORAGE_KEYFILE=truncate-cloud-storage.key.json" >> ./.env
-        scp -o StrictHostKeyChecking=no -i ./private_key ./.env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/truncate/actions-runner/Truncate-BE/Truncate2023-BE/.env
-        scp -o StrictHostKeyChecking=no -i ./private_key ./truncate-cloud-storage.key.json ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/truncate/actions-runner/Truncate-BE/Truncate2023-BE/truncate-cloud-storage.key.json
+        scp -o StrictHostKeyChecking=no -i ./private_key ./.env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/truncate/Truncate-Live/Truncate-BE/Truncate2023-BE/.env
+        scp -o StrictHostKeyChecking=no -i ./private_key ./truncate-cloud-storage.key.json ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/truncate/Truncate-Live/Truncate-BE/Truncate2023-BE/truncate-cloud-storage.key.json
 
     - name: Install Dependencies
       run: npm i
@@ -39,7 +39,7 @@ jobs:
     #    npm run sass:mail
     #    echo "${{ secrets.SERVER_SSH_KEY }}" > ./private_key
     #    chmod 600 ./private_key
-    #    scp -o StrictHostKeyChecking=no -i ./private_key ./template/mail/css/style.css ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/truncate/actions-runner/Truncate-BE/Truncate2023-BE/template/mail/css/style.css
+    #    scp -o StrictHostKeyChecking=no -i ./private_key ./template/mail/css/style.css ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/truncate/Truncate-Live/Truncate-BE/Truncate2023-BE/template/mail/css/style.css
 
     - name: Migrate Database
       run: npm run migrate
