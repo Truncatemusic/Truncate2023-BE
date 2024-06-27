@@ -1,15 +1,11 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: Node.js CI BE
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
-
     runs-on: self-hosted
 
     strategy:
@@ -32,8 +28,8 @@ jobs:
         echo -n '${{ secrets.GOOGLE_CLOUD_STORAGE_KEY }}' > ./truncate-cloud-storage.key.json
         echo "" >> ./.env
         echo "GOOGLE_STORAGE_KEYFILE=truncate-cloud-storage.key.json" >> ./.env
-        scp -o StrictHostKeyChecking=no -i ./private_key ./.env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/.env
-        scp -o StrictHostKeyChecking=no -i ./private_key ./truncate-cloud-storage.key.json ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/truncate-cloud-storage.key.json
+        scp -o StrictHostKeyChecking=no -i ./private_key ./.env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/truncate/Truncate/Truncate-BE/Truncate2023-BE/.env
+        scp -o StrictHostKeyChecking=no -i ./private_key ./truncate-cloud-storage.key.json ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/truncate/Truncate/Truncate-BE/Truncate2023-BE/truncate-cloud-storage.key.json
 
     - name: Install Dependencies
       run: npm i
@@ -43,7 +39,7 @@ jobs:
     #    npm run sass:mail
     #    echo "${{ secrets.SERVER_SSH_KEY }}" > ./private_key
     #    chmod 600 ./private_key
-    #    scp -o StrictHostKeyChecking=no -i ./private_key ./template/mail/css/style.css ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/Truncate/actions-runner/Truncate2023-Be/Truncate2023-BE/Truncate2023-BE/Truncate2023-BE/template/mail/css/style.css
+    #    scp -o StrictHostKeyChecking=no -i ./private_key ./template/mail/css/style.css ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/truncate/Truncate/Truncate-BE/Truncate2023-BE/template/mail/css/style.css
 
     - name: Migrate Database
       run: npm run migrate
@@ -58,5 +54,5 @@ jobs:
       run: npm run build
 
     - name: Restart Backend Api
-      run: pm2 restart Truncate-Backend
+      run: pm2 restart truncate-be
 
