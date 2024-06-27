@@ -21,7 +21,7 @@ jobs:
         cache: 'npm'
 
     - name: Remove pm2 Application
-      run: pm2 delete Truncate2023-BE
+      run: pm2 delete Truncate2023-BE || true
 
     - name: Setup Environment Files
       run: |
