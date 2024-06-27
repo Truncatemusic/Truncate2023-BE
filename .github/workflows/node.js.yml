@@ -20,26 +20,21 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    - name: Transfer Secret to Server
+    - name: Remove pm2 Application
+      run: pm2 delete Truncate2023-BE
+
+    - name: Setup Environment Files
       run: |
-        echo "${{ secrets.SERVER_SSH_KEY }}" > ./private_key
-        chmod 600 ./private_key
-        echo "${{ secrets.SETUP_ENV }}" > ./.env
-        echo -n '${{ secrets.GOOGLE_CLOUD_STORAGE_KEY }}' > ./truncate-cloud-storage.key.json
-        echo "" >> ./.env
-        echo "GOOGLE_STORAGE_KEYFILE=truncate-cloud-storage.key.json" >> ./.env
-        scp -o StrictHostKeyChecking=no -i ./private_key ./.env ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/truncate/Truncate-Live/Truncate2023-BE/Truncate2023-BE/.env
-        scp -o StrictHostKeyChecking=no -i ./private_key ./truncate-cloud-storage.key.json ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/truncate/Truncate-Live/Truncate2023-BE/Truncate2023-BE/truncate-cloud-storage.key.json
+        echo "${{ secrets.SETUP_ENV }}" > /home/truncate/Truncate-Live/Truncate2023-BE/Truncate2023-BE/.env
+        echo -n '${{ secrets.GOOGLE_CLOUD_STORAGE_KEY }}' > /home/truncate/Truncate-Live/Truncate2023-BE/Truncate2023-BE/truncate-cloud-storage.key.json
+        echo "" >> /home/truncate/Truncate-Live/Truncate2023-BE/Truncate2023-BE/.env
+        echo "GOOGLE_STORAGE_KEYFILE=truncate-cloud-storage.key.json" >> /home/truncate/Truncate-Live/Truncate2023-BE/Truncate2023-BE/.env
 
     - name: Install Dependencies
       run: npm i
 
-    #- name: Compile Mail Template SCSS
-    #  run: |
-    #    npm run sass:mail
-    #    echo "${{ secrets.SERVER_SSH_KEY }}" > ./private_key
-    #    chmod 600 ./private_key
-    #    scp -o StrictHostKeyChecking=no -i ./private_key ./template/mail/css/style.css ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/truncate/Truncate-Live/Truncate2023-BE/Truncate2023-BE/template/mail/css/style.css
+    - name: Compile Mail Template SCSS
+      run: npm run sass:mail
 
     - name: Migrate Database
       run: npm run migrate
@@ -53,6 +48,6 @@ jobs:
     - name: Build Nest.js Application
       run: npm run build
 
-    - name: Restart Backend Api
-      run: pm2 restart truncate-be
+    - name: Start pm2 Application
+      run: pm2 start npm --name "Truncate2023-BE" -- start
 
