@@ -22,10 +22,8 @@ jobs:
 #       node-version: ${{ matrix.node-version }}
 #       cache: 'npm'
 
-    - name: Remove pm2 Application
-      run: |
-        pm2 stop Truncate2023-BE || true
-        pm2 delete Truncate2023-BE || true
+    - name: Stop pm2 Application
+      run: ./pm2.sh stop Truncate2023-BE
 
     - name: Setup Environment Files
       run: |
@@ -53,4 +51,4 @@ jobs:
       run: npm run build
 
     - name: Start pm2 Application
-      run: pm2 start npm --name "Truncate2023-BE" -- start
+      run: ./pm2.sh start Truncate2023-BE
