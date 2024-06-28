@@ -1,5 +1,15 @@
 #!/bin/bash
 
+start_pm2() {
+  SERVICE_NAME=$1
+  pm2 describe $SERVICE_NAME > /dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    pm2 restart $SERVICE_NAME
+  else
+    pm2 start npm --name $SERVICE_NAME -- start
+  fi
+}
+
 if [ $# -lt 1 ] || [ $# -gt 2 ]; then
   echo "Usage: $0 <start|stop> [pm2_service_name]"
   exit 1
@@ -18,30 +28,32 @@ if [ "$ACTION" = "stop" ]; then
 elif [ "$ACTION" = "start" ]; then
 
   healthcheck_interval=5
-  healthcheck_max_attempts=10
-  healthcheck_attempt_count=0
+  healthcheck_max_attempts=20
+  healthcheck_start_attempts=3
 
-  while [ $healthcheck_attempt_count -lt $healthcheck_max_attempts ]; do
-    pm2 describe $SERVICE_NAME > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
-      pm2 restart $SERVICE_NAME
-    else
-      pm2 start npm --name $SERVICE_NAME -- start
-    fi
+  for (( healthcheck_attempt=1; healthcheck_attempt<=$healthcheck_start_attempts; healthcheck_attempt++ )); do
+    echo "Attempt $healthcheck_attempt to start PM2 process..."
 
-    ./healthcheck.sh
-    if [ $? -eq 0 ]; then
-      echo "PM2 process started successfully"
-      exit 0
-    else
-      echo "PM2 process start failed: Retrying in $healthcheck_interval seconds..."
-    fi
+    start_pm2 $SERVICE_NAME
 
-    sleep $healthcheck_interval
-    healthcheck_attempt_count=$((healthcheck_attempt_count + 1))
+    healthcheck_attempt_count=0
+    while [ $healthcheck_attempt_count -lt $healthcheck_max_attempts ]; do
+      ./healthcheck.sh
+      if [ $? -eq 0 ]; then
+        echo "PM2 process started successfully."
+        exit 0
+      else
+        echo "Healthcheck failed. Retrying in $healthcheck_interval seconds..."
+      fi
+
+      sleep $healthcheck_interval
+      healthcheck_attempt_count=$((healthcheck_attempt_count + 1))
+    done
+
+    echo "Healthcheck failed after $healthcheck_max_attempts attempts."
   done
 
-  echo "PM2 process start failed: Maximum number of attempts reached."
+  echo "Failed to start PM2 process after $healthcheck_start_attempts attempts."
   exit 1
 
 else
