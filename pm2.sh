@@ -28,7 +28,7 @@ if [ "$ACTION" = "stop" ]; then
 elif [ "$ACTION" = "start" ]; then
 
   healthcheck_interval=5
-  healthcheck_max_attempts=20
+  healthcheck_max_attempts=10
   healthcheck_start_attempts=3
 
   for (( healthcheck_attempt=1; healthcheck_attempt<=$healthcheck_start_attempts; healthcheck_attempt++ )); do
