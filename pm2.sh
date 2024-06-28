@@ -1,12 +1,16 @@
 #!/bin/bash
 
-if [ $# -ne 2 ]; then
-  echo "Usage: $0 <start|stop> <pm2_service_name>"
+if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+  echo "Usage: $0 <start|stop> [pm2_service_name]"
   exit 1
 fi
 
 ACTION=$1
 SERVICE_NAME=$2
+
+if [ -z "$SERVICE_NAME" ]; then
+  SERVICE_NAME=$(basename "$(pwd)")
+fi
 
 if [ "$ACTION" = "stop" ]; then
   pm2 stop $SERVICE_NAME || true
