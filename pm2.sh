@@ -4,7 +4,7 @@ start_pm2() {
   SERVICE_NAME=$1
   pm2 describe $SERVICE_NAME > /dev/null 2>&1
   if [ $? -eq 0 ]; then
-    pm2 restart $SERVICE_NAME
+    pm2 restart $SERVICE_NAME --update-env
   else
     pm2 start npm --name $SERVICE_NAME -- start
   fi
