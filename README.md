@@ -74,9 +74,7 @@ DATABASE_URL=  # db url with "mysql:" protocol and schema ( mysql://{USERNAME}:{
 SMTP_HOST=  # smtp host ( when using maildev for testing: smtp://localhost:1025 )
 SMTP_FROM=noreply@truncatemusic.de
 
-GOOGLE_STORAGE_BUCKET_PREFIX=live-
-
-GOOGLE_STORAGE_KEYFILE=truncate-cloud-storage.key.json
+GOOGLE_STORAGE_BUCKET_PREFIX=cbljtr-live-
 ```
 
 #### 2. set GCS key Secret
