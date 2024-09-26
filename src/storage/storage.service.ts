@@ -1,3 +1,4 @@
+import { CreateBucketRequest } from '@google-cloud/storage/build/src/storage';
 import { Injectable, Scope, HttpStatus } from '@nestjs/common';
 import { IdempotencyStrategy, Storage } from '@google-cloud/storage';
 import { env } from 'process';
@@ -8,7 +9,19 @@ import { join } from 'path';
   scope: Scope.DEFAULT,
 })
 export class StorageService {
-  static URL_LIFETIME = 60 * 60 * 1e3; // 1h
+  private static readonly createBucketOptions: CreateBucketRequest = {
+    storageClass: 'STANDARD',
+    multiRegional: true,
+    location: 'EU',
+    versioning: {
+      enabled: false,
+    },
+    autoclass: {
+      enabled: false,
+    },
+  };
+
+  private static readonly URL_LIFETIME: number = 60 * 60 * 1e3; // 1h
 
   private readonly storage: Storage;
 
@@ -37,7 +50,10 @@ export class StorageService {
   }
 
   async createBucket(name: string) {
-    return await this.storage.createBucket(name);
+    return await this.storage.createBucket(
+      name,
+      StorageService.createBucketOptions,
+    );
   }
 
   async deleteBucket(name: string) {
