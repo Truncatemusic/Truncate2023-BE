@@ -28,7 +28,22 @@ nvm alias default 18
 npm install pm2@latest @nestjs/cli -g
 ```
 
-#### 3. install audiowaveform extension
+#### 3. setup action runner
+
+[Create Self-Hosted GitHub Action Runner](https://github.com/organizations/Truncatemusic/settings/actions/runners/new)
+
+- use runner group: `Live`
+- optimal work folder: `/home/truncate/Truncate-Live`
+
+##### install Action Runner as service
+
+```bash
+sudo ./svc.sh install
+sudo ./svc.sh start
+# sudo ./svc.sh status
+```
+
+#### 4. install audiowaveform extension
 
 ```bash
 cd package
@@ -42,23 +57,14 @@ sudo apt-get -f install -y
 
 ### Backend Setup
 
-#### 1. clone repository and install
-
-```bash
-git clone https://github.com/Truncatemusic/Truncate2023-BE.git
-cd Truncate2023-BE
-
-npm ci
-```
-
-#### 2. set enviroment file Secret
+#### 1. set enviroment file Secret
 
 [GitHub Backend Secrets](https://github.com/Truncatemusic/Truncate2023-BE/settings/secrets/actions)
 
 ```dotenv
 # Secret: SETUP_ENV
 
-CWD=  # absolute path to the backend directory ( /home/truncate/Truncate2023-BE )
+CWD=  # absolute path to the backend directory ( /home/truncate/Truncate-Live/Truncate2023-BE/Truncate2023-BE )
 
 WEB_HOST=https://truncatemusic.de
 CORS_ORIGIN=https://truncatemusic.de
@@ -73,15 +79,16 @@ GOOGLE_STORAGE_BUCKET_PREFIX=live-
 GOOGLE_STORAGE_KEYFILE=truncate-cloud-storage.key.json
 ```
 
-#### 3. set GCS key Secret
+#### 2. set GCS key Secret
 
-[GitHub Backend Secrets](https://github.com/Truncatemusic/Truncate2023-BE/settings/secrets/actions)
+1. [Enable the Google Cloud Storage API](https://console.cloud.google.com/flows/enableapi?apiid=storage-api.googleapis.com)
 
-```dotenv
-# Secret: GOOGLE_CLOUD_STORAGE_KEY
-```
+2. Create and download API key JSON
+   - **[IAM & Admin > Service Accounts](https://console.cloud.google.com/projectselector2/iam-admin/serviceaccounts) > ({project}) > {service account}: manage keys > ADD KEY: Create new Key > JSON**
 
-#### ( 4. create maildev container - for testing only! )
+3. Set `GOOGLE_CLOUD_STORAGE_KEY` Secret at [GitHub Backend Secrets](https://github.com/Truncatemusic/Truncate2023-BE/settings/secrets/actions) 
+
+#### ( 3. create maildev container - for testing only! )
 
 ```yaml
 # docker-compose.yml
