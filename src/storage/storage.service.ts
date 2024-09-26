@@ -10,7 +10,6 @@ import { join } from 'path';
 })
 export class StorageService {
   private static readonly createBucketOptions: CreateBucketRequest = {
-    storageClass: 'STANDARD',
     multiRegional: true,
     location: 'EU',
     versioning: {
