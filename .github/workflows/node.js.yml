@@ -33,7 +33,7 @@ jobs:
         echo "GOOGLE_STORAGE_KEYFILE=truncate-cloud-storage.key.json" >> /home/truncate/Truncate-Live/Truncate2023-BE/Truncate2023-BE/.env
 
     - name: Install Dependencies
-      run: npm i
+      run: npm ci --no-update-notifier
 
     - name: Compile Mail Template SCSS
       run: npm run sass:mail
