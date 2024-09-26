@@ -52,7 +52,6 @@ async function bootstrap() {
   app.enableCors({
     origin: env.CORS_ORIGIN,
     credentials: true,
-    allowedHeaders: ['content-type'],
   });
   await app.listen(3000);
 }
