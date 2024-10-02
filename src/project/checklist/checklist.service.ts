@@ -41,6 +41,19 @@ export class ChecklistService {
     });
   }
 
+  async getCheckedProjectVersionByEntryId(entryId: number) {
+    return (
+      await this.prisma.tprojectchecklist.findFirst({
+        where: { id: entryId },
+        select: { checkedProjectversion_id: true },
+      })
+    )?.checkedProjectversion_id;
+  }
+
+  async isEntryChecked(entryId: number) {
+    return (await this.getCheckedProjectVersionByEntryId(entryId)) !== null;
+  }
+
   async addEntry(
     projectversionId: number,
     userId: number,

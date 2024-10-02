@@ -105,11 +105,8 @@ export class ChecklistController {
     if (userRole !== 'O' && userRole !== 'A')
       return AuthService.INVALID_SESSION_RESPONSE;
 
-    const lastVersion = (await this.versionService.getLastVersion(
-      projectId,
-    )) as { versionNumber: number };
-    if (thisVersionResult.versionNumber !== lastVersion?.versionNumber)
-      return { success: false, reason: 'OLD_PROJECT_VERSION' };
+    if (await this.service.isEntryChecked(body.entryId))
+      return { success: false, reason: 'ENTRY_IS_CHECKED' };
 
     const versionId = await this.versionService.getVersionId(
       projectId,
@@ -145,7 +142,10 @@ export class ChecklistController {
     const lastVersion = (await this.versionService.getLastVersion(
       projectId,
     )) as { versionNumber: number };
-    if (thisVersionResult.versionNumber !== lastVersion?.versionNumber)
+    if (
+      thisVersionResult.versionNumber !== lastVersion?.versionNumber &&
+      (await this.service.isEntryChecked(body.entryId))
+    )
       return { success: false, reason: 'OLD_PROJECT_VERSION' };
 
     const versionId = await this.versionService.getVersionId(
@@ -163,43 +163,29 @@ export class ChecklistController {
     @Req() request: Request,
     @Body()
     body: {
+      projectId: number;
+      versionNumber: number;
       entryId: number;
       rejected: boolean;
     },
   ) {
-    const projectId = await this.service.getProjectIdByEntryId(body.entryId);
-    if (!projectId) return { success: false, reason: 'INVALID_ENTRY_ID' };
-
-    const thisVersionResult = await this.service.getProjectVersionByEntryId(
-      body.entryId,
-    );
-    if (!thisVersionResult)
+    if (!(await this.service.getProjectVersionByEntryId(body.entryId)))
       return { success: false, reason: 'INVALID_ENTRY_ID' };
 
     const userRole = await this.projectService.getUserRoleBySession(
-      projectId,
+      body.projectId,
       request,
     );
     if (userRole !== 'O' && userRole !== 'A')
       return AuthService.INVALID_SESSION_RESPONSE;
 
-    const lastVersion = (await this.versionService.getLastVersion(
-      projectId,
-    )) as { versionNumber: number };
-    if (thisVersionResult.versionNumber !== lastVersion?.versionNumber)
-      return { success: false, reason: 'OLD_PROJECT_VERSION' };
-
     const versionId = await this.versionService.getVersionId(
-      projectId,
-      thisVersionResult.versionNumber,
+      body.projectId,
+      body.versionNumber,
     );
 
     return versionId
-      ? await this.service.checkEntry(
-          body.entryId,
-          thisVersionResult.id,
-          !!body.rejected,
-        )
+      ? await this.service.checkEntry(body.entryId, versionId, !!body.rejected)
       : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
   }
 
@@ -211,12 +197,6 @@ export class ChecklistController {
     const projectId = await this.service.getProjectIdByEntryId(body.entryId);
     if (!projectId) return { success: false, reason: 'INVALID_ENTRY_ID' };
 
-    const thisVersionResult = await this.service.getProjectVersionByEntryId(
-      body.entryId,
-    );
-    if (!thisVersionResult)
-      return { success: false, reason: 'INVALID_ENTRY_ID' };
-
     const userRole = await this.projectService.getUserRoleBySession(
       projectId,
       request,
@@ -224,20 +204,23 @@ export class ChecklistController {
     if (userRole !== 'O' && userRole !== 'A')
       return AuthService.INVALID_SESSION_RESPONSE;
 
+    const checkedProjectVersionId =
+      await this.service.getCheckedProjectVersionByEntryId(body.entryId);
+
+    const checkedProjectVersion = await this.versionService.getVersionNumber(
+      checkedProjectVersionId,
+    );
+
+    if (!checkedProjectVersion?.versionNumber)
+      return { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
+
     const lastVersion = (await this.versionService.getLastVersion(
       projectId,
     )) as { versionNumber: number };
-    if (thisVersionResult.versionNumber !== lastVersion?.versionNumber)
+    if (checkedProjectVersion.versionNumber !== lastVersion?.versionNumber)
       return { success: false, reason: 'OLD_PROJECT_VERSION' };
 
-    const versionId = await this.versionService.getVersionId(
-      projectId,
-      thisVersionResult.versionNumber,
-    );
-
-    return versionId
-      ? await this.service.uncheckEntry(body.entryId)
-      : { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
+    await this.service.uncheckEntry(body.entryId);
   }
 
   @Post('entry/marker')
