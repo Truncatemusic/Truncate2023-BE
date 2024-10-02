@@ -34,7 +34,8 @@ export class NotificationController {
 
     return {
       success: true,
-      count: await this.notificationService.getCountOfUnreadNotifications(),
+      count:
+        await this.notificationService.getCountOfUnreadNotifications(userId),
     };
   }
 

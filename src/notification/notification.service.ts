@@ -7,11 +7,68 @@ import { NotificationParam as NotificationParamInterface } from './notification-
 export class NotificationService {
   constructor(private readonly prisma: PrismaClient) {}
 
+  private compareParams(
+    notificationParams: NotificationParamInterface[],
+    params: NotificationParamInterface[],
+  ): boolean {
+    if (notificationParams.length !== params.length) {
+      return false;
+    }
+
+    const sortedNotificationParams = notificationParams.sort(
+      (a, b) => a.key.localeCompare(b.key) || a.value.localeCompare(b.value),
+    );
+    const sortedParams = params.sort(
+      (a, b) => a.key.localeCompare(b.key) || a.value.localeCompare(b.value),
+    );
+
+    for (let i = 0; i < sortedNotificationParams.length; i++)
+      if (
+        sortedNotificationParams[i].key !== sortedParams[i].key ||
+        sortedNotificationParams[i].value !== sortedParams[i].value
+      )
+        return false;
+
+    return true;
+  }
+
   async addNotification(
     userId: number,
     notificationTemplateId: number,
-    params: NotificationParamInterface[],
+    params: NotificationParamInterface[] = [],
+    force: boolean = false,
   ): Promise<number> {
+    if (!force) {
+      for (const notification of await this.prisma.tusernotification.findMany({
+        where: {
+          notificationTemplateId,
+          user_id: userId,
+        },
+        select: {
+          id: true,
+          tusernotificationparam: {
+            select: {
+              paramKey: true,
+              paramValue: true,
+            },
+          },
+        },
+      }))
+        if (
+          notification?.tusernotificationparam &&
+          this.compareParams(
+            notification.tusernotificationparam.map(
+              ({ paramKey, paramValue }) => ({
+                key: paramKey,
+                value: paramValue,
+              }),
+            ),
+            params,
+          )
+        )
+          return notification.id;
+    }
+
     const { id } = await this.prisma.tusernotification.create({
       data: {
         user_id: userId,
@@ -123,9 +180,10 @@ export class NotificationService {
     });
   }
 
-  async getCountOfUnreadNotifications() {
+  async getCountOfUnreadNotifications(userId: number) {
     return this.prisma.tusernotification.count({
       where: {
+        user_id: userId,
         isRead: false,
       },
     });
@@ -176,12 +234,6 @@ export class NotificationService {
   }
 
   async deleteNotification(notificationId: number) {
-    await this.prisma.tusernotificationparam.deleteMany({
-      where: {
-        notification_id: notificationId,
-      },
-    });
-
     await this.prisma.tusernotification.delete({
       where: {
         id: notificationId,
@@ -190,7 +242,11 @@ export class NotificationService {
   }
 
   async deleteAllNotifications(userId: number, isRead: boolean = undefined) {
-    for (const notification of await this.getNotifications(userId, isRead))
-      await this.deleteNotification(notification.id);
+    await this.prisma.tusernotification.deleteMany({
+      where: {
+        user_id: userId,
+        isRead,
+      },
+    });
   }
 }

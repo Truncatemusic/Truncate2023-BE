@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { NotificationTemplate } from '../notification/notification-template.enum';
+import { NotificationService } from '../notification/notification.service';
 import { VersionService } from './version/version.service';
 import { UserService } from '../user/user.service';
 import { AuthService } from '../auth/auth.service';
@@ -23,6 +25,7 @@ export class ProjectService {
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly versionService: VersionService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async getProjects(userId: number) {
@@ -216,21 +219,52 @@ export class ProjectService {
       if (!(await this.userService.userExists(userId)))
         return { success: false, reason: 'USER_DOES_NOT_EXIST' };
 
-      const projectUserId = (
-        await this.prisma.tprojectuser.findFirst({
-          where: {
-            project_id: projectId,
-            user_id: userId,
-          },
-          select: { id: true },
-        })
-      )?.id;
+      const projectUser = await this.prisma.tprojectuser.findFirst({
+        where: {
+          project_id: projectId,
+          user_id: userId,
+        },
+        select: {
+          id: true,
+          role: true,
+        },
+      });
 
-      if (projectUserId) {
+      if (projectUser?.id) {
         await this.prisma.tprojectuser.update({
-          where: { id: projectUserId },
+          where: { id: projectUser.id },
           data: { role },
         });
+
+        await this.notificationService.addNotification(
+          userId,
+          NotificationTemplate.USER_PROJECT_ROLE_WAS_CHANGED,
+          [
+            {
+              key: 'projectId',
+              value: projectId.toString(),
+            },
+            {
+              key: 'projectName',
+              value: (
+                await this.prisma.tproject.findUnique({
+                  where: { id: projectId },
+                  select: { name: true },
+                })
+              ).name,
+            },
+            {
+              key: 'role',
+              value: role,
+            },
+            {
+              key: 'prevRole',
+              value: projectUser.role,
+            },
+          ],
+          true,
+        );
+
         return { success: true, action: 'UPDATED' };
       }
 
@@ -241,6 +275,32 @@ export class ProjectService {
           role,
         },
       });
+
+      // TODO: on rename project: update projectName for params with projectId
+      await this.notificationService.addNotification(
+        userId,
+        NotificationTemplate.USER_INVITED_TO_PROJECT,
+        [
+          {
+            key: 'projectId',
+            value: projectId.toString(),
+          },
+          {
+            key: 'projectName',
+            value: (
+              await this.prisma.tproject.findUnique({
+                where: { id: projectId },
+                select: { name: true },
+              })
+            ).name,
+          },
+          {
+            key: 'role',
+            value: role,
+          },
+        ],
+      );
+
       return { success: true, action: 'ADDED' };
     } catch (_) {
       return { success: false, reason: 'UNKNOWN' };
@@ -257,6 +317,26 @@ export class ProjectService {
         user_id: userId,
       },
     });
+
+    await this.notificationService.addNotification(
+      userId,
+      NotificationTemplate.USER_REMOVED_FROM_PROJECT,
+      [
+        {
+          key: 'projectId',
+          value: projectId.toString(),
+        },
+        {
+          key: 'projectName',
+          value: (
+            await this.prisma.tproject.findUnique({
+              where: { id: projectId },
+              select: { name: true },
+            })
+          ).name,
+        },
+      ],
+    );
 
     return { success: true };
   }

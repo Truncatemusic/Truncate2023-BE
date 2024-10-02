@@ -115,6 +115,13 @@ CREATE TABLE IF NOT EXISTS tusernotificationparam (
     FOREIGN KEY (notification_id) REFERENCES tusernotification(id)
 );
 
+ALTER TABLE tusernotificationparam
+    DROP FOREIGN KEY tusernotificationparam_ibfk_1,
+    ADD CONSTRAINT fk_notification_id
+        FOREIGN KEY (notification_id) REFERENCES tusernotification(id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE;
+
 CREATE TABLE IF NOT EXISTS tuserresetpassword (
     resetKey  CHAR(32) PRIMARY KEY,
     user_id   INT UNSIGNED,

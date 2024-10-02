@@ -1,0 +1,5 @@
+export enum NotificationTemplate {
+  USER_INVITED_TO_PROJECT = 1,
+  USER_PROJECT_ROLE_WAS_CHANGED = 2,
+  USER_REMOVED_FROM_PROJECT = 3,
+}
