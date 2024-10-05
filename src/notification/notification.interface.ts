@@ -1,4 +1,4 @@
-import { NotificationParam as NotificationParamInterface } from './notification-param.interface';
+import { NotificationParams as NotificationParamsInterface } from './notification-param.interface';
 
 export interface Notification {
   id: number;
@@ -6,5 +6,5 @@ export interface Notification {
   notificationTemplateId: number;
   timestamp: Date;
   isRead: boolean;
-  params: NotificationParamInterface[];
+  params: NotificationParamsInterface;
 }

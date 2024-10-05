@@ -239,29 +239,17 @@ export class ProjectService {
         await this.notificationService.addNotification(
           userId,
           NotificationTemplate.USER_PROJECT_ROLE_WAS_CHANGED,
-          [
-            {
-              key: 'projectId',
-              value: projectId.toString(),
-            },
-            {
-              key: 'projectName',
-              value: (
-                await this.prisma.tproject.findUnique({
-                  where: { id: projectId },
-                  select: { name: true },
-                })
-              ).name,
-            },
-            {
-              key: 'role',
-              value: role,
-            },
-            {
-              key: 'prevRole',
-              value: projectUser.role,
-            },
-          ],
+          {
+            projectId: projectId.toString(),
+            projectName: (
+              await this.prisma.tproject.findUnique({
+                where: { id: projectId },
+                select: { name: true },
+              })
+            ).name,
+            role: role,
+            prevRole: projectUser.role,
+          },
           true,
         );
 
@@ -280,25 +268,16 @@ export class ProjectService {
       await this.notificationService.addNotification(
         userId,
         NotificationTemplate.USER_INVITED_TO_PROJECT,
-        [
-          {
-            key: 'projectId',
-            value: projectId.toString(),
-          },
-          {
-            key: 'projectName',
-            value: (
-              await this.prisma.tproject.findUnique({
-                where: { id: projectId },
-                select: { name: true },
-              })
-            ).name,
-          },
-          {
-            key: 'role',
-            value: role,
-          },
-        ],
+        {
+          projectId: projectId.toString(),
+          projectName: (
+            await this.prisma.tproject.findUnique({
+              where: { id: projectId },
+              select: { name: true },
+            })
+          ).name,
+          role: role,
+        },
       );
 
       return { success: true, action: 'ADDED' };
@@ -321,21 +300,15 @@ export class ProjectService {
     await this.notificationService.addNotification(
       userId,
       NotificationTemplate.USER_REMOVED_FROM_PROJECT,
-      [
-        {
-          key: 'projectId',
-          value: projectId.toString(),
-        },
-        {
-          key: 'projectName',
-          value: (
-            await this.prisma.tproject.findUnique({
-              where: { id: projectId },
-              select: { name: true },
-            })
-          ).name,
-        },
-      ],
+      {
+        projectId: projectId.toString(),
+        projectName: (
+          await this.prisma.tproject.findUnique({
+            where: { id: projectId },
+            select: { name: true },
+          })
+        ).name,
+      },
     );
 
     return { success: true };

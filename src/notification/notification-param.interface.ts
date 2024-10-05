@@ -1,4 +1,3 @@
-export interface NotificationParam {
-  key: string;
-  value: string;
+export interface NotificationParams {
+  [key: string]: string;
 }

@@ -1,33 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { Notification as NotificationInterface } from './notification.interface';
-import { NotificationParam as NotificationParamInterface } from './notification-param.interface';
+import { NotificationParams as NotificationParamsInterface } from './notification-param.interface';
 
 @Injectable()
 export class NotificationService {
   constructor(private readonly prisma: PrismaClient) {}
 
+  private parseParams(
+    params: { paramKey: string; paramValue: string }[],
+  ): NotificationParamsInterface {
+    return params.reduce((params, { paramKey, paramValue }) => {
+      params[paramKey] = paramValue;
+      return params;
+    }, {} as NotificationParamsInterface);
+  }
+
   private compareParams(
-    notificationParams: NotificationParamInterface[],
-    params: NotificationParamInterface[],
+    notificationParams: NotificationParamsInterface,
+    params: NotificationParamsInterface,
   ): boolean {
-    if (notificationParams.length !== params.length) {
-      return false;
-    }
+    const notificationKeys = Object.keys(notificationParams).sort();
+    const paramKeys = Object.keys(params).sort();
 
-    const sortedNotificationParams = notificationParams.sort(
-      (a, b) => a.key.localeCompare(b.key) || a.value.localeCompare(b.value),
-    );
-    const sortedParams = params.sort(
-      (a, b) => a.key.localeCompare(b.key) || a.value.localeCompare(b.value),
-    );
+    if (notificationKeys.length !== paramKeys.length) return false;
 
-    for (let i = 0; i < sortedNotificationParams.length; i++)
-      if (
-        sortedNotificationParams[i].key !== sortedParams[i].key ||
-        sortedNotificationParams[i].value !== sortedParams[i].value
-      )
+    for (let i = 0; i < notificationKeys.length; i++) {
+      const key = notificationKeys[i];
+
+      if (key !== paramKeys[i] || notificationParams[key] !== params[key]) {
         return false;
+      }
+    }
 
     return true;
   }
@@ -35,7 +39,7 @@ export class NotificationService {
   async addNotification(
     userId: number,
     notificationTemplateId: number,
-    params: NotificationParamInterface[] = [],
+    params: NotificationParamsInterface = {},
     force: boolean = false,
   ): Promise<number> {
     if (!force) {
@@ -57,12 +61,7 @@ export class NotificationService {
         if (
           notification?.tusernotificationparam &&
           this.compareParams(
-            notification.tusernotificationparam.map(
-              ({ paramKey, paramValue }) => ({
-                key: paramKey,
-                value: paramValue,
-              }),
-            ),
+            this.parseParams(notification.tusernotificationparam),
             params,
           )
         )
@@ -78,10 +77,10 @@ export class NotificationService {
     });
 
     await this.prisma.tusernotificationparam.createMany({
-      data: params.map((param) => ({
+      data: Object.entries(params).map(([key, value]) => ({
         notification_id: id,
-        paramKey: param.key,
-        paramValue: param.value,
+        paramKey: key,
+        paramValue: value,
       })),
     });
 
@@ -117,10 +116,7 @@ export class NotificationService {
       notificationTemplateId: notification.id,
       timestamp: notification.timestamp,
       isRead: notification.isRead,
-      params: params.map((param) => ({
-        key: param.paramKey,
-        value: param.paramValue,
-      })),
+      params: this.parseParams(params),
     };
   }
 
@@ -130,54 +126,42 @@ export class NotificationService {
     from: number = undefined,
     to: number = undefined,
   ): Promise<NotificationInterface[]> {
-    const notifications = await this.prisma.tusernotification.findMany({
-      where: {
-        user_id: userId,
-        isRead,
-      },
-      orderBy: {
-        timestamp: {
-          sort: 'desc',
+    return (
+      await this.prisma.tusernotification.findMany({
+        where: {
+          user_id: userId,
+          isRead,
         },
-      },
-      skip: from,
-      take: from === undefined || to === undefined ? undefined : to - from + 1,
-    });
-
-    const params = notifications.length
-      ? await this.prisma.tusernotificationparam.findMany({
-          where: {
-            OR: notifications.map((notification) => ({
-              notification_id: notification.id,
-            })),
+        orderBy: {
+          timestamp: {
+            sort: 'desc',
           },
-          select: {
-            notification_id: true,
-            paramKey: true,
-            paramValue: true,
+        },
+        select: {
+          id: true,
+          user_id: true,
+          notificationTemplateId: true,
+          timestamp: true,
+          isRead: true,
+          tusernotificationparam: {
+            select: {
+              paramKey: true,
+              paramValue: true,
+            },
           },
-        })
-      : [];
-
-    return notifications.map((notification) => {
-      const notificationOut: NotificationInterface = {
-        id: notification.id,
-        user_id: notification.user_id,
-        notificationTemplateId: notification.notificationTemplateId,
-        timestamp: notification.timestamp,
-        isRead: notification.isRead,
-        params: [],
-      };
-
-      for (const param of params)
-        if (param.notification_id === notification.id)
-          notificationOut.params.push({
-            key: param.paramKey,
-            value: param.paramValue,
-          });
-
-      return notificationOut;
-    });
+        },
+        skip: from,
+        take:
+          from === undefined || to === undefined ? undefined : to - from + 1,
+      })
+    ).map((notification) => ({
+      id: notification.id,
+      user_id: notification.user_id,
+      notificationTemplateId: notification.notificationTemplateId,
+      timestamp: notification.timestamp,
+      isRead: notification.isRead,
+      params: this.parseParams(notification.tusernotificationparam),
+    }));
   }
 
   async getCountOfUnreadNotifications(userId: number) {
