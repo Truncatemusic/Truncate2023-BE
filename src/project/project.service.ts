@@ -28,6 +28,24 @@ export class ProjectService {
     private readonly notificationService: NotificationService,
   ) {}
 
+  async getProjectIdByProjectId(projectId: number) {
+    return (
+      await this.prisma.tproject.findUnique({
+        where: { id: projectId },
+        select: { id: true },
+      })
+    )?.id;
+  }
+
+  async getProjectName(projectId: number) {
+    return (
+      await this.prisma.tproject.findUnique({
+        where: { id: projectId },
+        select: { name: true },
+      })
+    )?.name;
+  }
+
   async getProjects(userId: number) {
     const projectResults = await this.prisma.tproject.findMany({
       where: {
@@ -71,10 +89,10 @@ export class ProjectService {
     return projects;
   }
 
-  async getInfo(id: number) {
+  async getInfo(projectId: number) {
     try {
       const project = await this.prisma.tproject.findUnique({
-        where: { id: id },
+        where: { id: projectId },
       });
 
       return !Number.isInteger(project?.id)

@@ -8,6 +8,7 @@ export class ProjectController {
   constructor(
     private readonly service: ProjectService,
     private readonly authService: AuthService,
+    private readonly projectService: ProjectService,
     private readonly versionService: VersionService,
   ) {}
 
@@ -25,14 +26,28 @@ export class ProjectController {
     @Query('id') id: number,
     @Query('versionId') versionId: number,
   ) {
-    id = versionId
+    const projectId = versionId
       ? await this.versionService.getProjectIdByVersionId(+versionId)
-      : +id;
+      : await this.projectService.getProjectIdByProjectId(+id);
 
-    const userRole = await this.service.getUserRoleBySession(id, request);
-    if (!userRole) return AuthService.INVALID_SESSION_RESPONSE;
+    if (!projectId)
+      return {
+        success: false,
+        reason: 'PROJECT_DOES_NOT_EXIST',
+      };
 
-    return await this.service.getInfo(id);
+    const userRole = await this.service.getUserRoleBySession(
+      projectId,
+      request,
+    );
+    if (!userRole)
+      return {
+        success: false,
+        reason: 'NO_PROJECT_PERMISSION',
+        name: await this.service.getProjectName(projectId),
+      };
+
+    return await this.service.getInfo(projectId);
   }
 
   @Post('create')
@@ -126,7 +141,10 @@ export class ProjectController {
     if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
 
     if (!(await this.service.getUserRole(id, userId)))
-      return AuthService.INVALID_SESSION_RESPONSE;
+      return {
+        success: false,
+        reason: 'NO_PROJECT_PERMISSION',
+      };
 
     return {
       success: true,
