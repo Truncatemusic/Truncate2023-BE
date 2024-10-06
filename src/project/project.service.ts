@@ -149,7 +149,7 @@ export class ProjectService {
     }
 
     if (notification)
-      await this.notificationService.addNotification(
+      this.notificationService.addNotification(
         userId,
         NotificationTemplate.PROJECT_CREATED_SUCCESSFULLY,
         {
@@ -157,7 +157,7 @@ export class ProjectService {
           projectName: project.name,
         },
         true,
-      );
+      ).then();
 
     return {
       success: true,
@@ -268,7 +268,7 @@ export class ProjectService {
         });
 
         if (notification)
-          await this.notificationService.addNotification(
+          this.notificationService.addNotification(
             userId,
             NotificationTemplate.USER_PROJECT_ROLE_WAS_CHANGED,
             {
@@ -283,7 +283,7 @@ export class ProjectService {
               prevRole: projectUser.role,
             },
             true,
-          );
+          ).then();
 
         return { success: true, action: 'UPDATED' };
       }
@@ -298,7 +298,7 @@ export class ProjectService {
 
       // TODO: on rename project: update projectName for params with projectId
       if (notification)
-        await this.notificationService.addNotification(
+        this.notificationService.addNotification(
           userId,
           NotificationTemplate.USER_INVITED_TO_PROJECT,
           {
@@ -311,7 +311,7 @@ export class ProjectService {
             ).name,
             role: role,
           },
-        );
+        ).then();
 
       return { success: true, action: 'ADDED' };
     } catch (_) {
@@ -335,7 +335,7 @@ export class ProjectService {
     });
 
     if (notification)
-      await this.notificationService.addNotification(
+      this.notificationService.addNotification(
         userId,
         NotificationTemplate.USER_REMOVED_FROM_PROJECT,
         {
@@ -347,7 +347,7 @@ export class ProjectService {
             })
           ).name,
         },
-      );
+      ).then();
 
     return { success: true };
   }
