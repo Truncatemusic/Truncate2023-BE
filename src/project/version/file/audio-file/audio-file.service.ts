@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as wav from 'node-wav';
 import * as Mp32Wav from 'mp3-to-wav';
+import { PrismaClient } from '@prisma/client';
 import {
   readFileSync,
   copyFileSync,
@@ -27,6 +28,7 @@ export class AudioFileService {
   }
 
   constructor(
+    private readonly prisma: PrismaClient,
     private readonly audiowaveformService: AudiowaveformService,
     private readonly fileService: FileService,
   ) {}
@@ -88,6 +90,15 @@ export class AudioFileService {
     );
 
     return { waveHash, mp3Hash };
+  }
+
+  async deleteAudioFile(versionId: number, type: string = 'wav') {
+    await this.prisma.tprojectversionfile.deleteMany({
+      where: {
+        projectversion_id: versionId,
+        type,
+      },
+    });
   }
 
   addAudioFile(versionId: number, file: Express.Multer.File) {

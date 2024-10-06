@@ -1,5 +1,6 @@
 import {
   Controller,
+  Body,
   Get,
   HttpStatus,
   Param,
@@ -25,8 +26,43 @@ export class AudioFileController {
     private readonly fileService: FileService,
     private readonly authService: AuthService,
     private readonly storageService: StorageService,
+    private readonly projectService: ProjectService,
     private readonly versionService: VersionService,
   ) {}
+
+  @Post('delete')
+  async deleteAudioFile(
+    @Req() request: Request,
+    @Body() body: { projectId: number; versionNumber: number },
+  ) {
+    if (!(await this.authService.validateSession(request)))
+      return AuthService.INVALID_SESSION_RESPONSE;
+
+    const userRole = await this.projectService.getUserRoleBySession(
+      +body.projectId,
+      request,
+    );
+    if (!userRole)
+      return {
+        success: false,
+        reason: 'NO_PROJECT_PERMISSION',
+      };
+
+    const versionId = await this.versionService.getVersionId(
+      +body.projectId,
+      +body.versionNumber,
+    );
+
+    if (!versionId)
+      return {
+        success: false,
+        reason: 'INVALID_PROJECT_OR_VERSION',
+      };
+
+    await this.service.deleteAudioFile(versionId);
+
+    return { success: true };
+  }
 
   @Post('upload/:projectId/:versionNumber')
   @UseInterceptors(FileInterceptor('file'))
