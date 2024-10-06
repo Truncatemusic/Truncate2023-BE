@@ -24,12 +24,9 @@ export class ProjectController {
   async getInfo(
     @Req() request: Request,
     @Query('id') id: number,
-    @Query('versionId') versionId: number,
+    @Query('versionNumber') versionNumber: number,
   ) {
-    const projectId = versionId
-      ? await this.versionService.getProjectIdByVersionId(+versionId)
-      : await this.projectService.getProjectIdByProjectId(+id);
-
+    const projectId = await this.projectService.getProjectIdByProjectId(+id);
     if (!projectId)
       return {
         success: false,
@@ -47,7 +44,18 @@ export class ProjectController {
         name: await this.service.getProjectName(projectId),
       };
 
-    return await this.service.getInfo(projectId);
+    const info = await this.service.getInfo(projectId);
+
+    versionNumber = +versionNumber;
+    if (
+      !isNaN(versionNumber) &&
+      !info.versions.some((version) => version.versionNumber === versionNumber)
+    ) {
+      info.success = false;
+      info.reason = 'PROJECT_VERSION_DOES_NOT_EXIST';
+    }
+
+    return info;
   }
 
   @Post('create')
