@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { PrismaClient } from '@prisma/client';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
@@ -62,7 +61,6 @@ import { StemsController } from './project/version/file/stems/stems.controller';
     StemsController,
   ],
   providers: [
-    AppService,
     PrismaClient,
     AuthService,
     ProjectService,
