@@ -121,6 +121,7 @@ export class ProjectService {
     name: string,
     songBPM?: number,
     songKey?: string,
+    notification: boolean = true,
   ) {
     if (!name || !String(name).trim())
       return { success: false, reason: 'INVALID_PROJECT_NAME' };
@@ -146,6 +147,17 @@ export class ProjectService {
       console.error(error);
       return { success: false, reason: 'UNKNOWN' };
     }
+
+    if (notification)
+      await this.notificationService.addNotification(
+        userId,
+        NotificationTemplate.PROJECT_CREATED_SUCCESSFULLY,
+        {
+          projectId: project.id.toString(),
+          projectName: project.name,
+        },
+        true,
+      );
 
     return {
       success: true,
