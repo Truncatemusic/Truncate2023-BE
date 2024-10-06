@@ -34,7 +34,7 @@ export class UserController {
     const userId = await this.authService.getUserId(request);
     if (!userId) return AuthService.INVALID_SESSION_RESPONSE;
 
-    const queryId = isNaN(parseInt(id)) ? undefined : parseInt(id);
+    const queryId = isNaN(+id) ? undefined : +id;
 
     if (queryId && queryId !== userId) {
       const isFollowing = await this.service.isUserFollowing(userId, queryId);
