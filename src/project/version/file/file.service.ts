@@ -144,6 +144,8 @@ export class FileService {
     bucketName?: string,
     clear: boolean = true,
   ) {
+    let uploadError: Error | undefined;
+
     const hash =
       typeof bufferOrHash === 'string'
         ? bufferOrHash
@@ -151,7 +153,27 @@ export class FileService {
         ? this.save(bufferOrHash, type)
         : FileService.generateRandomHash();
 
-    if (addToDB && !(await this.existsByHash(versionId, hash, type)))
+    if (upload) {
+      if (!bucketName)
+        bucketName = ProjectService.getBucketName(
+          await this.getProjectIdByFileHash(hash),
+        );
+
+      if (upload !== 'dry') {
+        try {
+          if (!(await this.uploadByHash(bucketName, hash, type)))
+            throw new Error("uploadByHash returned 'false'");
+        } catch (error) {
+          uploadError = error;
+        }
+      }
+    }
+
+    if (
+      addToDB &&
+      !uploadError &&
+      !(await this.existsByHash(versionId, hash, type))
+    )
       await this.prisma.tprojectversionfile.create({
         data: {
           hash,
@@ -160,17 +182,8 @@ export class FileService {
         },
       });
 
-    if (upload) {
-      if (!bucketName)
-        bucketName = ProjectService.getBucketName(
-          await this.getProjectIdByFileHash(hash),
-        );
-
-      if (upload !== 'dry') await this.uploadByHash(bucketName, hash, type);
-    }
-
     if (clear) this.clearByHash(hash, type);
 
-    return { hash, bucketName };
+    return { hash, bucketName, uploadError };
   }
 }
