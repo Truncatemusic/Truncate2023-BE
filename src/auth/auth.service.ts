@@ -49,6 +49,8 @@ export class AuthService {
       });
     }
 
+    this.updateSession(session).then();
+
     return { success: true, session };
   }
 
