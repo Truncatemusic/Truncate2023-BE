@@ -29,7 +29,10 @@ export class StemsController {
         request,
       ))
     )
-      return AuthService.INVALID_SESSION_RESPONSE;
+      return {
+        success: false,
+        reason: 'NO_PROJECT_PERMISSION',
+      };
 
     const versionId = await this.versionService.getVersionId(
       parseInt(String(projectId)),

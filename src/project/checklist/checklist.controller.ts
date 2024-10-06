@@ -25,7 +25,11 @@ export class ChecklistController {
       +projectId,
       request,
     );
-    if (!userRole) return AuthService.INVALID_SESSION_RESPONSE;
+    if (!userRole)
+      return {
+        success: false,
+        reason: 'NO_PROJECT_PERMISSION',
+      };
 
     const versionId = await this.versionService.getVersionId(
       +projectId,
