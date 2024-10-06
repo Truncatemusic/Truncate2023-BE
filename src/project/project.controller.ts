@@ -25,8 +25,11 @@ export class ProjectController {
     @Req() request: Request,
     @Query('id') id: number,
     @Query('versionNumber') versionNumber: number,
+    @Query('versionId') versionId: number,
   ) {
-    const projectId = await this.projectService.getProjectIdByProjectId(+id);
+    const projectId = versionId
+      ? await this.versionService.getProjectIdByVersionId(+versionId)
+      : await this.projectService.getProjectIdByProjectId(+id);
     if (!projectId)
       return {
         success: false,
@@ -46,13 +49,17 @@ export class ProjectController {
 
     const info = await this.service.getInfo(projectId);
 
-    versionNumber = +versionNumber;
-    if (
-      !isNaN(versionNumber) &&
-      !info.versions.some((version) => version.versionNumber === versionNumber)
-    ) {
-      info.success = false;
-      info.reason = 'PROJECT_VERSION_DOES_NOT_EXIST';
+    if (!versionId) {
+      versionNumber = +versionNumber;
+      if (
+        !isNaN(versionNumber) &&
+        !info.versions.some(
+          (version) => version.versionNumber === versionNumber,
+        )
+      ) {
+        info.success = false;
+        info.reason = 'PROJECT_VERSION_DOES_NOT_EXIST';
+      }
     }
 
     return info;
