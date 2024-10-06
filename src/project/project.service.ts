@@ -137,7 +137,7 @@ export class ProjectService {
         songKey,
       );
 
-      await this.addUserToProject(project.id, userId, 'O');
+      await this.addUserToProject(project.id, userId, 'O', false);
 
       await this.storageService.createBucket(
         ProjectService.getBucketName(project.id),
@@ -232,6 +232,7 @@ export class ProjectService {
     projectId: number,
     userId: number,
     role: ProjectUserRole,
+    notification: boolean = true,
   ) {
     try {
       if (!(await this.userService.userExists(userId)))
@@ -254,22 +255,23 @@ export class ProjectService {
           data: { role },
         });
 
-        await this.notificationService.addNotification(
-          userId,
-          NotificationTemplate.USER_PROJECT_ROLE_WAS_CHANGED,
-          {
-            projectId: projectId.toString(),
-            projectName: (
-              await this.prisma.tproject.findUnique({
-                where: { id: projectId },
-                select: { name: true },
-              })
-            ).name,
-            role: role,
-            prevRole: projectUser.role,
-          },
-          true,
-        );
+        if (notification)
+          await this.notificationService.addNotification(
+            userId,
+            NotificationTemplate.USER_PROJECT_ROLE_WAS_CHANGED,
+            {
+              projectId: projectId.toString(),
+              projectName: (
+                await this.prisma.tproject.findUnique({
+                  where: { id: projectId },
+                  select: { name: true },
+                })
+              ).name,
+              role: role,
+              prevRole: projectUser.role,
+            },
+            true,
+          );
 
         return { success: true, action: 'UPDATED' };
       }
@@ -283,20 +285,21 @@ export class ProjectService {
       });
 
       // TODO: on rename project: update projectName for params with projectId
-      await this.notificationService.addNotification(
-        userId,
-        NotificationTemplate.USER_INVITED_TO_PROJECT,
-        {
-          projectId: projectId.toString(),
-          projectName: (
-            await this.prisma.tproject.findUnique({
-              where: { id: projectId },
-              select: { name: true },
-            })
-          ).name,
-          role: role,
-        },
-      );
+      if (notification)
+        await this.notificationService.addNotification(
+          userId,
+          NotificationTemplate.USER_INVITED_TO_PROJECT,
+          {
+            projectId: projectId.toString(),
+            projectName: (
+              await this.prisma.tproject.findUnique({
+                where: { id: projectId },
+                select: { name: true },
+              })
+            ).name,
+            role: role,
+          },
+        );
 
       return { success: true, action: 'ADDED' };
     } catch (_) {
@@ -304,7 +307,11 @@ export class ProjectService {
     }
   }
 
-  async removeUserFromProject(projectId: number, userId: number) {
+  async removeUserFromProject(
+    projectId: number,
+    userId: number,
+    notification: boolean = true,
+  ) {
     if (!(await this.userService.userExists(userId)))
       return { success: false, reason: 'USER_DOES_NOT_EXIST' };
 
@@ -315,19 +322,20 @@ export class ProjectService {
       },
     });
 
-    await this.notificationService.addNotification(
-      userId,
-      NotificationTemplate.USER_REMOVED_FROM_PROJECT,
-      {
-        projectId: projectId.toString(),
-        projectName: (
-          await this.prisma.tproject.findUnique({
-            where: { id: projectId },
-            select: { name: true },
-          })
-        ).name,
-      },
-    );
+    if (notification)
+      await this.notificationService.addNotification(
+        userId,
+        NotificationTemplate.USER_REMOVED_FROM_PROJECT,
+        {
+          projectId: projectId.toString(),
+          projectName: (
+            await this.prisma.tproject.findUnique({
+              where: { id: projectId },
+              select: { name: true },
+            })
+          ).name,
+        },
+      );
 
     return { success: true };
   }
