@@ -76,8 +76,8 @@ export class AudioFileController {
       return AuthService.INVALID_SESSION_RESPONSE;
 
     const versionId = await this.versionService.getVersionId(
-      parseInt(String(projectId)),
-      parseInt(String(versionNumber)),
+      +projectId,
+      +versionNumber,
     );
     if (!versionId)
       return { success: false, reason: 'INVALID_PROJECT_OR_VERSION' };
