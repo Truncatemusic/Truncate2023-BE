@@ -87,36 +87,6 @@ export class AudioFileController {
     };
   }
 
-  /* WARNING: DEPRECATED
-
-  @Get('stream/:type/:hash')
-  async getAudio(
-    @Req() request: Request,
-    @Res() response: Response,
-    @Param('type') type: string,
-    @Param('hash') hash: string,
-  ) {
-    const userId = await this.authService.getUserId(request);
-    if (!userId) return response.status(HttpStatus.UNAUTHORIZED).send();
-
-    const { role, file } = await this.service.getUserFileAndRoleByFileHash(
-      hash,
-      userId,
-    );
-    if (!role) return response.status(HttpStatus.UNAUTHORIZED).send();
-    if (!file) return response.status(HttpStatus.NOT_FOUND).send();
-
-    response.redirect(
-      await this.storageService.getFileTmpURL(
-        ProjectService.getBucketName(
-          await this.service.getProjectIdByFileHash(file.hash),
-        ),
-        FileService.getFileNameByHash(file.hash, type || file.type),
-      ),
-    );
-  }
-  */
-
   @Get('waveformData/:hash')
   async getwaveformData(
     @Req() request: Request,
